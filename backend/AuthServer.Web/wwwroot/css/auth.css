@@ -1,0 +1,160 @@
+﻿html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+:root {
+  color-scheme: light;
+  --border-color: #d3d3d3;
+  --input-bg: #f1f1f1;
+  --background: #fafafa;
+  --on-background: #181818;
+  --surface: #f4f4f4;
+  --on-surface: #181818;
+  --primary: #181818;
+  --on-primary: #fafafa;
+  --secondary: #ececec;
+  --on-secondary: #181818;
+  --tertiary: #c1aa7b;
+  --on-tertiary: #181818;
+  --error: #b00020;
+  --on-error: #ffffff;
+  --info: #2196f3;
+  --on-info: #ffffff;
+  --success: #4caf50;
+  --on-success: #ffffff;
+  --warning: #fb8c00;
+  --on-warning: #ffffff;
+  --border-hover: #b8b8b8;
+  --focus-color: var(--primary);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --border-color: #3a3a3a;
+    --input-bg: #2a2a2a;
+    --background: #181818;
+    --on-background: #f3f3f3;
+    --surface: #1f1f1f;
+    --on-surface: #f3f3f3;
+    --primary: #d3d3d3;
+    --on-primary: #181818;
+    --secondary: #3a3a3a;
+    --on-secondary: #e6e6e6;
+    --tertiary: #c1aa7b;
+    --on-tertiary: #181818;
+    --error: #cf6679;
+    --on-error: #181818;
+    --info: #64b5f6;
+    --on-info: #181818;
+    --success: #81c784;
+    --on-success: #181818;
+    --warning: #ffb74d;
+    --on-warning: #181818;
+    --border-hover: #555555;
+    --focus-color: var(--primary);
+  }
+}
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  color: var(--on-background);
+  background: var(--background);
+}
+.page {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 200px;
+}
+.card {
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--on-surface);
+}
+.card-header {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+}
+p {
+  margin: 0;
+}
+.card-body {
+  padding: 24px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  font: inherit;
+  color: var(--on-surface);
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+input[type="email"]:hover,
+input[type="text"]:hover,
+input[type="password"]:hover {
+  border-color: var(--border-hover);
+}
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: var(--focus-color);
+}
+.btn {
+  height: 48px;
+  margin-top: 4px;
+  font: inherit;
+  font-weight: 600;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.05s ease;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.btn.btn-secondary {
+  background: var(--secondary);
+  color: var(--on-secondary);
+}
+.btn.login,
+.btn.send-link {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}

@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/roboto';
+
+@theme {
+	--font-sans: 'Roboto Variable', sans-serif;
+}
+
+/* Otetaan käyttöön vain omat teemat (ei daisyUI:n valmiita) */
+@plugin 'daisyui' {
+	themes: false;
+}
+
+/* ============ VAALEA TEEMA ============ */
+@plugin 'daisyui/theme' {
+	name: 'auth-light';
+	default: true;
+	color-scheme: light;
+
+	/* Taustat: base-100 = sivu ja kortit, base-200 = sivupalkki ja yläpalkki, base-300 = reunat */
+	--color-base-100: #ffffff;
+	--color-base-200: #ebebeb;
+	--color-base-300: #d6d6d6;
+	--color-base-content: #181818;
+
+	--color-primary: #181818;
+	--color-primary-content: #ffffff;
+	--color-secondary: #eeeeee;
+	--color-secondary-content: #181818;
+	--color-accent: #c1aa7b;
+	--color-accent-content: #181818;
+	--color-neutral: #3a3a3a;
+	--color-neutral-content: #ffffff;
+
+	--color-info: #2196f3;
+	--color-info-content: #ffffff;
+	--color-success: #4caf50;
+	--color-success-content: #ffffff;
+	--color-warning: #fb8c00;
+	--color-warning-content: #181818;
+	--color-error: #b00020;
+	--color-error-content: #ffffff;
+
+	/* Pyöristykset ja reunat */
+	--radius-selector: 0.5rem;
+	--radius-field: 0.5rem;
+	--radius-box: 0.75rem;
+	--size-selector: 0.25rem;
+	--size-field: 0.25rem;
+	--border: 1px;
+	--depth: 1;
+	--noise: 0;
+}
+
+/* ============ TUMMA TEEMA ============ */
+@plugin 'daisyui/theme' {
+	name: 'auth-dark';
+	prefersdark: true;
+	color-scheme: dark;
+
+	--color-base-100: #1f1f1f;
+	--color-base-200: #262626;
+	--color-base-300: #303030;
+	--color-base-content: #f3f3f3;
+
+	--color-primary: #d3d3d3;
+	--color-primary-content: #181818;
+	--color-secondary: #3a3a3a;
+	--color-secondary-content: #e6e6e6;
+	--color-accent: #c1aa7b;
+	--color-accent-content: #181818;
+	--color-neutral: #3a3a3a;
+	--color-neutral-content: #e6e6e6;
+
+	--color-info: #64b5f6;
+	--color-info-content: #181818;
+	--color-success: #81c784;
+	--color-success-content: #181818;
+	--color-warning: #ffb74d;
+	--color-warning-content: #181818;
+	--color-error: #c0324c;
+	--color-error-content: #ffffff;
+
+	--radius-selector: 0.5rem;
+	--radius-field: 0.5rem;
+	--radius-box: 0.75rem;
+	--size-selector: 0.25rem;
+	--size-field: 0.25rem;
+	--border: 1px;
+	--depth: 1;
+	--noise: 0;
+}
+.input:focus,
+.input:focus-within,
+.textarea:focus,
+.select:focus {
+	outline: none;
+	border-color: var(--color-neutral);
+	box-shadow: 0 0 0 1px var(--color-neutral);
+}
+.validator:user-valid {
+	--input-color: var(--color-base-300);
+}
+
+.validator.input-error {
+	--input-color: var(--color-error);
+}
+:root:not([data-theme='dark'])
+	.table
+	:is(thead tr :is(td, th), tbody tr:not(:last-child) :is(td, th)) {
+	border-bottom-color: color-mix(in oklch, var(--color-base-content) 15%, transparent);
+}
+.list .list-row::after {
+	border-color: var(--color-base-300);
+}
+
+.label:not(.text-error) {
+	color: color-mix(in oklab, var(--color-base-content) 80%, transparent);
+}

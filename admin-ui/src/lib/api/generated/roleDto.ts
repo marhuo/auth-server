@@ -1,0 +1,12 @@
+/**
+ * This is a TypeGen auto-generated file.
+ * Any changes made to this file can be lost when this file is regenerated.
+ */
+
+export interface RoleDto {
+    id: string;
+    name: string;
+    description: string;
+    resourceServerId: string;
+    createdAt: string;
+}
