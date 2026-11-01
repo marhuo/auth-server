@@ -1,0 +1,12 @@
+﻿@page
+@model AuthServer.Web.Pages.LoginModel
+<div class="card">
+    <h1 class="card-header">@(ViewData["Title"] ?? "AuthServer")</h1>
+    <form method="post" class="card-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input asp-for="ReturnUrl" type="hidden" />
+        <input asp-for="Username" type="text" placeholder="Käyttäjätunnus" autocomplete="username" autofocus required />
+        <input asp-for="Password" type="password" placeholder="Salasana" autocomplete="current-password" required />
+        <button class="btn btn-primary" type="submit">Kirjaudu</button>
+    </form>
+</div>

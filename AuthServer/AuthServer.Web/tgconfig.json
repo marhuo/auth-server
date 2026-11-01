@@ -1,0 +1,15 @@
+﻿{
+  "clearOutputDirectory": true,
+  "outputPath": "../../admin-ui/src/lib/api/generated",
+  "createIndexFile": true,
+  "csNullableTranslation": "null",
+  "fileNameConverters": [ "PascalCaseToCamelCase" ],
+  "propertyNameConverters": [ "PascalCaseToCamelCase" ],
+  "generationSpecs": [ "AdminUiGenerationSpec" ],
+  "generateFromAssemblies": false,
+  "useImportType": true,
+  "customTypeMappings": {
+    "System.DateTime": "string",
+    "System.DateTimeOffset": "string"
+  }
+}
