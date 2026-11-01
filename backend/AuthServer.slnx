@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/demos/">
+    <Project Path="../demos/Muistio/Muistio.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="BannedSymbols.txt" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="AuthServer.Application/AuthServer.Application.csproj" Id="a5cf323f-11a4-4f14-b1b2-0c23ae845fd7" />
+  <Project Path="AuthServer.Domain/AuthServer.Domain.csproj" Id="6204cb2c-acb4-4706-89a6-1cdc668df734" />
+  <Project Path="AuthServer.Infrastructure/AuthServer.Infrastructure.csproj" Id="eedd601c-75e8-4711-afb6-63e3ea91be27" />
+  <Project Path="AuthServer.Web/AuthServer.Web.csproj" />
+</Solution>

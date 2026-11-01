@@ -1,0 +1,36 @@
+@page
+@model KayttajatModel
+@{
+    ViewData["Title"] = "Käyttäjät";
+}
+
+<div class="card">
+    <h1>Kutsu käyttäjä</h1>
+    <form method="post">
+        <label for="email">Sähköposti</label>
+        <input id="email" type="email" asp-for="Email" required />
+
+        @if (Model.Error is not null)
+        {
+            <p class="error">@Model.Error</p>
+        }
+        @if (Model.InvitedEmail is not null)
+        {
+            <p>
+                <strong>@Model.InvitedEmail</strong> sai roolin <code>@Roles.User</code>.
+                Uuden käyttäjän kutsulinkki löytyy autentikointipalvelimen lokista (rivi <code>Invite for @Model.InvitedEmail</code>).
+            </p>
+        }
+
+        <button type="submit">Kutsu käyttäjäksi</button>
+    </form>
+</div>
+
+<div class="explain">
+    <h2>Mitä tässä tapahtuu</h2>
+    <ul>
+        <li>Sivu näkyy vain roolille <code>@Roles.Admin</code>. Muistio päättää sen itse.</li>
+        <li>Muistio kutsuu <code>POST api/user/invite</code>: tenantti on sinun tokenisi <code>tenant_id</code>, rooli <code>@Roles.User</code>.</li>
+        <li>Kokeile: kirjaudu ulos, kirjaudu kutsuttuna. Laskutus-sivulla ei ole Osta-nappia, koska roolisi on <code>@Roles.User</code>.</li>
+    </ul>
+</div>

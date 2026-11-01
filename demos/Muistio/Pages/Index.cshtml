@@ -1,0 +1,27 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Etusivu";
+}
+
+<div class="card">
+    <h1>Muistio</h1>
+    <p>Muistiinpanot koko tiimille. Kokeile ilmaiseksi, osta kun olet valmis.</p>
+
+    @if (Model.Error is not null)
+    {
+        <p class="error">@Model.Error</p>
+    }
+
+    <a class="button" href="/Rekisteroidy">Kokeile ilmaiseksi</a>
+    <a class="button secondary" href="/Kirjaudu">Kirjaudu</a>
+</div>
+
+<div class="explain">
+    <h2>Mitä tässä tapahtuu</h2>
+    <p>Tämä on tuotteen kotisivu. Napit ovat pelkkiä linkkejä:</p>
+    <ul>
+        <li><strong>Kokeile</strong> vie autentikointipalvelimen rekisteröitymissivulle (tunnuksen luonti), <strong>Kirjaudu</strong> sen kirjautumissivulle.</li>
+        <li>Jos sinulla ei vielä ole työtilaa Muistiossa, Muistio pyytää luomaan sellaisen. Muuten pääset suoraan työtilaasi. Jos kuulut useaan työtilaan, valitset autentikointipalvelimella, minkä työtilan sisällä toimit.</li>
+    </ul>
+</div>

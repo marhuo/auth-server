@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="react-ui/react-ui.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="ReactDemo.Api/ReactDemo.Api.csproj" />
+</Solution>

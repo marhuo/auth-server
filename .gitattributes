@@ -1,0 +1,4 @@
+# Admin UI: LF on disk on every machine (matches Prettier's default endOfLine)
+admin-ui/** text=auto eol=lf
+# TypeGen writes CRLF on every build; match it so the generated files do not show as modified
+admin-ui/src/lib/api/generated/** text eol=crlf

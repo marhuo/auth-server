@@ -1,0 +1,13 @@
+﻿@page
+@{
+    ViewData["Title"] = "Pääsy evätty";
+}
+<div class="card">
+    <h1 class="card-header">Pääsy evätty</h1>
+    <div class="card-body">
+        <p>Sinulla ei ole oikeutta tälle sivulle.</p>
+        <form method="get" asp-page="/Logout">
+            <button class="btn btn-primary" type="submit">Kirjaudu ulos</button>
+        </form>
+    </div>
+</div>
