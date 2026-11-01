@@ -1,0 +1,12 @@
+﻿@page
+@model AuthServer.Web.Pages.SelectTenantModel
+<div class="card">
+    <h1 class="card-header">Valitse yritys</h1>
+    <form method="post" class="card-body">
+        <input asp-for="ReturnUrl" type="hidden" />
+        @foreach (var tenant in Model.Tenants)
+        {
+            <button class="btn btn-primary" type="submit" name="tenantId" value="@tenant.Id">@tenant.Name</button>
+        }
+    </form>
+</div>

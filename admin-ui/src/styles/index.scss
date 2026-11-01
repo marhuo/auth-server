@@ -1,0 +1,61 @@
+//index.scss
+a {
+  color: rgb(var(--v-theme-primary));
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.v-table thead {
+  th {
+    font-weight: 600 !important;
+  }
+}
+h1 {
+  font-size: 1.5em;
+  margin-block-end: 16px;
+  margin-block-start: 6px;
+}
+h2 {
+  font-size: 1em;
+}
+.v-breadcrumbs {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  margin-left: 0;
+  padding-left: 0;
+}
+.v-form {
+  &.stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    .v-btn {
+      margin-top: 20px;
+      align-self: flex-start;
+    }
+  }
+}
+.v-breadcrumbs-item--link {
+  text-decoration: underline;
+}
+a.v-btn:hover {
+  text-decoration: none;
+}
+.page {
+  max-width: 900px;
+}
+.not-found {
+  margin-top: 40px;
+}
+.v-list {
+  &.details {
+    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    .v-list-item-subtitle {
+      margin-bottom: 4px;
+    }
+  }
+}

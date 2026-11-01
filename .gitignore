@@ -1,0 +1,25 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# Editorit
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Salaisuudet
+appsettings.Development.json
+appsettings.*.local.json
+*.pfx
+*.key
+*.pem
+.env
+.env.*

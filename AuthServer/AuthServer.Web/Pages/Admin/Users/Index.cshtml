@@ -1,0 +1,198 @@
+﻿@page
+@model AuthServer.Web.Pages.Admin.Users.IndexModel
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Users</h2>
+
+    <button class="btn btn-secondary">
+        Add user
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+
+        <div class="input-group" style="max-width: 350px;">
+            <input type="search"
+                   class="form-control"
+                   placeholder="Search users...">
+
+            <button class="btn btn-secondary" type="button">
+                Search
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Phone number</th>
+                        <th>Roles</th>
+                        <th>Enabled</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>admin</td>
+                        <td>admin@example.com</td>
+                        <td>+358 40 123 4567</td>
+                        <td>
+                            <span class="badge text-bg-dark">Admin</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>matti.meikalainen</td>
+                        <td>matti@example.com</td>
+                        <td>+358 40 234 5678</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>maija.virtanen</td>
+                        <td>maija@example.com</td>
+                        <td>+358 50 345 6789</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                            <span class="badge text-bg-info">Manager</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>pekka.korhonen</td>
+                        <td>pekka@example.com</td>
+                        <td>+358 44 456 7890</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-danger">Disabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>anna.lahtinen</td>
+                        <td>anna@example.com</td>
+                        <td>+358 45 567 8901</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>jari.nieminen</td>
+                        <td>jari@example.com</td>
+                        <td>+358 40 678 9012</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                            <span class="badge text-bg-info">Manager</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>liisa.salo</td>
+                        <td>liisa@example.com</td>
+                        <td>+358 50 789 0123</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>ville.heikkinen</td>
+                        <td>ville@example.com</td>
+                        <td>+358 44 890 1234</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-danger">Disabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>emilia.makinen</td>
+                        <td>emilia@example.com</td>
+                        <td>+358 45 901 2345</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>antti.lehtonen</td>
+                        <td>antti@example.com</td>
+                        <td>+358 40 012 3456</td>
+                        <td>
+                            <span class="badge text-bg-secondary">User</span>
+                            <span class="badge text-bg-info">Manager</span>
+                            <span class="badge text-bg-info">Manager</span>
+                            <span class="badge text-bg-info">Manager</span>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-success">Enabled</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>

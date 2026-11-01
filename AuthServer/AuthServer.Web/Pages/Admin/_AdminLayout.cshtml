@@ -1,0 +1,90 @@
+﻿@{
+    var path = Context.Request.Path;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Server</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
+</head>
+
+<body class="d-flex flex-column min-vh-100 bg-body">
+    <header>
+        <nav class="navbar bg-dark border-bottom">
+            <div class="container-fluid">
+
+                <span class="navbar-brand text-white d-flex align-items-center gap-2">
+                    <img src="~/logo-32x32.png"
+                         alt="Auth Server"
+                         width="32"
+                         height="32">
+
+                    Auth Server
+                </span>
+
+                <a class="btn btn-outline-secondary"
+                   asp-page="/Logout">
+                    Log out
+                </a>
+
+            </div>
+        </nav>
+    </header>
+
+    <div class="d-flex flex-grow-1">
+        <aside class="border-end p-3" style="width: 200px;">
+            <nav class="nav flex-column">
+                <a class="nav-link @(path.StartsWithSegments("/Admin/Users/Index") ? "active" : "")"
+                   asp-page="/Admin/Users">
+                    Users
+                </a>
+
+                <a class="nav-link @(path.StartsWithSegments("/Admin/Clients") ? "active" : "")"
+                   asp-page="/Admin/Clients">
+                    Clients
+                </a>
+
+                <a class="nav-link @(path.StartsWithSegments("/Admin/Roles") ? "active" : "")"
+                   asp-page="/Admin/Roles">
+                    Roles
+                </a>
+                 
+                <a class="nav-link @(path.StartsWithSegments("/Admin/Scopes") ? "active" : "")"
+                   asp-page="/Admin/Scopes">
+                    Scopes
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-grow-1 p-4">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <footer class="border-top text-muted py-3">
+        <div class="container-fluid">
+            &copy; 2026 - AuthServer
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+            const darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            document.documentElement.setAttribute(
+                'data-bs-theme',
+                darkMode ? 'dark' : 'light'
+            );
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
