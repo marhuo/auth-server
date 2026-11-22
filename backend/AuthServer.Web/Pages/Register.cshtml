@@ -17,6 +17,7 @@
                 <input asp-for="ReturnUrl" type="hidden" />
                 <p>Anna sähköpostiosoitteesi, niin lähetämme linkin salasanan asettamiseen.</p>
                 <input asp-for="Email" type="email" placeholder="Sähköposti" autocomplete="username" autofocus required />
+                <partial name="_Turnstile" />
                 <button class="btn btn-primary send-link" type="submit">Jatka</button>
                 <p>Onko sinulla jo tunnus? <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Kirjaudu</a></p>
             </form>

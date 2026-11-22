@@ -1,0 +1,6 @@
+@using AuthServer.Web.Captcha
+@using Microsoft.Extensions.Options
+@inject IOptions<TurnstileOptions> Turnstile
+@* Cloudflare Turnstile widget. It adds the field cf-turnstile-response to the form (TurnstileVerifier). *@
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<div class="cf-turnstile" data-sitekey="@Turnstile.Value.SiteKey" data-language="fi"></div>

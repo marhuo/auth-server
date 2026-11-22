@@ -36,6 +36,7 @@ builder.Services.Configure<AuthTokenOptions>(builder.Configuration.GetSection("T
 builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddRateLimits();
+builder.Services.AddTurnstile(builder.Configuration);
 builder.Services.AddCorsPolicy();
 
 var app = builder.Build();

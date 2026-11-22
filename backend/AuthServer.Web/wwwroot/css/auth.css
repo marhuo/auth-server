@@ -149,6 +149,17 @@ input[type="password"]:focus {
   border-color: var(--color-neutral);
   box-shadow: 0 0 0 1px var(--color-neutral);
 }
+/* Form errors (asp-validation-summary). Hidden when there are none. */
+.text-danger {
+  color: var(--color-error);
+}
+.validation-summary-valid {
+  display: none;
+}
+.validation-summary-errors ul {
+  margin: 0;
+  padding-left: 20px;
+}
 .btn {
   box-sizing: border-box;
   display: inline-flex;

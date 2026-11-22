@@ -116,6 +116,7 @@ Autentikointipalvelin ei tiedä maksuista mitään.
 - [ ] Rekisteröitymissivu: `prompt=create`, sähköpostin vahvistuskoodi ennen käyttäjän luontia, salasana
 - [ ] Kirjautuminen käyttäjälle, jolla ei vielä ole yhtään tenanttia (tuotteen onboarding tarvitsee tämän)
 - [ ] Kirjautumistietojen päivitys, kun tuote on juuri luonut uuden tenantin (vaihe 5)
+- [ ] Google-kirjautuminen: suunnitelma [google-kirjautuminen.md](google-kirjautuminen.md)
 
 ## 9. Seuraava askel: demotuote "Razor Pages demo"
 
@@ -155,7 +156,19 @@ Kumpikaan ei ole tietoturvaongelma: sähköposti on aina vahvistettu, joten tunn
 - Auth0, Okta ja Microsoft eivät normalisoi plus-osoitteita.
 - Plus-osoitteita käytetään laillisesti (testaus, roskapostin suodatus).
 
-Jos kokeilujen väärinkäytöstä tulee ongelma, tuote voi tallentaa erillisen kanonisen osoitteen, jota käytetään vain kokeilujen rajoittamiseen. Kirjautuminen ei muutu.
+**Miksi plus-merkkiä ei estetä tuotannossakaan:** esto ei estä useita tunnuksia. Uuden Gmail-tilin luominen vie pari minuuttia, kertakäyttöisiä sähköpostipalveluja on tuhansia, ja omalla domainilla voi luoda rajattomasti osoitteita. Esto pysäyttäisi vain laiskimmat, mutta haittaisi plus-osoitteiden laillisia käyttäjiä.
+
+Muut palvelut eivät yritä estää tunnuksia, vaan rajoittavat sitä, **mitä uudesta tunnuksesta saa**. Tunnus itsessään on vaaraton, ja väärinkäyttö kohdistuu ilmaiseen etuun:
+
+| Etu | Tyypillinen suojaus |
+|---|---|
+| Ilmainen kokeilu | Kokeiluun vaaditaan maksukortti. Stripe tunnistaa saman kortin (*card fingerprint*), vaikka tunnus olisi eri. |
+| Ilmaiset krediitit tai suositusbonus | Puhelinnumeron vahvistus, kortti tai käsintarkistus |
+| Roskapostitus tai botit | Rekisteröitymisten rajoitus IP:n mukaan, CAPTCHA, kertakäyttöosoitteiden estolista |
+
+Tässä järjestelmässä ainoa etu on ilmainen kokeilu, joten väärinkäyttö ratkaistaan tuotteessa kokeilun ehdoilla (ks. avoin kysymys kokeilujaksosta, osio 12). Jos kokeiluun vaaditaan kortti, plus-tunnuksista ei ole hyötyä. Tarvittaessa tuote voi myös tallentaa erillisen kanonisen osoitteen, jota käytetään vain kokeilujen rajoittamiseen. Kirjautuminen ei muutu.
+
+Auth serverissä on jo IP-rajoitus: rekisteröityminen ja "Unohtunut salasana" saavat kumpikin lähettää enintään 10 sähköpostia samasta IP-osoitteesta 15 minuutissa (`RateLimitSetup`).
 
 ## 12. Avoimet kysymykset
 
