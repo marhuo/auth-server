@@ -117,13 +117,13 @@ Autentikointipalvelin ei tiedä maksuista mitään.
 - [ ] Kirjautuminen käyttäjälle, jolla ei vielä ole yhtään tenanttia (tuotteen onboarding tarvitsee tämän)
 - [ ] Kirjautumistietojen päivitys, kun tuote on juuri luonut uuden tenantin (vaihe 5)
 
-## 9. Seuraava askel: demotuote "Muistio"
+## 9. Seuraava askel: demotuote "Razor Pages demo"
 
 Abstrakti keskustelu ei ole selventänyt asiaa, joten logiikka tehdään näkyväksi demolla (`demos/`-kansioon).
 
 - Yksi ASP.NET Core -projekti, Razor Pages (ei Reactia). Kirjautuminen OIDC:llä tähän autentikointipalvelimeen.
 - Oma pieni kanta: `Subscription (TenantId, Status)`.
-- Sivut: Etusivu (Kokeile / Kirjaudu), Aloitus (yrityksen nimi → `POST api/tenant`, rooli `muistio_admin`), Sovellus (tenantin nimi, oma rooli, tilauksen tila), Laskutus (Osta vain adminille), Käyttäjät (kutsu roolilla `muistio_user`).
+- Sivut: Etusivu (Kokeile / Kirjaudu), Aloitus (yrityksen nimi → `POST api/tenant`, rooli `razor_pages_demo_tenant_admin`), Sovellus (tenantin nimi, oma rooli, tilauksen tila), Laskutus (Osta vain adminille), Käyttäjät (kutsu roolilla `razor_pages_demo_user`).
 
 Vaiheet:
 1. Ilman Stripeä: Osta merkitsee tilauksen suoraan maksetuksi. Rekisteröitymisen tilalla Liisan tunnus luodaan nykyisellä kutsulla. Ei muutoksia autentikointipalvelimeen.
@@ -136,11 +136,28 @@ Clientin resurssipalvelin tarkoittaa aina **kohdetta**, jota client käyttää. 
 
 - Kun resurssipalvelin luodaan, autentikointipalvelin luo samalla sille clientin autentikointipalvelimen API:n (`Controllers/Api/`) kutsumista varten: kone-client, kohde `auth-server`, scope `auth_server:api`.
 - Resurssipalvelimeen ei tallenneta tietoa clientista. Client ei siis kerro, minkä tuotteen client se on.
-- `Api/`-rajapinta saa antaa minkä tahansa tuotteen rooleja, mutta ei koskaan autentikointipalvelimen rooleja. **On kutsujan vastuulla antaa oikea rooli** (esim. Muistio antaa `muistio_admin`). Kaikki tuotteet ovat omia, joten niiden ei tarvitse suojautua toisiltaan.
+- `Api/`-rajapinta saa antaa minkä tahansa tuotteen rooleja, mutta ei koskaan autentikointipalvelimen rooleja. **On kutsujan vastuulla antaa oikea rooli** (esim. Razor Pages -demo antaa `razor_pages_demo_tenant_admin`). Kaikki tuotteet ovat omia, joten niiden ei tarvitse suojautua toisiltaan.
 
-Toteutettu 19.11.2026: resurssipalvelimen luonti luo clientin `<audience>-backend` (admin antaa salaisuuden luontilomakkeessa), `Api/`-rajapinta hyväksyy minkä tahansa tuotteen roolit nimellä, ja Muistion client on `muistio-backend`, jonka kohde on `auth-server`.
+Toteutettu 19.11.2026: resurssipalvelimen luonti luo clientin `<audience>-backend` (admin antaa salaisuuden luontilomakkeessa), `Api/`-rajapinta hyväksyy minkä tahansa tuotteen roolit nimellä, ja Razor Pages -demon client on `razor-pages-demo-backend`, jonka kohde on `auth-server`.
 
-## 11. Avoimet kysymykset
+## 11. Päätös: yrityksen domain ja plus-osoitteet (22.11.2026)
+
+Kumpikaan ei ole tietoturvaongelma: sähköposti on aina vahvistettu, joten tunnuksen luoja omistaa osoitteen. Molemmat ovat liiketoimintakysymyksiä. **Ei muutoksia nyt.**
+
+**Yrityksen domain.** Kun Acmella on jo tenantti ja `ville@acme.com` painaa "Kokeile ilmaiseksi", hän saa oman erillisen tenantin eikä päädy Acmen tenanttiin. Tämä hyväksytään, ja Slack, Notion ja Atlassian toimivat oletuksena samoin. Haittana on, että isolle asiakkaalle voi syntyä tenantteja, joista sen ylläpitäjä ei tiedä.
+
+- Myöhemmin: asiakkaan ylläpitäjä vahvistaa domainin (DNS-tietue). Sen jälkeen `@acme.com`-käyttäjälle näytetään tenantin luonnin sijaan "Liity Acmeen" tai "Pyydä pääsyä". Tämä on yritysominaisuus, jota ei tarvita alussa.
+- Tarkistus kuuluu kohtaan "Luo tenantti" (tuote tai `POST api/tenant`), ei rekisteröitymiseen.
+
+**Gmailin plus-osoitteet.** `jaana@gmail.com`, `jaana+1@gmail.com` ja `j.a.a.n.a@gmail.com` ovat sama postilaatikko, joten yksi ihminen voi luoda useita tunnuksia ja kokeiluja. Kirjautumissähköpostia **ei normalisoida**:
+
+- Säännöt riippuvat palveluntarjoajasta (Gmail ohittaa pisteet, Outlook ei), ja arvaus voisi yhdistää kaksi eri ihmistä samaksi käyttäjäksi.
+- Auth0, Okta ja Microsoft eivät normalisoi plus-osoitteita.
+- Plus-osoitteita käytetään laillisesti (testaus, roskapostin suodatus).
+
+Jos kokeilujen väärinkäytöstä tulee ongelma, tuote voi tallentaa erillisen kanonisen osoitteen, jota käytetään vain kokeilujen rajoittamiseen. Kirjautuminen ei muutu.
+
+## 12. Avoimet kysymykset
 
 - Ostovaltuus: riittääkö tuotteen admin-rooli (`abc_admin`), vai tarvitaanko erillinen tuoterooli?
 - Kokeilujakso: ilman korttia (oma logiikka) vai Stripen trial kortin kanssa?

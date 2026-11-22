@@ -1,6 +1,6 @@
 <Solution>
   <Folder Name="/demos/">
-    <Project Path="../demos/Muistio/Muistio.csproj" />
+    <Project Path="../demos/RazorPagesDemo/RazorPagesDemo.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

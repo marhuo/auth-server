@@ -15,4 +15,5 @@ export interface ClientCreateRequest {
     redirectUris: string[];
     postLogoutRedirectUris: string[];
     scopeIds: string[];
+    initiateLoginUri: string | null;
 }

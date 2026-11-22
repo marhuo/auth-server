@@ -1,0 +1,31 @@
+@page
+@model CreateTenantModel
+@{
+    ViewData["Title"] = "Luo tenantti";
+}
+
+<div class="card">
+    <h1>Tervetuloa, @User.Email()</h1>
+    <p>Sinulla ei vielä ole tenanttia sovelluksessa. Anna sille nimi, niin pääset alkuun.</p>
+    <form method="post">
+        <label for="name">Yrityksen tai tiimin nimi</label>
+        <input id="name" type="text" asp-for="Name" required />
+
+        @if (Model.Error is not null)
+        {
+            <p class="error">@Model.Error</p>
+        }
+
+        <button type="submit">Luo tenantti</button>
+    </form>
+</div>
+
+<div class="explain">
+    <h2>Mitä tässä tapahtuu</h2>
+    <ol>
+        <li>Olet kirjautunut, mutta tokenissasi ei ole <code>tenant_id</code>:tä, koska sinulla ei vielä ole tenanttia sovelluksessa. Siksi päädyit tälle sivulle.</li>
+        <li>Kun painat Luo, sovelluksen palvelin kutsuu <code>POST api/tenant</code>: luo tenantti tällä nimellä ja anna sinulle (sähköposti tokenista) rooli <code>@Roles.TenantAdmin</code>.</li>
+        <li>Sovellus hakee sinulle uuden tokenin autentikointipalvelimelta. Salasanaa ei kysytä, koska olet jo kirjautunut siellä. Uudessa tokenissa on tenantti ja rooli.</li>
+    </ol>
+    <p>Jos kirjaudut myöhemmin uudelleen, päädyt suoraan tenanttiisi. Uutta tenanttia ei synny.</p>
+</div>

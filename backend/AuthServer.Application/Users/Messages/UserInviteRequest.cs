@@ -8,7 +8,7 @@ public class UserInviteRequest
     // tenant, tenant roles need one.
     public List<UserRoleDto> UserRoles { get; init; } = [];
 
-    // Which app the user is invited to, e.g. "muistio-web". After setting the password, the user
+    // Which app the user is invited to, e.g. "razor-pages-demo-web". After setting the password, the user
     // gets a button to sign in to that app. Optional.
     public string? ClientId { get; init; }
 }

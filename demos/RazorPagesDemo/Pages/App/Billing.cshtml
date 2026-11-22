@@ -1,0 +1,47 @@
+@page
+@model BillingModel
+@{
+    ViewData["Title"] = "Laskutus";
+}
+
+<div class="card">
+    <h1>Laskutus</h1>
+    <table>
+        <tr><td>Ostaja (tenantti)</td><td>@(Model.Tenant?.Name ?? "Tuntematon tenantti") <br /><code>@User.TenantId()</code></td></tr>
+        <tr><td>Tilaus</td><td>
+            @if (Model.Tenant?.Paid == true)
+            {
+                <span class="badge ok">Maksettu</span> @Model.Tenant.PaidAt?.ToLocalTime().ToString("d.M.yyyy HH:mm")
+            }
+            else
+            {
+                <span class="badge warn">Kokeilu</span>
+            }
+        </td></tr>
+        <tr><td>Hinta</td><td>49 € / kk</td></tr>
+    </table>
+
+    @if (Model.Tenant?.Paid != true)
+    {
+        @if (User.IsTenantAdmin())
+        {
+            <form method="post">
+                <button type="submit">Osta täysversio</button>
+            </form>
+        }
+        else
+        {
+            <p>Vain tenantin ylläpitäjä (<code>@Roles.TenantAdmin</code>) voi ostaa. Sinun roolisi: @string.Join(", ", User.RoleNames()).</p>
+        }
+    }
+</div>
+
+<div class="explain">
+    <h2>Mitä tässä tapahtuu</h2>
+    <ol>
+        <li><strong>Mille tenantille ostetaan:</strong> sille, jonka id on tokenissa (<code>tenant_id</code>), eli jonka valitsit kirjautuessa.</li>
+        <li><strong>Saako ostaa:</strong> Sovellus päättää omien roolinsa perusteella. Vain <code>@Roles.TenantAdmin</code> näkee napin, ja palvelin tarkistaa roolin uudelleen, kun nappia painetaan.</li>
+        <li><strong>Mihin osto kirjataan:</strong> Sovelluksen omaan kantaan tämän tenantin kohdalle.</li>
+    </ol>
+    <p>Vaihe 1: nappi merkitsee tilauksen suoraan maksetuksi. Vaiheessa 2 tilalle tulee Stripen maksusivu, ja Stripe palauttaa saman <code>tenant_id</code>:n webhookissa.</p>
+</div>

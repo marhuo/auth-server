@@ -8,10 +8,11 @@ using AuthServer.Domain.Scopes;
 using AuthServer.Domain.Tenants;
 using AuthServer.Domain.Users;
 using AuthServer.Infrastructure.Persistence.Ef;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options)
+public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options), IDataProtectionKeyContext
 {
     public const string RoleNameIndex = "ix_roles_name";
     public const string ResourceServerAudienceIndex = "ix_resource_servers_audience";
@@ -33,6 +34,8 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
     public DbSet<SigningKeyEntity> SigningKeys => Set<SigningKeyEntity>();
     public DbSet<PasswordTokenEntity> PasswordTokens => Set<PasswordTokenEntity>();
+    // ASP.NET Data Protection keys (Program.cs: PersistKeysToDbContext).
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

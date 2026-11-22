@@ -5,6 +5,7 @@ using AuthServer.Application.OAuth;
 using AuthServer.Domain.OAuth;
 using AuthServer.Web.Authentication;
 using AuthServer.Web.Setup;
+using AuthServer.Infrastructure.Persistence;
 using AuthServer.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.DataProtection;
 using System.Text.Json.Serialization;
@@ -26,7 +27,10 @@ builder.Services.AddBackgroundJobs(builder.Configuration.GetConnectionString("Jo
 builder.Services.AddAuthServerAuthentication(builder.Configuration["Tokens:Issuer"]!);
 builder.Services.AddAuthorizationPolicies();
 
-builder.Services.AddDataProtection().SetApplicationName("AuthServer");
+// Keys are in the main database, together with the signing keys they protect.
+builder.Services.AddDataProtection()
+    .SetApplicationName("AuthServer")
+    .PersistKeysToDbContext<AuthDbContext>();
 builder.Services.Configure<AuthTokenOptions>(builder.Configuration.GetSection("Tokens"));
 
 builder.Services.AddSingleton(TimeProvider.System);

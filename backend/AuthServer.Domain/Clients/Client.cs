@@ -86,7 +86,7 @@ public sealed partial class Client : SoftDeletableAggregateRoot
     public IReadOnlyList<string> RedirectUris => _redirectUris;
     public IReadOnlyList<string> PostLogoutRedirectUris => _postLogoutRedirectUris;
 
-    // The product's address that starts the sign-in (e.g. https://muistio.fi/Kirjaudu), like Okta's
+    // The product's address that starts the sign-in (e.g. https://app.example.com/Login), like Okta's
     // "Initiate login URI". The auth server cannot start a sign-in for a product itself, so after an
     // invited user has set their password it shows a button to this address. Only for clients that
     // sign in users; null when not set.

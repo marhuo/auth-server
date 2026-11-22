@@ -1,73 +1,95 @@
-﻿html,
+﻿/* Roboto like in the admin UI. Files copied from @fontsource-variable/roboto 5.3.0 (latin, latin-ext). */
+@font-face {
+  font-family: "Roboto Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(../fonts/roboto/roboto-latin-ext-wght-normal.woff2) format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Roboto Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url(../fonts/roboto/roboto-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html,
 body {
   margin: 0;
   min-height: 100%;
 }
 
+/* Colors and sizes are copied from the admin UI theme (admin-ui/src/routes/layout.css, auth-light). */
 :root {
   color-scheme: light;
-  --border-color: #d3d3d3;
-  --input-bg: #f1f1f1;
-  --background: #fafafa;
-  --on-background: #181818;
-  --surface: #f4f4f4;
-  --on-surface: #181818;
-  --primary: #181818;
-  --on-primary: #fafafa;
-  --secondary: #ececec;
-  --on-secondary: #181818;
-  --tertiary: #c1aa7b;
-  --on-tertiary: #181818;
-  --error: #b00020;
-  --on-error: #ffffff;
-  --info: #2196f3;
-  --on-info: #ffffff;
-  --success: #4caf50;
-  --on-success: #ffffff;
-  --warning: #fb8c00;
-  --on-warning: #ffffff;
-  --border-hover: #b8b8b8;
-  --focus-color: var(--primary);
+
+  --color-base-100: #ffffff;
+  --color-base-200: #ebebeb;
+  --color-base-300: #d6d6d6;
+  --color-base-content: #181818;
+
+  --color-primary: #181818;
+  --color-primary-content: #ffffff;
+  --color-secondary: #eeeeee;
+  --color-secondary-content: #181818;
+  --color-accent: #c1aa7b;
+  --color-accent-content: #181818;
+  --color-neutral: #3a3a3a;
+  --color-neutral-content: #ffffff;
+
+  --color-info: #2196f3;
+  --color-info-content: #ffffff;
+  --color-success: #4caf50;
+  --color-success-content: #ffffff;
+  --color-warning: #fb8c00;
+  --color-warning-content: #181818;
+  --color-error: #b00020;
+  --color-error-content: #ffffff;
+
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
 }
 
+/* Admin UI theme auth-dark. */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --border-color: #3a3a3a;
-    --input-bg: #2a2a2a;
-    --background: #181818;
-    --on-background: #f3f3f3;
-    --surface: #1f1f1f;
-    --on-surface: #f3f3f3;
-    --primary: #d3d3d3;
-    --on-primary: #181818;
-    --secondary: #3a3a3a;
-    --on-secondary: #e6e6e6;
-    --tertiary: #c1aa7b;
-    --on-tertiary: #181818;
-    --error: #cf6679;
-    --on-error: #181818;
-    --info: #64b5f6;
-    --on-info: #181818;
-    --success: #81c784;
-    --on-success: #181818;
-    --warning: #ffb74d;
-    --on-warning: #181818;
-    --border-hover: #555555;
-    --focus-color: var(--primary);
+
+    --color-base-100: #1f1f1f;
+    --color-base-200: #262626;
+    --color-base-300: #303030;
+    --color-base-content: #f3f3f3;
+
+    --color-primary: #d3d3d3;
+    --color-primary-content: #181818;
+    --color-secondary: #3a3a3a;
+    --color-secondary-content: #e6e6e6;
+    --color-accent: #c1aa7b;
+    --color-accent-content: #181818;
+    --color-neutral: #3a3a3a;
+    --color-neutral-content: #e6e6e6;
+
+    --color-info: #64b5f6;
+    --color-info-content: #181818;
+    --color-success: #81c784;
+    --color-success-content: #181818;
+    --color-warning: #ffb74d;
+    --color-warning-content: #181818;
+    --color-error: #c0324c;
+    --color-error-content: #ffffff;
   }
 }
+
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
-  color: var(--on-background);
-  background: var(--background);
+  font-family: "Roboto Variable", sans-serif;
+  color: var(--color-base-content);
+  background: var(--color-base-100);
 }
 .page {
   flex: 1;
@@ -79,10 +101,10 @@ body {
 .card {
   width: 100%;
   max-width: 400px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--on-surface);
+  border: 1px solid var(--color-base-300);
+  border-radius: var(--radius-box);
+  background: var(--color-base-100);
+  color: var(--color-base-content);
 }
 .card-header {
   margin: 0;
@@ -111,47 +133,56 @@ input[type="email"] {
   height: 48px;
   padding: 0 16px;
   font: inherit;
-  color: var(--on-surface);
-  background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  color: var(--color-base-content);
+  background: var(--color-base-100);
+  border: 1px solid var(--color-base-300);
+  border-radius: var(--radius-field);
   outline: none;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
-input[type="email"]:hover,
-input[type="text"]:hover,
-input[type="password"]:hover {
-  border-color: var(--border-hover);
-}
+/* Same focus style as the admin UI inputs. */
 input[type="email"]:focus,
 input[type="text"]:focus,
 input[type="password"]:focus {
-  border-color: var(--focus-color);
+  border-color: var(--color-neutral);
+  box-shadow: 0 0 0 1px var(--color-neutral);
 }
 .btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   height: 48px;
+  padding: 0 24px;
+  text-decoration: none;
   margin-top: 4px;
   font: inherit;
   font-weight: 600;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-field);
   cursor: pointer;
   transition:
     background-color 0.15s ease,
     transform 0.05s ease;
 }
+/* Full-width button outside a form. */
+.btn.btn-block {
+  display: flex;
+  width: 100%;
+  margin-top: 20px;
+}
 .btn:active {
   transform: translateY(1px);
 }
 .btn.btn-primary {
-  background: var(--primary);
-  color: var(--on-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-content);
 }
 .btn.btn-secondary {
-  background: var(--secondary);
-  color: var(--on-secondary);
+  background: var(--color-secondary);
+  color: var(--color-secondary-content);
 }
 .btn.login,
 .btn.send-link {

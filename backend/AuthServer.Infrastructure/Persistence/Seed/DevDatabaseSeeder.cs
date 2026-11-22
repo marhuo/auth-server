@@ -25,37 +25,37 @@ public static class DevDatabaseSeeder
         ]);
 
         await CreateReactDemo(services);
-        await CreateMuistioDemo(db);
+        await CreateRazorPagesDemo(db);
     }
 
-    // demos/Muistio: a product that is sold online (docs/saas-myynti-ja-rekisteroityminen.md).
+    // demos/RazorPagesDemo: a product that is sold online (docs/saas-myynti-ja-rekisteroityminen.md).
     // No users or tenants: the demo creates them through the external API.
-    private static async Task CreateMuistioDemo(AuthDbContext db)
+    private static async Task CreateRazorPagesDemo(AuthDbContext db)
     {
-        var resourceServerId = await db.CreateResourceServerIfNotExistsAsync("muistio", "Muistio demo");
-        await db.CreateRoleIfNotExistsAsync(resourceServerId, "muistio_admin", "Muistion ylläpitäjä: saa ostaa ja kutsua käyttäjiä");
-        await db.CreateRoleIfNotExistsAsync(resourceServerId, "muistio_user", "Muistion käyttäjä");
+        var resourceServerId = await db.CreateResourceServerIfNotExistsAsync("razor-pages-demo", "Razor Pages demo");
+        await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_tenant_admin", "Tenantin ylläpitäjä: saa ostaa ja kutsua käyttäjiä");
+        await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_user", "Käyttäjä");
 
         // Signs in users.
         await db.CreateConfidentialClientIfNotExistsAsync(
             type: ClientTypes.ConfidentialApplication,
-            clientId: "muistio-web",
-            displayName: "Muistio web",
-            secret: "muistio-web-secret",
+            clientId: "razor-pages-demo-web",
+            displayName: "Razor Pages demo web",
+            secret: "razor-pages-demo-web-secret",
             targetResourceServerId: resourceServerId,
             redirectUris: ["https://localhost:5101/signin-oidc"],
             postLogoutRedirectUris: ["https://localhost:5101/signout-callback-oidc"],
             allowedScopeIds: await db.GetScopeIdsByNamesAsync(["openid", "profile", "email"]),
-            initiateLoginUri: "https://localhost:5101/Kirjaudu");
+            initiateLoginUri: "https://localhost:5101/Login");
 
         // The backend client that the app creates with every resource server (ResourceServerService.CreateAsync):
-        // Muistio's server calls the external API with it (POST api/tenant, POST api/user/invite).
+        // The demo's server calls the external API with it (POST api/tenant, POST api/user/invite).
         // Its target is the auth server.
         await db.CreateConfidentialClientIfNotExistsAsync(
             type: ClientTypes.ConfidentialMachine,
-            clientId: ResourceServer.BackendClientId("muistio"),
-            displayName: ResourceServer.BackendClientDisplayName("Muistio demo"),
-            secret: "muistio-backend-secret",
+            clientId: ResourceServer.BackendClientId("razor-pages-demo"),
+            displayName: ResourceServer.BackendClientDisplayName("Razor Pages demo"),
+            secret: "razor-pages-demo-backend-secret",
             targetResourceServerId: (await db.ResourceServers.SingleAsync(r => r.IsAuthServer)).Id,
             redirectUris: [],
             postLogoutRedirectUris: [],

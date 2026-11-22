@@ -52,7 +52,7 @@
 
 		<button type="submit" class="btn mt-6 self-start px-6 btn-primary" disabled={model.submitting}>
 			{#if model.submitting}<span class="loading loading-sm loading-spinner"></span>{/if}
-			Kutsu
+			Lähetä kutsu
 		</button>
 	</form>
 </div>
