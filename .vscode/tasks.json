@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build auth server",
+			"type": "process",
+			"command": "dotnet",
+			"args": ["build", "${workspaceFolder}/backend/AuthServer.slnx"],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "build razor-pages-demo",
+			"type": "process",
+			"command": "dotnet",
+			"args": ["build", "${workspaceFolder}/demos/RazorPagesDemo/RazorPagesDemo.csproj"],
+			"problemMatcher": "$msCompile"
+		}
+	]
+}

@@ -1,0 +1,38 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Auth server",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build auth server",
+			"program": "${workspaceFolder}/backend/AuthServer.Web/bin/Debug/net10.0/AuthServer.Web.dll",
+			"cwd": "${workspaceFolder}/backend/AuthServer.Web",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development",
+				"ASPNETCORE_URLS": "http://localhost:5028"
+			},
+			"console": "integratedTerminal"
+		},
+		{
+			"name": "Razor Pages demo",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build razor-pages-demo",
+			"program": "${workspaceFolder}/demos/RazorPagesDemo/bin/Debug/net10.0/RazorPagesDemo.dll",
+			"cwd": "${workspaceFolder}/demos/RazorPagesDemo",
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development",
+				"ASPNETCORE_URLS": "https://localhost:5101"
+			},
+			"console": "integratedTerminal"
+		}
+	],
+	"compounds": [
+		{
+			"name": "Auth server + Razor Pages demo",
+			"configurations": ["Auth server", "Razor Pages demo"],
+			"stopAll": true
+		}
+	]
+}
