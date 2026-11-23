@@ -1,5 +1,13 @@
 import type { TenantDomainDto } from '#lib/api/generated/tenantDomainDto.ts';
-import { deleteTenant, getTenantById, getTenantDomains, updateTenant } from '#lib/api/tenantApi.ts';
+import {
+	createTenantDomain,
+	deleteTenant,
+	deleteTenantDomain,
+	getTenantById,
+	getTenantDomains,
+	updateTenant,
+	verifyTenantDomain
+} from '#lib/api/tenantApi.ts';
 
 export class TenantDetailsModel {
 	readonly id: string;
@@ -47,7 +55,7 @@ export class TenantDetailsModel {
 		return this._suspendedAt !== null;
 	}
 
-	// Added and verified by the tenant through its product; read-only here.
+	// Verified by the tenant through its product (DNS TXT record).
 	private _domains = $state<TenantDomainDto[]>([]);
 	get domains() {
 		return this._domains;
@@ -87,4 +95,19 @@ export class TenantDetailsModel {
 	};
 
 	delete = () => deleteTenant(this.id);
+
+	addDomain = async (name: string) => {
+		const domain = await createTenantDomain({ tenantId: this.id, name });
+		this._domains = [...this._domains, domain].sort((a, b) => a.name.localeCompare(b.name));
+	};
+
+	verifyDomain = async (domainId: string) => {
+		const verified = await verifyTenantDomain(this.id, domainId);
+		this._domains = this._domains.map((d) => (d.id === domainId ? verified : d));
+	};
+
+	deleteDomain = async (domainId: string) => {
+		await deleteTenantDomain(this.id, domainId);
+		this._domains = this._domains.filter((d) => d.id !== domainId);
+	};
 }

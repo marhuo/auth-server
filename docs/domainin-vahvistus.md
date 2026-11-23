@@ -2,7 +2,7 @@
 
 Tila (23.11.2026): vaihe 1 toteutettu, eli domainin lisäys, vahvistus ja viikoittainen uudelleentarkistus. Vaihe 2, eli mitä vahvistuksella saa tehdä (osio 4), on toteuttamatta.
 
-Liisa on tenantin ylläpitäjä, mutta auth server ei tunne tenanttien ylläpitäjiä (tuote päättää roolien merkityksen). Siksi vahvistus tehdään **tuotteen asetussivulla**, ja tuote kutsuu auth serverin ulkoista API:a, kuten tenantin luonnissa ja kutsuissa. Razor Pages -demossa sivu on `App/Domains`, ja se näkyy vain roolille `razor_pages_demo_tenant_admin`. Admin-UI näyttää tenantin domainit vain luettavina.
+Liisa on tenantin ylläpitäjä, mutta auth server ei tunne tenanttien ylläpitäjiä (tuote päättää roolien merkityksen). Siksi vahvistus tehdään **tuotteen asetussivulla**, ja tuote kutsuu auth serverin ulkoista API:a, kuten tenantin luonnissa ja kutsuissa. Razor Pages -demossa sivu on `App/Domains`, ja se näkyy vain roolille `razor_pages_demo_tenant_admin`. Admin-UI:ssa auth serverin ylläpitäjä voi myös lisätä, tarkistaa ja poistaa tenantin domaineja ja näkee niiden TXT-rivit. Vahvistus onnistuu silti vain, kun TXT-rivi on DNS:ssä.
 
 ## 1. Mitä se on
 
@@ -62,7 +62,7 @@ Domain voi vaihtaa omistajaa: jos Acme lopettaa eikä maksa domainia, joku muu v
 | Taulu `tenant_domains` | Sama domain voi olla vahvistettuna vain yhdellä tenantilla |
 | Ulkoinen API | `GET/POST api/tenant/{tenantId}/domain`, `POST .../domain/{id}/verify`, `DELETE .../domain/{id}` |
 | `Web/Jobs/TenantDomainRecheckJob.cs` | Maanantaisin klo 4 (UTC). Epäonnistunut haku ei poista vahvistusta. |
-| Admin-UI | Tenantin tiedot → kortti "Domainit" (vain luku) |
+| Admin-UI | Tenantin tiedot → kortti "Domainit": lisäys (dialogi), TXT-rivi, "Tarkista" ja poisto |
 | Razor Pages -demo | `App/Domains`: lisäys, TXT-rivi, "Tarkista" ja "Poista" |
 
 Itse tarkistus:

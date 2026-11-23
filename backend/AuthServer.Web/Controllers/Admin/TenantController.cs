@@ -12,6 +12,25 @@ public class TenantController(TenantService service, TenantDomainService domainS
     public Task<List<TenantDomainDto>> GetDomains(Guid id) =>
         domainService.GetByTenantIdAsync(id);
 
+    [HttpPost("domain")]
+    public async Task<ActionResult<TenantDomainDto>> CreateDomain([FromBody] TenantDomainCreateRequest request)
+    {
+        var domain = await domainService.CreateAsync(request);
+        return StatusCode(StatusCodes.Status201Created, domain);
+    }
+
+    // Reads the domain's DNS. Fails with an error if the TXT record is not there yet.
+    [HttpPost("{id:guid}/domain/{domainId:guid}/verify")]
+    public Task<TenantDomainDto> VerifyDomain(Guid id, Guid domainId) =>
+        domainService.VerifyAsync(id, domainId);
+
+    [HttpDelete("{id:guid}/domain/{domainId:guid}")]
+    public async Task<IActionResult> DeleteDomain(Guid id, Guid domainId)
+    {
+        await domainService.DeleteAsync(id, domainId);
+        return NoContent();
+    }
+
     [HttpGet]
     public Task<PagedListDto<TenantDto>> GetPagedList([FromQuery] PagedListRequest request) =>
         service.GetPagedListAsync(request);

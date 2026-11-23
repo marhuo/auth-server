@@ -3,6 +3,7 @@ import type {
 	PagedListDto,
 	PagedListRequest,
 	TenantCreateRequest,
+	TenantDomainCreateRequest,
 	TenantDomainDto,
 	TenantDto,
 	TenantSuspendRequest,
@@ -41,3 +42,12 @@ export const unsuspendTenant = (id: string) => httpPost<void>(`/tenant/${id}/uns
 export const deleteTenant = (id: string) => httpDelete(`/tenant/${id}`);
 
 export const getTenantDomains = (id: string) => httpGet<TenantDomainDto[]>(`/tenant/${id}/domain`);
+
+export const createTenantDomain = (request: TenantDomainCreateRequest) =>
+	httpPost<TenantDomainDto>('/tenant/domain', request);
+
+export const verifyTenantDomain = (tenantId: string, domainId: string) =>
+	httpPost<TenantDomainDto>(`/tenant/${tenantId}/domain/${domainId}/verify`);
+
+export const deleteTenantDomain = (tenantId: string, domainId: string) =>
+	httpDelete(`/tenant/${tenantId}/domain/${domainId}`);

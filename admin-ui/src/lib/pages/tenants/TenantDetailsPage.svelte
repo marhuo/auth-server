@@ -6,6 +6,9 @@
 	import DetailsTextInput from '#lib/components/DetailsTextInput.svelte';
 	import SuspendTenantDialog from '#lib/pages/tenants/components/SuspendTenantDialog.svelte';
 	import UnsuspendTenantDialog from '#lib/pages/tenants/components/UnsuspendTenantDialog.svelte';
+	import AddDomainDialog from '#lib/pages/tenants/components/AddDomainDialog.svelte';
+	import VerifyDomainButton from '#lib/pages/tenants/components/VerifyDomainButton.svelte';
+	import DeleteIconButton from '#lib/components/DeleteIconButton.svelte';
 	import { TenantDetailsModel } from '#lib/pages/tenants/TenantDetailsModel.svelte.ts';
 	import { formatIsoDateTime } from '#lib/utils/dateUtils.ts';
 	import { normalizeSlug } from '#lib/utils/normalizers.ts';
@@ -29,6 +32,7 @@
 	let suspendDialogOpen = $state(false);
 	let unsuspendDialogOpen = $state(false);
 	let deleteDialogOpen = $state(false);
+	let addDomainDialogOpen = $state(false);
 
 	const menuItems = $derived.by(() => {
 		const items: MenuItem[] = [];
@@ -121,15 +125,31 @@
 
 		<div class="card max-w-3xl border border-base-300">
 			<div class="card-body">
-				<div class="card-title">
-					<h2>Domainit</h2>
+				<div class="flex items-center justify-between">
+					<h2 class="card-title">Domainit</h2>
+					<button class="btn btn-ghost btn-sm" onclick={() => (addDomainDialogOpen = true)}>
+						<Icon icon="ic:outline-add" width="18" />
+						Lisää domain
+					</button>
 				</div>
-				<p class="text-sm opacity-60">Tenantti lisää ja vahvistaa domainit tuotteen kautta.</p>
+				<p class="text-sm opacity-60">
+					Domain vahvistuu, kun sen DNS:ssä on TXT-rivi ja painetaan Tarkista.
+				</p>
 
 				<ul class="list -mx-4">
 					{#each model.domains as domain (domain.id)}
 						<li class="list-row items-center">
-							<div class="font-mono">{domain.name}</div>
+							<div class="list-col-grow">
+								<div class="font-mono">{domain.name}</div>
+								{#if !domain.verifiedAt}
+									<div class="font-mono text-xs break-all opacity-60" title="TXT-rivi">
+										{domain.txtRecord}
+									</div>
+									<div class="mt-2">
+										<VerifyDomainButton onVerify={() => model.verifyDomain(domain.id)} />
+									</div>
+								{/if}
+							</div>
 							<div>
 								{#if domain.verifiedAt}
 									<span
@@ -142,6 +162,12 @@
 									<span class="badge badge-soft badge-sm badge-warning">Ei vahvistettu</span>
 								{/if}
 							</div>
+							<DeleteIconButton
+								dialogTitle="Poista domain"
+								onDelete={() => model.deleteDomain(domain.id)}
+							>
+								Oletko varma, että haluat poistaa domainin <strong>{domain.name}</strong>?
+							</DeleteIconButton>
 						</li>
 					{:else}
 						<li class="list-row opacity-60">Ei domaineja</li>
@@ -255,6 +281,10 @@
 		>
 			Oletko varma, että haluat poistaa tenantin <strong>{model.name}</strong>?
 		</DeleteDialog>
+	{/if}
+
+	{#if addDomainDialogOpen}
+		<AddDomainDialog onAdd={model.addDomain} onClose={() => (addDomainDialogOpen = false)} />
 	{/if}
 
 	{#if suspendDialogOpen}
