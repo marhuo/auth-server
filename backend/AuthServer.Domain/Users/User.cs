@@ -48,9 +48,8 @@ public sealed class User : AggregateRoot
     // The login identifier.
     public string Email { get; private set; }
 
-    // Uniqueness and lookup key, see NormalizeEmail. Every normalized email a user has had stays
-    // reserved for that user (taken_emails), so an email always identifies one user. The user can
-    // take an email they have had before back into use.
+    // Uniqueness and lookup key, see NormalizeEmail. Unique among current users only: a changed email
+    // is free for others. Identify users by Id, not by email.
     public string NormalizedEmail { get; private set; }
 
     // Null until the invited user sets a password (later also for users who sign in only externally).

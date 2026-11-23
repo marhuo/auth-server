@@ -20,20 +20,20 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
     public const string ClientIdIndex = "ix_clients_client_id";
     public const string TenantSlugIndex = "ix_tenants_slug";
     public const string UserNormalizedEmailIndex = "ix_users_normalized_email";
-    public const string TakenEmailIndex = "ix_taken_emails_normalized_email";
+    public const string TenantDomainVerifiedNameIndex = "ix_tenant_domains_verified_name";
 
     public DbSet<TenantEntity> Tenants => Set<TenantEntity>();
     public DbSet<UserEntity> Users => Set<UserEntity>();
     public DbSet<ResourceServerEntity> ResourceServers => Set<ResourceServerEntity>();
     public DbSet<RoleEntity> Roles => Set<RoleEntity>();
     public DbSet<UserRoleEntity> UserRoles => Set<UserRoleEntity>();
-    public DbSet<TakenEmailEntity> TakenEmails => Set<TakenEmailEntity>();
     public DbSet<ClientEntity> Clients => Set<ClientEntity>();
     public DbSet<ScopeEntity> Scopes => Set<ScopeEntity>();
     public DbSet<AuthorizationCodeEntity> AuthorizationCodes => Set<AuthorizationCodeEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
     public DbSet<SigningKeyEntity> SigningKeys => Set<SigningKeyEntity>();
     public DbSet<PasswordTokenEntity> PasswordTokens => Set<PasswordTokenEntity>();
+    public DbSet<TenantDomainEntity> TenantDomains => Set<TenantDomainEntity>();
     // ASP.NET Data Protection keys (Program.cs: PersistKeysToDbContext).
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 
@@ -99,8 +99,7 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
             b.Property(e => e.Email).HasMaxLength(User.MaxEmailLength);
             b.Property(e => e.NormalizedEmail).HasMaxLength(User.MaxEmailLength);
 
-            // Uniqueness, exact lookups (login) and list order. Users are never deleted; earlier
-            // emails of a user stay reserved in taken_emails.
+            // Uniqueness, exact lookups (login) and list order.
             b.HasIndex(e => e.NormalizedEmail, UserNormalizedEmailIndex).IsUnique();
 
             // Substring search (ILIKE '%text%')
@@ -109,7 +108,6 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
                 .HasOperators("gin_trgm_ops");
 
             b.HasMany(e => e.UserRoles).WithOne(e => e.User).HasForeignKey(e => e.UserId);
-            b.HasMany(e => e.TakenEmails).WithOne().HasForeignKey(e => e.UserId);
         });
 
         modelBuilder.Entity<RoleEntity>(b =>
@@ -157,14 +155,6 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
             b.HasQueryFilter(ur => ur.Role.DeletedAt == null);
         });
 
-        modelBuilder.Entity<TakenEmailEntity>(b =>
-        {
-            b.ToTable("taken_emails");
-            b.HasKey(e => e.Id);
-            b.Property(e => e.NormalizedEmail).HasMaxLength(User.MaxEmailLength);
-            b.HasIndex(e => e.NormalizedEmail, TakenEmailIndex).IsUnique();
-            b.HasOne<UserEntity>().WithMany(e => e.TakenEmails).HasForeignKey(e => e.UserId);
-        });
 
         modelBuilder.Entity<ClientEntity>(b =>
         {
@@ -268,6 +258,25 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
             b.HasIndex(e => e.ExpiresAt);
 
             b.HasOne<UserEntity>().WithMany().HasForeignKey(e => e.UserId);
+        });
+
+        modelBuilder.Entity<TenantDomainEntity>(b =>
+        {
+            b.ToTable("tenant_domains");
+            b.HasKey(e => e.Id);
+
+            b.Property(e => e.Name).HasMaxLength(TenantDomain.MaxNameLength);
+
+            b.HasIndex(e => new { e.TenantId, e.Name }, "ix_tenant_domains_tenant_id_name")
+                .IsUnique()
+                .HasFilter("deleted_at IS NULL");
+
+            // A domain is verified for one tenant at a time.
+            b.HasIndex(e => e.Name, TenantDomainVerifiedNameIndex)
+                .IsUnique()
+                .HasFilter("verified_at IS NOT NULL AND deleted_at IS NULL");
+
+            b.HasOne<TenantEntity>().WithMany().HasForeignKey(e => e.TenantId);
         });
 
         foreach (var fk in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))

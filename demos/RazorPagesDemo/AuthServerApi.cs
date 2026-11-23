@@ -10,7 +10,7 @@ public class AuthServerApi(HttpClient http, IConfiguration configuration)
     // Creates a tenant and makes the user its admin.
     public async Task<Guid> CreateTenantAsync(string name, string adminEmail)
     {
-        var response = await SendAsync("api/tenant", new
+        var response = await SendAsync(HttpMethod.Post, "api/tenant", new
         {
             name,
             adminEmail,
@@ -26,7 +26,7 @@ public class AuthServerApi(HttpClient http, IConfiguration configuration)
 
     public async Task InviteUserAsync(Guid tenantId, string email, string roleName)
     {
-        await SendAsync("api/user/invite", new
+        await SendAsync(HttpMethod.Post, "api/user/invite", new
         {
             email,
             tenantId,
@@ -35,9 +35,27 @@ public class AuthServerApi(HttpClient http, IConfiguration configuration)
         });
     }
 
-    private async Task<HttpResponseMessage> SendAsync(string url, object body)
+    public async Task<List<TenantDomain>> GetDomainsAsync(Guid tenantId)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = JsonContent.Create(body) };
+        var response = await SendAsync(HttpMethod.Get, $"api/tenant/{tenantId}/domain");
+        return await response.Content.ReadFromJsonAsync<List<TenantDomain>>() ?? [];
+    }
+
+    public Task AddDomainAsync(Guid tenantId, string name) =>
+        SendAsync(HttpMethod.Post, $"api/tenant/{tenantId}/domain", new { name });
+
+    // Fails with the auth server's message if the TXT record is not in the domain's DNS yet.
+    public Task VerifyDomainAsync(Guid tenantId, Guid domainId) =>
+        SendAsync(HttpMethod.Post, $"api/tenant/{tenantId}/domain/{domainId}/verify");
+
+    public Task DeleteDomainAsync(Guid tenantId, Guid domainId) =>
+        SendAsync(HttpMethod.Delete, $"api/tenant/{tenantId}/domain/{domainId}");
+
+    private async Task<HttpResponseMessage> SendAsync(HttpMethod method, string url, object? body = null)
+    {
+        using var request = new HttpRequestMessage(method, url);
+        if (body is not null)
+            request.Content = JsonContent.Create(body);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await GetAccessTokenAsync());
 
         var response = await http.SendAsync(request);
@@ -87,3 +105,6 @@ public class AuthServerApi(HttpClient http, IConfiguration configuration)
 }
 
 public class AuthServerApiException(string message) : Exception(message);
+
+// A domain of the tenant in the auth server.
+public record TenantDomain(Guid Id, string Name, string TxtRecord, DateTimeOffset? VerifiedAt);

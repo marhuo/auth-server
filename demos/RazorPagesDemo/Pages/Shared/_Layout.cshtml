@@ -36,7 +36,9 @@
         table { border-collapse: collapse; width: 100%; }
         td { padding: 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
         td:first-child { color: var(--muted); width: 40%; }
-        code { background: #eef0f3; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+        code { background: #eef0f3; padding: 1px 5px; border-radius: 4px; font-size: 13px; word-break: break-all; }
+        .domain { border-top: 1px solid var(--line); padding: 12px 0; }
+        form.inline { display: inline-block; margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -64,6 +66,7 @@
                     @if (User.IsTenantAdmin())
                     {
                         <a href="/App/Users">Käyttäjät</a>
+                        <a href="/App/Domains">Domainit</a>
                     }
                 }
             </nav>

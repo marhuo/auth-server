@@ -13,6 +13,8 @@ export * from './userPagedListRequest';
 export * from './userRoleDto';
 export * from './userUpdateRequest';
 export * from './tenantCreateRequest';
+export * from './tenantDomainCreateRequest';
+export * from './tenantDomainDto';
 export * from './tenantDto';
 export * from './tenantSuspendRequest';
 export * from './tenantUpdateRequest';

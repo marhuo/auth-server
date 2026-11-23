@@ -6,6 +6,8 @@ using AuthServer.Web.Controllers.Api.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AppTenantCreateRequest = AuthServer.Application.Tenants.Messages.TenantCreateRequest;
+using AppTenantDomainCreateRequest = AuthServer.Application.Tenants.Messages.TenantDomainCreateRequest;
+using AppTenantDomainDto = AuthServer.Application.Tenants.Messages.TenantDomainDto;
 using AppUserInviteRequest = AuthServer.Application.Users.Messages.UserInviteRequest;
 using AppUserRoleDto = AuthServer.Application.Users.Messages.UserRoleDto;
 
@@ -14,7 +16,11 @@ namespace AuthServer.Web.Controllers.Api;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Policy = AuthorizationPolicies.ExternalApi)]
-public class TenantController(TenantService tenantService, UserService userService, RoleService roleService) : ControllerBase
+public class TenantController(
+    TenantService tenantService,
+    TenantDomainService domainService,
+    UserService userService,
+    RoleService roleService) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<TenantCreateResponse>> Create(TenantCreateRequest request)
@@ -39,4 +45,43 @@ public class TenantController(TenantService tenantService, UserService userServi
 
         return new TenantCreateResponse { TenantId = tenantId, UserId = userId, Slug = tenant.Slug };
     }
+
+    [HttpGet("{tenantId:guid}/domain")]
+    public async Task<List<TenantDomainDto>> GetDomains(Guid tenantId)
+    {
+        var domains = await domainService.GetByTenantIdAsync(tenantId);
+        return domains.Select(ToDto).ToList();
+    }
+
+    [HttpPost("{tenantId:guid}/domain")]
+    public async Task<ActionResult<TenantDomainDto>> CreateDomain(Guid tenantId, TenantDomainCreateRequest request)
+    {
+        var domain = await domainService.CreateAsync(new AppTenantDomainCreateRequest
+        {
+            TenantId = tenantId,
+            Name = request.Name
+        });
+
+        return StatusCode(StatusCodes.Status201Created, ToDto(domain));
+    }
+
+    // Reads the domain's DNS. Fails with an error if the TXT record is not there yet.
+    [HttpPost("{tenantId:guid}/domain/{id:guid}/verify")]
+    public async Task<TenantDomainDto> VerifyDomain(Guid tenantId, Guid id) =>
+        ToDto(await domainService.VerifyAsync(tenantId, id));
+
+    [HttpDelete("{tenantId:guid}/domain/{id:guid}")]
+    public async Task<IActionResult> DeleteDomain(Guid tenantId, Guid id)
+    {
+        await domainService.DeleteAsync(tenantId, id);
+        return NoContent();
+    }
+
+    private static TenantDomainDto ToDto(AppTenantDomainDto domain) => new()
+    {
+        Id = domain.Id,
+        Name = domain.Name,
+        TxtRecord = domain.TxtRecord,
+        VerifiedAt = domain.VerifiedAt
+    };
 }

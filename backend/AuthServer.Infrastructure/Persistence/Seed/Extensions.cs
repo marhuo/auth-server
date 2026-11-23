@@ -209,14 +209,6 @@ public static class Extensions
             CreatedAt = DateTimeOffset.UtcNow
         });
 
-        db.TakenEmails.Add(new TakenEmailEntity
-        {
-            Id = Guid.CreateVersion7(),
-            UserId = userId,
-            NormalizedEmail = normalizedEmail,
-            CreatedAt = DateTimeOffset.UtcNow
-        });
-
         await db.SaveChangesAsync();
 
         return userId;

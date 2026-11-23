@@ -64,15 +64,13 @@ public class UserRepository(AuthDbContext db) : IUserRepository
         return users.OrderBy(u => u.NormalizedEmail).ToPagedListAsync(query, e => e.ToDomain());
     }
 
-    // taken_emails keeps every email a user has had, also after the user changes it.
     public Task<bool> EmailTakenAsync(string normalizedEmail, Guid? excludeUserId = null) =>
-        db.TakenEmails.AnyAsync(x => x.NormalizedEmail == normalizedEmail && x.UserId != excludeUserId);
+        db.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail && u.Id != excludeUserId);
 
     public async Task CreateAsync(User user)
     {
         var entity = UserEntity.FromDomain(user);
         SyncRoles(entity, user);
-        await ReserveEmailAsync(entity);
 
         db.Users.Add(entity);
         await SaveAsync();
@@ -81,13 +79,9 @@ public class UserRepository(AuthDbContext db) : IUserRepository
     public async Task UpdateAsync(User user)
     {
         var entity = await db.Users.Include(u => u.UserRoles).SingleAsync(u => u.Id == user.Id);
-        var emailChanged = entity.NormalizedEmail != user.NormalizedEmail;
 
         entity.UpdateFrom(user);
         SyncRoles(entity, user);
-
-        if (emailChanged)
-            await ReserveEmailAsync(entity);
 
         await SaveAsync();
     }
@@ -120,23 +114,6 @@ public class UserRepository(AuthDbContext db) : IUserRepository
         }
     }
 
-    // Every normalized email a user has had stays reserved for that user. If the user takes back an
-    // email they have had before, the reservation already exists. If it belongs to another user, the
-    // unique index rejects the save (the validator checks this first).
-    private async Task ReserveEmailAsync(UserEntity entity)
-    {
-        if (await db.TakenEmails.AnyAsync(x => x.NormalizedEmail == entity.NormalizedEmail && x.UserId == entity.Id))
-            return;
-
-        db.TakenEmails.Add(new TakenEmailEntity
-        {
-            Id = Guid.CreateVersion7(),
-            UserId = entity.Id,
-            NormalizedEmail = entity.NormalizedEmail,
-            CreatedAt = DateTimeOffset.UtcNow
-        });
-    }
-
     private async Task SaveAsync()
     {
         try
@@ -146,7 +123,7 @@ public class UserRepository(AuthDbContext db) : IUserRepository
         catch (DbUpdateException ex) when (ex.InnerException is PostgresException
         {
             SqlState: PostgresErrorCodes.UniqueViolation,
-            ConstraintName: AuthDbContext.TakenEmailIndex or AuthDbContext.UserNormalizedEmailIndex
+            ConstraintName: AuthDbContext.UserNormalizedEmailIndex
         })
         {
             // A concurrent request took the email after the validator checked it.

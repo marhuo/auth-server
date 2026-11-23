@@ -81,10 +81,6 @@ public class UserAuthenticationService(
 
         if (user is null)
         {
-            // Another user had this email before: it stays reserved for them.
-            if (await users.EmailTakenAsync(normalizedEmail))
-                return;
-
             user = User.CreateInvited(
                 email: email,
                 now: now);

@@ -33,7 +33,7 @@ public class UserValidator(
                 "Käyttäjä on jo hyväksynyt kutsun.");
     }
 
-    // A new user's email must not be used, or have been used, by another user.
+    // A new user's email must not belong to another user.
     public async Task ValidateEmailNotTakenAsync(string email)
     {
         if (await users.EmailTakenAsync(User.NormalizeEmail(email)))
@@ -50,7 +50,6 @@ public class UserValidator(
         if (request.Locked && !user.Locked)
             await ValidateNotLastAdminAsync(user.Id, nameof(request.Locked));
 
-        // The user may take back an email they have had before.
         var normalized = User.NormalizeEmail(request.Email);
         if (normalized != user.NormalizedEmail && await users.EmailTakenAsync(normalized, excludeUserId: user.Id))
             throw new ValidationException(User.EmailTakenError());

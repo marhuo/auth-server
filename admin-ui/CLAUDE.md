@@ -20,7 +20,7 @@ npm run format   # prettier --write
 
 After changes, run `npm run check` and `npm run lint`.
 
-The dev server proxies `/api`, `/Login` and `/Logout` to the backend at `http://localhost:5028`, so the backend must be running. Authentication is cookie-based and handled by the backend: a 401 from the API redirects to `/Login`.
+The dev server proxies `/api`, the backend's Razor sign-in pages (`/Login`, `/Logout`, `/Register`, `/ForgotPassword`, `/SetPassword`, `/PasswordSet`) and their `/css` and `/fonts` to the backend at `http://localhost:5028`, so the backend must be running. Authentication is cookie-based and handled by the backend: a 401 from the API redirects to `/Login`.
 
 ## Architecture
 

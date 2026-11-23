@@ -13,9 +13,8 @@ public class UserEntity
     public bool Locked { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public virtual List<UserRoleEntity> UserRoles { get; set; } = [];
-    public virtual List<TakenEmailEntity> TakenEmails { get; set; } = [];
 
-    // Roles and taken emails are not set here; the repository syncs them.
+    // Roles are not set here; the repository syncs them.
     public static UserEntity FromDomain(User user)
     {
         var entity = new UserEntity { Id = user.Id, CreatedAt = user.CreatedAt };
@@ -23,7 +22,7 @@ public class UserEntity
         return entity;
     }
 
-    // Roles and taken emails are not set here; the repository syncs them.
+    // Roles are not set here; the repository syncs them.
     public void UpdateFrom(User user)
     {
         Email = user.Email;

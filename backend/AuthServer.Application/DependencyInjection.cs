@@ -24,6 +24,8 @@ public static class DependencyInjection
         services.AddScoped<ScopeValidator>();
         services.AddScoped<TenantService>();
         services.AddScoped<TenantValidator>();
+        services.AddScoped<TenantDomainService>();
+        services.AddScoped<TenantDomainValidator>();
         services.AddScoped<UserService>();
         services.AddScoped<UserValidator>();
         services.AddScoped<AuthorizationCodeService>();

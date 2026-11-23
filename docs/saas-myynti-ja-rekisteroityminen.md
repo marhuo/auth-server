@@ -147,7 +147,7 @@ Kumpikaan ei ole tietoturvaongelma: sähköposti on aina vahvistettu, joten tunn
 
 **Yrityksen domain.** Kun Acmella on jo tenantti ja `ville@acme.com` painaa "Kokeile ilmaiseksi", hän saa oman erillisen tenantin eikä päädy Acmen tenanttiin. Tämä hyväksytään, ja Slack, Notion ja Atlassian toimivat oletuksena samoin. Haittana on, että isolle asiakkaalle voi syntyä tenantteja, joista sen ylläpitäjä ei tiedä.
 
-- Myöhemmin: asiakkaan ylläpitäjä vahvistaa domainin (DNS-tietue). Sen jälkeen `@acme.com`-käyttäjälle näytetään tenantin luonnin sijaan "Liity Acmeen" tai "Pyydä pääsyä". Tämä on yritysominaisuus, jota ei tarvita alussa.
+- Myöhemmin: asiakkaan ylläpitäjä vahvistaa domainin (DNS-tietue, ks. [domainin-vahvistus.md](domainin-vahvistus.md)). Sen jälkeen `@acme.com`-käyttäjälle näytetään tenantin luonnin sijaan "Liity Acmeen" tai "Pyydä pääsyä". Tämä on yritysominaisuus, jota ei tarvita alussa.
 - Tarkistus kuuluu kohtaan "Luo tenantti" (tuote tai `POST api/tenant`), ei rekisteröitymiseen.
 
 **Gmailin plus-osoitteet.** `jaana@gmail.com`, `jaana+1@gmail.com` ja `j.a.a.n.a@gmail.com` ovat sama postilaatikko, joten yksi ihminen voi luoda useita tunnuksia ja kokeiluja. Kirjautumissähköpostia **ei normalisoida**:
@@ -166,11 +166,39 @@ Muut palvelut eivät yritä estää tunnuksia, vaan rajoittavat sitä, **mitä u
 | Ilmaiset krediitit tai suositusbonus | Puhelinnumeron vahvistus, kortti tai käsintarkistus |
 | Roskapostitus tai botit | Rekisteröitymisten rajoitus IP:n mukaan, CAPTCHA, kertakäyttöosoitteiden estolista |
 
-Tässä järjestelmässä ainoa etu on ilmainen kokeilu, joten väärinkäyttö ratkaistaan tuotteessa kokeilun ehdoilla (ks. avoin kysymys kokeilujaksosta, osio 12). Jos kokeiluun vaaditaan kortti, plus-tunnuksista ei ole hyötyä. Tarvittaessa tuote voi myös tallentaa erillisen kanonisen osoitteen, jota käytetään vain kokeilujen rajoittamiseen. Kirjautuminen ei muutu.
+Tässä järjestelmässä ainoa etu on ilmainen kokeilu, joten väärinkäyttö ratkaistaan tuotteessa kokeilun ehdoilla (ks. avoin kysymys kokeilujaksosta, osio 13). Jos kokeiluun vaaditaan kortti, plus-tunnuksista ei ole hyötyä. Tarvittaessa tuote voi myös tallentaa erillisen kanonisen osoitteen, jota käytetään vain kokeilujen rajoittamiseen. Kirjautuminen ei muutu.
 
 Auth serverissä on jo IP-rajoitus: rekisteröityminen ja "Unohtunut salasana" saavat kumpikin lähettää enintään 10 sähköpostia samasta IP-osoitteesta 15 minuutissa (`RateLimitSetup`).
 
-## 12. Avoimet kysymykset
+## 12. Kierrätetty sähköpostiosoite (23.11.2026)
+
+**Ratkaisu (23.11.2026):** `taken_emails` poistettiin. Sähköposti on uniikki vain nykyisten käyttäjien kesken. Kun yritys antaa lähteneen työntekijän osoitteen uudelle, auth serverin ylläpitäjä vaihtaa ensin lähteneen käyttäjän osoitteen admin-UI:ssa (esim. `matti.vanha@yritys.fi`). Sen jälkeen uusi työntekijä kutsutaan alkuperäisellä osoitteella, ja hän saa uuden käyttäjän. Varaus ei olisi estänyt postilaatikon siirtymistä uudelle ihmiselle, joten sillä ei ollut todellista hyötyä. Lokit ja tuotteet tunnistavat käyttäjän id:llä (`sub`), eivät sähköpostilla.
+
+Alla alkuperäinen ongelman kuvaus.
+
+Yritykset antavat lähteneen työntekijän osoitteen joskus uudelle työntekijälle. Nykyinen auth server antaa silloin uudelle työntekijälle **edellisen haltijan käyttäjän**:
+
+1. Matti lähtee. Ylläpitäjä poistaa häneltä roolit, mutta käyttäjä `matti@yritys.fi` jää kantaan (käyttäjiä ei poisteta).
+2. Uusi työntekijä saa osoitteen `matti@yritys.fi`.
+3. Ylläpitäjä kutsuu hänet. Käyttäjä on jo olemassa, joten kutsu vain lisää roolit Matin käyttäjälle (`UserService.InviteAsync`).
+4. Uusi työntekijä vaihtaa salasanan "Unohtunut salasana" -toiminnolla ja saa Matin käyttäjän: Matin muut tenantit, historian ja myöhemmin myös Google-yhdistyksen.
+
+Lisäksi `taken_emails` varasi jokaisen osoitteen ikuisesti alkuperäiselle käyttäjälle, joten osoitetta ei voinut vapauttaa uudelle käyttäjälle (poistettu, ks. ratkaisu yllä).
+
+Ongelma on olemassa jo salasanoilla, ei vain Google-kirjautumisessa. Se kannattaa ratkaista ennen Google-kirjautumista.
+
+**Miten Slack toimii:** käyttäjä deaktivoidaan, ei poisteta. Saman osoitteen saa uudelleen käyttöön, kun ylläpitäjä vaihtaa ensin deaktivoidun käyttäjän osoitteen (esim. `matti-old@yritys.fi`). Uusi työntekijä saa aina uuden käyttäjän.
+
+**Vaihtoehdot:**
+
+- Ylläpitäjä voi vaihtaa lähteneen käyttäjän osoitteen ja vapauttaa alkuperäisen osoitteen uudelle käyttäjälle (Slackin malli). Vaatii muutoksen `taken_emails`-sääntöön.
+- Kutsu olemassa olevalle käyttäjälle, jolla ei ole yhtään roolia missään, varoittaa ylläpitäjää: "Tällä osoitteella on vanha käyttäjä."
+
+Atlassianin pitkän aikavälin ratkaisu on domainin vahvistus: yritys todistaa omistavansa domainin ja saa hallita sen käyttäjiä ("managed accounts"). Ks. [domainin-vahvistus.md](domainin-vahvistus.md). Siihen asti auth serverin ylläpitäjä voi tarvittaessa vapauttaa osoitteen käsin.
+
+Google-kirjautuminen ei pahenna ongelmaa, kun käyttäjä tunnistetaan `sub`:lla: uudella haltijalla on oma Google-tili ja eri `sub` (ks. [google-kirjautuminen.md](google-kirjautuminen.md)).
+
+## 13. Avoimet kysymykset
 
 - Ostovaltuus: riittääkö tuotteen admin-rooli (`abc_admin`), vai tarvitaanko erillinen tuoterooli?
 - Kokeilujakso: ilman korttia (oma logiikka) vai Stripen trial kortin kanssa?

@@ -12,6 +12,7 @@ builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/App");
     options.Conventions.AuthorizePage("/App/Users", Roles.TenantAdminPolicy);
+    options.Conventions.AuthorizePage("/App/Domains", Roles.TenantAdminPolicy);
     options.Conventions.AuthorizePage("/CreateTenant");
 });
 builder.Services.AddControllers(); // AccountController: sign-in actions without a page.

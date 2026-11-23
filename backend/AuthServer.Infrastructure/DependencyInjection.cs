@@ -7,6 +7,7 @@ using AuthServer.Domain.Tenants;
 using AuthServer.Domain.Users;
 using AuthServer.Infrastructure.OAuth;
 using AuthServer.Infrastructure.Persistence;
+using AuthServer.Infrastructure.Tenants;
 using AuthServer.Infrastructure.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IScopeRepository, ScopeRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<ITenantRepository, TenantRepository>();
+        services.AddScoped<ITenantDomainRepository, TenantDomainRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IPasswordTokenRepository, PasswordTokenRepository>();
         services.AddScoped<IAuthorizationCodeRepository, AuthorizationCodeRepository>();
@@ -35,6 +37,7 @@ public static class DependencyInjection
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserEmailSender, LoggingUserEmailSender>();
+        services.AddSingleton<IDnsTxtLookup, DnsTxtLookup>();
 
         // One instance per scope serves both interfaces.
         services.AddScoped<SigningKeyService>();

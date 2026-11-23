@@ -121,6 +121,37 @@
 
 		<div class="card max-w-3xl border border-base-300">
 			<div class="card-body">
+				<div class="card-title">
+					<h2>Domainit</h2>
+				</div>
+				<p class="text-sm opacity-60">Tenantti lisää ja vahvistaa domainit tuotteen kautta.</p>
+
+				<ul class="list -mx-4">
+					{#each model.domains as domain (domain.id)}
+						<li class="list-row items-center">
+							<div class="font-mono">{domain.name}</div>
+							<div>
+								{#if domain.verifiedAt}
+									<span
+										class="badge badge-soft badge-sm badge-success"
+										title={formatIsoDateTime(domain.verifiedAt)}
+									>
+										Vahvistettu
+									</span>
+								{:else}
+									<span class="badge badge-soft badge-sm badge-warning">Ei vahvistettu</span>
+								{/if}
+							</div>
+						</li>
+					{:else}
+						<li class="list-row opacity-60">Ei domaineja</li>
+					{/each}
+				</ul>
+			</div>
+		</div>
+
+		<div class="card max-w-3xl border border-base-300">
+			<div class="card-body">
 				<div class="mb-4 card-title">
 					<h2>Käyttäjät</h2>
 				</div>

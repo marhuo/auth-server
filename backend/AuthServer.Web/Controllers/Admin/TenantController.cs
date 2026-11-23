@@ -6,8 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace AuthServer.Web.Controllers.Admin;
 
 [Route("api/admin/tenant")]
-public class TenantController(TenantService service) : AdminControllerBase
+public class TenantController(TenantService service, TenantDomainService domainService) : AdminControllerBase
 {
+    [HttpGet("{id:guid}/domain")]
+    public Task<List<TenantDomainDto>> GetDomains(Guid id) =>
+        domainService.GetByTenantIdAsync(id);
+
     [HttpGet]
     public Task<PagedListDto<TenantDto>> GetPagedList([FromQuery] PagedListRequest request) =>
         service.GetPagedListAsync(request);

@@ -1,0 +1,68 @@
+@page
+@model DomainsModel
+@{
+    ViewData["Title"] = "Domainit";
+}
+
+<div class="card">
+    <h1>Domainit</h1>
+
+    @if (Model.Error is not null)
+    {
+        <p class="error">@Model.Error</p>
+    }
+
+    @if (Model.Domains.Count == 0)
+    {
+        <p>Ei domaineja.</p>
+    }
+
+    @foreach (var domain in Model.Domains)
+    {
+        <div class="domain">
+            <p>
+                <strong>@domain.Name</strong>
+                @if (domain.VerifiedAt is not null)
+                {
+                    <span class="badge ok">Vahvistettu</span>
+                }
+                else
+                {
+                    <span class="badge warn">Ei vahvistettu</span>
+                }
+            </p>
+
+            @if (domain.VerifiedAt is null)
+            {
+                <p>Lisää domainin DNS-asetuksiin TXT-rivi:</p>
+                <p><code>@domain.TxtRecord</code></p>
+                <form method="post" asp-page-handler="Verify" asp-route-id="@domain.Id" class="inline">
+                    <button type="submit">Tarkista</button>
+                </form>
+            }
+
+            <form method="post" asp-page-handler="Delete" asp-route-id="@domain.Id" class="inline">
+                <button type="submit" class="button secondary">Poista</button>
+            </form>
+        </div>
+    }
+</div>
+
+<div class="card">
+    <h2>Lisää domain</h2>
+    <form method="post" asp-page-handler="Add">
+        <label for="name">Domain</label>
+        <input id="name" type="text" asp-for="Name" placeholder="acme.fi" required />
+        <button type="submit">Lisää</button>
+    </form>
+</div>
+
+<div class="explain">
+    <h2>Mitä tässä tapahtuu</h2>
+    <ol>
+        <li>Lisää yrityksesi domain. Autentikointipalvelin antaa sille TXT-rivin.</li>
+        <li>Lisää rivi domainin DNS-asetuksiin siellä, mistä domain on ostettu.</li>
+        <li>Paina Tarkista. Autentikointipalvelin lukee domainin DNS:n ja vahvistaa domainin, jos rivi löytyy.</li>
+    </ol>
+    <p>Sivu näkyy vain roolille <code>@Roles.TenantAdmin</code>. Sovellus kutsuu autentikointipalvelimen API:a <code>api/tenant/{tenantId}/domain</code>.</p>
+</div>

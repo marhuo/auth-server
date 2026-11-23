@@ -580,7 +580,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.ToTable("signing_keys", (string)null);
                 });
 
-            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.TakenEmailEntity", b =>
+            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.TenantDomainEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -591,27 +591,43 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("NormalizedEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("normalized_email");
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(253)
+                        .HasColumnType("character varying(253)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid>("TenantId")
                         .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnName("tenant_id");
+
+                    b.Property<string>("VerificationCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("verification_code");
+
+                    b.Property<DateTimeOffset?>("VerifiedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("verified_at");
 
                     b.HasKey("Id")
-                        .HasName("pk_taken_emails");
+                        .HasName("pk_tenant_domains");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_taken_emails_user_id");
-
-                    b.HasIndex(new[] { "NormalizedEmail" }, "ix_taken_emails_normalized_email")
+                    b.HasIndex(new[] { "TenantId", "Name" }, "ix_tenant_domains_tenant_id_name")
                         .IsUnique()
-                        .HasDatabaseName("ix_taken_emails_normalized_email");
+                        .HasDatabaseName("ix_tenant_domains_tenant_id_name")
+                        .HasFilter("deleted_at IS NULL");
 
-                    b.ToTable("taken_emails", (string)null);
+                    b.HasIndex(new[] { "Name" }, "ix_tenant_domains_verified_name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_tenant_domains_name")
+                        .HasFilter("verified_at IS NOT NULL AND deleted_at IS NULL");
+
+                    b.ToTable("tenant_domains", (string)null);
                 });
 
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.TenantEntity", b =>
@@ -914,14 +930,14 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.Navigation("ResourceServer");
                 });
 
-            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.TakenEmailEntity", b =>
+            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.TenantDomainEntity", b =>
                 {
-                    b.HasOne("AuthServer.Infrastructure.Persistence.Ef.UserEntity", null)
-                        .WithMany("TakenEmails")
-                        .HasForeignKey("UserId")
+                    b.HasOne("AuthServer.Infrastructure.Persistence.Ef.TenantEntity", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_taken_emails_users_user_id");
+                        .HasConstraintName("fk_tenant_domains_tenants_tenant_id");
                 });
 
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserRoleEntity", b =>
@@ -993,8 +1009,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserEntity", b =>
                 {
-                    b.Navigation("TakenEmails");
-
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

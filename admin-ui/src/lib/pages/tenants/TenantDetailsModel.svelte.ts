@@ -1,4 +1,5 @@
-import { deleteTenant, getTenantById, updateTenant } from '#lib/api/tenantApi.ts';
+import type { TenantDomainDto } from '#lib/api/generated/tenantDomainDto.ts';
+import { deleteTenant, getTenantById, getTenantDomains, updateTenant } from '#lib/api/tenantApi.ts';
 
 export class TenantDetailsModel {
 	readonly id: string;
@@ -46,14 +47,24 @@ export class TenantDetailsModel {
 		return this._suspendedAt !== null;
 	}
 
+	// Added and verified by the tenant through its product; read-only here.
+	private _domains = $state<TenantDomainDto[]>([]);
+	get domains() {
+		return this._domains;
+	}
+
 	load = async () => {
 		this._loading = true;
 		try {
-			const tenant = await getTenantById(this.id);
+			const [tenant, domains] = await Promise.all([
+				getTenantById(this.id),
+				getTenantDomains(this.id)
+			]);
 			if (!tenant) {
 				this._notFound = true;
 				return;
 			}
+			this._domains = domains;
 			this._name = tenant.name;
 			this._slug = tenant.slug;
 			this._suspendedAt = tenant.suspendedAt;

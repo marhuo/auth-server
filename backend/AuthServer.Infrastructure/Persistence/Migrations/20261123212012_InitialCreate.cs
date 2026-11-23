@@ -187,6 +187,29 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "tenant_domains",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    tenant_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(253)", maxLength: 253, nullable: false),
+                    verification_code = table.Column<string>(type: "text", nullable: false),
+                    verified_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_tenant_domains", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_tenant_domains_tenants_tenant_id",
+                        column: x => x.tenant_id,
+                        principalTable: "tenants",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "password_tokens",
                 columns: table => new
                 {
@@ -205,26 +228,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     table.PrimaryKey("pk_password_tokens", x => x.id);
                     table.ForeignKey(
                         name: "fk_password_tokens_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "taken_emails",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    normalized_email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_taken_emails", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_taken_emails_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "id",
@@ -557,15 +560,18 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_taken_emails_normalized_email",
-                table: "taken_emails",
-                column: "normalized_email",
-                unique: true);
+                name: "ix_tenant_domains_name",
+                table: "tenant_domains",
+                column: "name",
+                unique: true,
+                filter: "verified_at IS NOT NULL AND deleted_at IS NULL");
 
             migrationBuilder.CreateIndex(
-                name: "ix_taken_emails_user_id",
-                table: "taken_emails",
-                column: "user_id");
+                name: "ix_tenant_domains_tenant_id_name",
+                table: "tenant_domains",
+                columns: new[] { "tenant_id", "name" },
+                unique: true,
+                filter: "deleted_at IS NULL");
 
             migrationBuilder.CreateIndex(
                 name: "ix_tenants_normalized_name",
@@ -640,7 +646,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "signing_keys");
 
             migrationBuilder.DropTable(
-                name: "taken_emails");
+                name: "tenant_domains");
 
             migrationBuilder.DropTable(
                 name: "user_roles");

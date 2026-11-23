@@ -32,10 +32,17 @@ export default defineConfig({
 	server: {
 		port: 5174,
 		strictPort: true,
+		// Backend addresses: the API and the Razor sign-in pages with their styles and fonts.
 		proxy: {
 			'/api': 'http://localhost:5028',
 			'/Logout': 'http://localhost:5028',
-			'/Login': 'http://localhost:5028'
+			'/Login': 'http://localhost:5028',
+			'/Register': 'http://localhost:5028',
+			'/ForgotPassword': 'http://localhost:5028',
+			'/SetPassword': 'http://localhost:5028',
+			'/PasswordSet': 'http://localhost:5028',
+			'/css': 'http://localhost:5028',
+			'/fonts': 'http://localhost:5028'
 		}
 	}
 });
