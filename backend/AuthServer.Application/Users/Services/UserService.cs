@@ -84,8 +84,7 @@ public class UserService(
         await SendInvitationAsync(user, clientId: null, timeProvider.GetUtcNow());
     }
 
-    // The user sets the password on the SetPassword page (UserAuthenticationService). Creating the
-    // token invalidates the user's earlier unused tokens (IPasswordTokenRepository.CreateAsync).
+    // Sends a link to set the password. A new link invalidates the user's earlier unused links.
     private async Task SendInvitationAsync(User user, string? clientId, DateTimeOffset now)
     {
         var (token, rawToken) = PasswordToken.Create(

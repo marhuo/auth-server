@@ -43,15 +43,15 @@ public class UserAuthenticationService(
     public Task<List<string>> GetAuthServerRoleNamesAsync(Guid userId) =>
         roles.GetAuthServerRoleNamesAsync(userId);
 
-    // "Forgot password": sends a reset link if the email belongs to a user. Returns nothing and never
-    // fails for an unknown email, so the page cannot be used to find out which emails have an account.
-    // An admin-locked user gets no link: a new password would not let them sign in.
+    // Sends a password reset link.
+    // Returns nothing on purpose: otherwise anyone could check which emails are registered.
     public async Task RequestPasswordResetAsync(string email)
     {
         var user = string.IsNullOrWhiteSpace(email)
             ? null
             : await users.GetByNormalizedEmailAsync(User.NormalizeEmail(email));
 
+        // A locked user could not sign in with a new password either.
         if (user is null || user.Locked)
             return;
 
@@ -65,15 +65,8 @@ public class UserAuthenticationService(
         await emailSender.SendPasswordResetAsync(user.Email, rawToken);
     }
 
-    // Self-registration (Register page). Creates an invited user and sends a link to set the password;
-    // setting it proves that the user owns the email. The page always shows the same message, so it
-    // cannot be used to find out which emails have an account. What is sent depends on the email:
-    // - no account: a new account and a link to set the password
-    // - account without a password (registered earlier but did not finish): a new link
-    // - account with a password: a reminder to sign in instead
-    // - locked account: nothing
-    // - an email that some account had before it was changed: nothing (it stays reserved for that account)
-    // Throws ValidationException only for an invalid email address.
+    // Registers a user and sends a link to set the password.
+    // If email is taken does nothing: otherwise anyone could check which emails are registered.
     public async Task RegisterAsync(string email, string? returnUrl)
     {
         email = email.Trim();
@@ -88,6 +81,7 @@ public class UserAuthenticationService(
 
         if (user is null)
         {
+            // Another user had this email before: it stays reserved for them.
             if (await users.EmailTakenAsync(normalizedEmail))
                 return;
 
@@ -100,12 +94,14 @@ public class UserAuthenticationService(
         {
             return;
         }
+        // Already registered: a reminder to sign in instead.
         else if (user.Status == UserStatuses.Active)
         {
             await emailSender.SendAlreadyRegisteredAsync(user.Email, returnUrl);
             return;
         }
 
+        // A new user, or one who registered earlier but did not set a password.
         var (token, rawToken) = PasswordToken.Create(
             userId: user.Id,
             email: user.Email,
@@ -116,17 +112,15 @@ public class UserAuthenticationService(
         await emailSender.SendRegistrationAsync(user.Email, rawToken, returnUrl);
     }
 
-    // The type of a usable password token (invitation or reset), or null if the link is not valid.
+    // Checks a password link. Returns its type, or null if the link is unknown, used or expired.
     public async Task<PasswordTokenTypes?> GetUsablePasswordTokenTypeAsync(string rawToken)
     {
         var token = await passwordTokens.GetByTokenHashAsync(PasswordToken.HashToken(rawToken));
         return token is not null && token.IsUsable(timeProvider.GetUtcNow()) ? token.Type : null;
     }
 
-    // Sets the password with an invitation, registration or reset link. Returns the user, or null if the
-    // link is not valid (the page may then sign the user in). Throws ValidationException if the password
-    // does not meet the requirements; the link then stays usable. Also ends the automatic lockout
-    // (User.SetPassword) and revokes the user's refresh tokens.
+    // Sets the password with a link token. Returns the user, or null if the link is not valid.
+    // A rejected password keeps the link usable. Also revokes the user's refresh tokens.
     public async Task<User?> SetPasswordWithTokenAsync(string rawToken, string password)
     {
         userValidator.ValidatePassword(password);

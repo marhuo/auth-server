@@ -15,7 +15,7 @@ public static class DevDatabaseSeeder
         var passwordHasher = services.GetRequiredService<IPasswordHasher>();
         var db = services.GetRequiredService<AuthDbContext>();
 
-       
+
 
         await db.CreateTenantsAsync([
             "Acme Corporation", "Globex", "Initech", "Umbrella Group", "Stark Industries",
@@ -25,16 +25,16 @@ public static class DevDatabaseSeeder
         ]);
 
         await CreateReactDemo(services);
-        await CreateRazorPagesDemo(db);
+        await CreateRazorPagesDemo(db, passwordHasher);
     }
 
     // demos/RazorPagesDemo: a product that is sold online (docs/saas-myynti-ja-rekisteroityminen.md).
     // No users or tenants: the demo creates them through the external API.
-    private static async Task CreateRazorPagesDemo(AuthDbContext db)
+    private static async Task CreateRazorPagesDemo(AuthDbContext db, IPasswordHasher passwordHasher)
     {
         var resourceServerId = await db.CreateResourceServerIfNotExistsAsync("razor-pages-demo", "Razor Pages demo");
-        await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_tenant_admin", "Tenantin ylläpitäjä: saa ostaa ja kutsua käyttäjiä");
-        await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_user", "Käyttäjä");
+        var tenantAdminRoleId = await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_tenant_admin", "Tenantin ylläpitäjä: saa ostaa ja kutsua käyttäjiä");
+        var userRoleId = await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_user", "Käyttäjä");
 
         // Signs in users.
         await db.CreateConfidentialClientIfNotExistsAsync(
@@ -46,7 +46,7 @@ public static class DevDatabaseSeeder
             redirectUris: ["https://localhost:5101/signin-oidc"],
             postLogoutRedirectUris: ["https://localhost:5101/signout-callback-oidc"],
             allowedScopeIds: await db.GetScopeIdsByNamesAsync(["openid", "profile", "email"]),
-            initiateLoginUri: "https://localhost:5101/Login");
+            initiateLoginUri: "https://localhost:5101/account/login");
 
         // The backend client that the app creates with every resource server (ResourceServerService.CreateAsync):
         // The demo's server calls the external API with it (POST api/tenant, POST api/user/invite).
@@ -60,6 +60,23 @@ public static class DevDatabaseSeeder
             redirectUris: [],
             postLogoutRedirectUris: [],
             allowedScopeIds: await db.GetScopeIdsByNamesAsync([SystemScopes.AuthServerApi]));
+
+        var tenant1Id = await db.CreateTenantIfNotExistsAsync("razor-tenant-1", "razor-tenant-1");
+        var tenantAdmin1Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-tenant-1-admin@example.com", "salasana1");
+        await db.CreateUserRoleIfNotExistAsync(tenantAdmin1Id, tenantAdminRoleId, tenant1Id);
+
+        var tenant2Id = await db.CreateTenantIfNotExistsAsync("razor-tenant-2", "razor-tenant-2");
+        var tenantAdmin2Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-tenant-2-admin@example.com", "salasana1");
+        await db.CreateUserRoleIfNotExistAsync(tenantAdmin2Id, tenantAdminRoleId, tenant2Id);
+
+        // User 1 belongs to both tenants
+        var tenantUser1Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-user-1@example.com", "salasana1");
+        await db.CreateUserRoleIfNotExistAsync(tenantUser1Id, userRoleId, tenant1Id);
+        await db.CreateUserRoleIfNotExistAsync(tenantUser1Id, userRoleId, tenant2Id);
+
+        //User 2 belongs only to tenant 1
+        var tenantUser2Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-user-2@example.com", "salasana1");
+        await db.CreateUserRoleIfNotExistAsync(tenantUser2Id, userRoleId, tenant1Id);
     }
 
     private static async Task<List<(Guid TenantId, string TenantName)>> CreateTenantsAsync(this AuthDbContext db, params string[] tenantNames)

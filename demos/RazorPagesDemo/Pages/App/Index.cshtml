@@ -5,7 +5,7 @@
 }
 
 <div class="card">
-    <h1>@(Model.Tenant?.Name ?? "Tuntematon tenantti")</h1>
+    <h1>@User.TenantName()</h1>
     @if (Model.Tenant?.Paid == true)
     {
         <p><span class="badge ok">Maksettu</span> Kaikki ominaisuudet ovat käytössä.</p>
@@ -30,7 +30,7 @@
         <tr><td>Sähköposti (<code>email</code>)</td><td>@User.Email()</td></tr>
         <tr><td>Tenantin id (<code>tenant_id</code>)</td><td>@User.TenantId()</td></tr>
         <tr><td>Roolit tässä tenantissa (<code>role</code>)</td><td>@string.Join(", ", User.RoleNames())</td></tr>
-        <tr><td>Tenantin nimi</td><td>@(Model.Tenant?.Name ?? "– (ei sovelluksen kannassa)")</td></tr>
+        <tr><td>Tenantin nimi</td><td>@User.TenantName()</td></tr>
         <tr><td>Tilaus</td><td>@(Model.Tenant?.Paid == true ? "Maksettu" : "Kokeilu")</td></tr>
     </table>
 </div>
@@ -38,8 +38,8 @@
 <div class="explain">
     <h2>Mitä tässä tapahtuu</h2>
     <ul>
-        <li>Kolme ensimmäistä riviä tulevat autentikointipalvelimen tokenista. Tenantti on se, jonka valitsit kirjautuessa.</li>
-        <li>Tenantin nimi ja tilaus tulevat sovelluksen omasta kannasta. Autentikointipalvelin ei tiedä tilauksista mitään.</li>
+        <li>Neljä ensimmäistä riviä tulevat autentikointipalvelimelta (token ja <code>connect/userinfo</code>). Tenantti on se, jonka valitsit kirjautuessa.</li>
+        <li>Tilaus tulee sovelluksen omasta kannasta. Autentikointipalvelin ei tiedä tilauksista mitään.</li>
         <li>Kaikki mitä teet, myös ostaminen, koskee tätä tenanttia.</li>
     </ul>
 </div>

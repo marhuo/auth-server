@@ -2,8 +2,8 @@ using System.Text.Json;
 
 namespace RazorPagesDemo;
 
-// The demo's own data about a tenant: its name and whether it has paid.
-public record Tenant(Guid Id, string Name, bool Paid, DateTimeOffset? PaidAt);
+// The demo's own data about a tenant: whether it has paid. The name is in the auth server.
+public record Tenant(Guid Id, bool Paid, DateTimeOffset? PaidAt);
 
 // Stores the tenants in a JSON file instead of a database.
 public class TenantStore(string path)

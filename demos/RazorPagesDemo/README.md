@@ -11,9 +11,7 @@ Kaikki kirjautumiseen liittyvä on näissä:
 | `appsettings.json` | Auth serverin osoite, client id ja secret |
 | `Program.cs`: `AddAuthentication` | Eväste + OpenID Connect -asetukset |
 | `Program.cs`: `AddRazorPages` | Mitkä sivut vaativat kirjautumisen tai roolin |
-| `Pages/Login.cshtml.cs` | Kirjautuminen: `Challenge(...)` |
-| `Pages/Register.cshtml.cs` | Rekisteröityminen: `Challenge(...)` + `Prompt = "create"` |
-| `Pages/Logout.cshtml.cs` | Uloskirjautuminen: `SignOut(...)` |
+| `Controllers/AccountController.cs` | Kirjautuminen (`Challenge`), rekisteröityminen (`Prompt = "create"`), uloskirjautuminen (`SignOut`) ja tenantin vaihto |
 
 Clientin paluuosoite auth serverissä: `https://localhost:5101/signin-oidc`.
 

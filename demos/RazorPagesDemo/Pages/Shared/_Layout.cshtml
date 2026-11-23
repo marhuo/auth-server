@@ -47,7 +47,7 @@
             @* asp-page adds the security token the form needs. *@
             @if (tenantId is not null)
             {
-                <form method="post" asp-page="/SwitchTenant">
+                <form method="post" asp-controller="Account" asp-action="SwitchTenant">
                     <select name="tenantId" onchange="this.form.submit()">
                         @foreach (var t in User.Tenants())
                         {
@@ -70,7 +70,7 @@
             <div class="who">
                 @User.Email() · @(User.RoleNames().Count > 0 ? string.Join(", ", User.RoleNames()) : "ei rooleja")
             </div>
-            <form method="post" asp-page="/Logout">
+            <form method="post" asp-controller="Account" asp-action="Logout">
                 <button class="link-button" type="submit">Kirjaudu ulos</button>
             </form>
         }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using RazorPagesDemo;
+using RazorPagesDemo.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 var authServer = builder.Configuration.GetSection("AuthServer");
@@ -13,6 +14,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizePage("/App/Users", Roles.TenantAdminPolicy);
     options.Conventions.AuthorizePage("/CreateTenant");
 });
+builder.Services.AddControllers(); // AccountController: sign-in actions without a page.
 
 // Sign-in through the auth server.
 builder.Services.AddAuthentication(options =>
@@ -57,8 +59,8 @@ builder.Services.AddAuthentication(options =>
         // Tenant switch: sends the chosen tenant to the auth server.
         options.Events.OnRedirectToIdentityProvider = context =>
         {
-            if (context.Properties.Items.TryGetValue("tenant", out var tenantId))
-                context.ProtocolMessage.SetParameter("tenant", tenantId);
+            if (context.Properties.Items.TryGetValue(AccountController.TenantParameter, out var tenantId))
+                context.ProtocolMessage.SetParameter(AccountController.TenantParameter, tenantId);
             return Task.CompletedTask;
         };
 
@@ -109,5 +111,6 @@ app.Use(async (context, next) =>
 
 app.UseAuthorization();
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

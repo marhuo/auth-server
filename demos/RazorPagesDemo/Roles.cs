@@ -34,6 +34,10 @@ public static class ClaimsPrincipalExtensions
     public static List<UserTenant> Tenants(this ClaimsPrincipal user) =>
         user.FindAll("tenants").Select(c => JsonSerializer.Deserialize<UserTenant>(c.Value, JsonOptions)!).ToList();
 
+    // The name of the signed-in tenant, from the auth server.
+    public static string TenantName(this ClaimsPrincipal user) =>
+        user.Tenants().FirstOrDefault(t => t.Id == user.FindTenantId())?.Name ?? "";
+
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 }
 

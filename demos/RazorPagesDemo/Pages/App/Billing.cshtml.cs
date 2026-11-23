@@ -19,7 +19,7 @@ public class BillingModel(TenantStore tenants) : PageModel
             return Forbid();
 
         var tenantId = User.TenantId();
-        var tenant = tenants.Get(tenantId) ?? new Tenant(tenantId, "Tuntematon tenantti", false, null);
+        var tenant = tenants.Get(tenantId) ?? new Tenant(tenantId, Paid: false, PaidAt: null);
         tenants.Save(tenant with { Paid = true, PaidAt = DateTimeOffset.UtcNow });
 
         return RedirectToPage();

@@ -31,7 +31,7 @@ public class CreateTenantModel(AuthServerApi authServer, TenantStore tenants) : 
         {
             // The signed-in user becomes the tenant admin.
             var tenantId = await authServer.CreateTenantAsync(Name, User.Email());
-            tenants.Save(new Tenant(tenantId, Name, Paid: false, PaidAt: null));
+            tenants.Save(new Tenant(tenantId, Paid: false, PaidAt: null));
         }
         catch (AuthServerApiException e)
         {

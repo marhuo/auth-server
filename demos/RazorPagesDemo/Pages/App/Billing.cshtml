@@ -7,7 +7,7 @@
 <div class="card">
     <h1>Laskutus</h1>
     <table>
-        <tr><td>Ostaja (tenantti)</td><td>@(Model.Tenant?.Name ?? "Tuntematon tenantti") <br /><code>@User.TenantId()</code></td></tr>
+        <tr><td>Ostaja (tenantti)</td><td>@User.TenantName() <br /><code>@User.TenantId()</code></td></tr>
         <tr><td>Tilaus</td><td>
             @if (Model.Tenant?.Paid == true)
             {
