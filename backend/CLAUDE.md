@@ -53,6 +53,7 @@ Hangfire recurring jobs are classes in `Web/Jobs/` (namespace `AuthServer.Web.Jo
 4. **User-facing text** is bilingual: every validation message has `MessageEn` and `MessageFi`. All other strings (exception messages, logs, comments) are in English.
 5. **Query in the database:** Filtering, sorting and paging run in the database via `IQueryable`. Loading a full set into memory is allowed only as a documented exception (see below) and must have a comment pointing here.
 6. **Named arguments for aggregate construction:** Calls to an aggregate's static `Create(...)` factory (in services) and to its rehydration constructor (`ToDomain` in EF entities, and the `new Xxx(...)` inside `Create`) always use named arguments, one per line (`id: Id, name: Name, ...`). These methods have many parameters of the same type, and positional arguments in the wrong order would still compile.
+7. **Comments describe their own layer only:** A comment says what this code does and, when needed, why. It never describes an upper layer: a service does not mention pages, controllers or what the user sees, and the domain does not mention services. Write `// Returns nothing on purpose: otherwise anyone could check which emails are registered.`, not `// The page always shows the same message.` Put notes about a single case next to the branch that handles it. Keep comments short.
 
 ### Domain
 
