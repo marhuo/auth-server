@@ -4,24 +4,24 @@
 @model string?
 @* A "tai" divider, then sign-in with external services. The model is the return URL. *@
 @{
-    string? buttonRoute = null;
-    string buttonText = "";
+    var buttons = new List<(string Route, string Text)>();
     if (AuthenticationSetup.IsGoogleConfigured(Configuration))
     {
-        buttonRoute = "/ExternalLogin";
-        buttonText = "Jatka Google-tilillä";
+        buttons.Add(("/ExternalLogin", "Jatka Google-tilillä"));
     }
     if (Environment.IsDevelopment())
     {
-        buttonRoute = "/DevExternalLogin";
-        buttonText = "Jatka Google-tilillä (testi)";
+        buttons.Add(("/DevExternalLogin", "Jatka Google-tilillä (testi)"));
     }
 }
-@if (buttonRoute is not null)
+@if (buttons.Count > 0)
 {
     <div class="divider">tai</div>
+}
+@foreach (var button in buttons)
+{
     @* A link, not a button: a button inside the login form would submit the form. *@
-    <a class="gsi-material-button" asp-page="@buttonRoute" asp-route-returnUrl="@Model">
+    <a class="gsi-material-button" asp-page="@button.Route" asp-route-returnUrl="@Model">
         <div class="gsi-material-button-state"></div>
         <div class="gsi-material-button-content-wrapper">
             <div class="gsi-material-button-icon">
@@ -42,8 +42,8 @@
                     <path fill="none" d="M0 0h48v48H0z"></path>
                 </svg>
             </div>
-            <span class="gsi-material-button-contents">@buttonText</span>
-            <span style="display: none;">@buttonText</span>
+            <span class="gsi-material-button-contents">@button.Text</span>
+            <span style="display: none;">@button.Text</span>
         </div>
     </a>
 }
