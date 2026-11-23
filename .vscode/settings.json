@@ -23,6 +23,9 @@
     "editor.defaultFormatter": "ms-dotnettools.csharp",
     "editor.formatOnSave": true
   },
+  "[aspnetcorerazor]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
   "dotnet.defaultSolution": "backend/AuthServer.slnx",
   "vsicons.presets.foldersAllDefaultIcon": true
 }

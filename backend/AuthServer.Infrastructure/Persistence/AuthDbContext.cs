@@ -27,6 +27,7 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
     public DbSet<ResourceServerEntity> ResourceServers => Set<ResourceServerEntity>();
     public DbSet<RoleEntity> Roles => Set<RoleEntity>();
     public DbSet<UserRoleEntity> UserRoles => Set<UserRoleEntity>();
+    public DbSet<UserExternalIdEntity> UserExternalIds => Set<UserExternalIdEntity>();
     public DbSet<ClientEntity> Clients => Set<ClientEntity>();
     public DbSet<ScopeEntity> Scopes => Set<ScopeEntity>();
     public DbSet<AuthorizationCodeEntity> AuthorizationCodes => Set<AuthorizationCodeEntity>();
@@ -108,6 +109,19 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
                 .HasOperators("gin_trgm_ops");
 
             b.HasMany(e => e.UserRoles).WithOne(e => e.User).HasForeignKey(e => e.UserId);
+            b.HasMany(e => e.ExternalIds).WithOne().HasForeignKey(e => e.UserId);
+        });
+
+        modelBuilder.Entity<UserExternalIdEntity>(b =>
+        {
+            b.ToTable("user_external_ids");
+            b.HasKey(e => e.Id);
+            b.Property(e => e.Provider).HasMaxLength(50);
+            b.Property(e => e.ProviderUserId).HasMaxLength(255);
+
+            // One account of a service belongs to one user.
+            b.HasIndex(e => new { e.Provider, e.ProviderUserId }, "ix_user_external_ids_provider_user").IsUnique();
+            b.HasIndex(e => e.UserId);
         });
 
         modelBuilder.Entity<RoleEntity>(b =>

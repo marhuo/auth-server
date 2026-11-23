@@ -12,6 +12,8 @@ public interface IUserRepository
     // Ordered by normalized email. SearchTerm matches the email.
     Task<PagedList<User>> GetPagedListAsync(UserPagedListQuery query);
 
+    Task<User?> GetByExternalIdAsync(string provider, string providerUserId);
+
     // Whether another user has the normalized email.
     Task<bool> EmailTakenAsync(string normalizedEmail, Guid? excludeUserId = null);
 

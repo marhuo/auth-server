@@ -1,6 +1,21 @@
 # Google-kirjautuminen: suunnitelma
 
-Tila: suunnitelma, ei toteutettu (23.11.2026).
+Tila: toteutettu (23.11.2026). Ei vielä kokeiltu oikealla Googlella.
+
+**Käyttöönotto:**
+
+1. Google Cloud Console (osio 2): OAuth-client, paluuosoite `http://localhost:5028/signin-google`.
+2. Avaimet auth serverin user-secretsiin (komennot projektin juuresta):
+   ```
+   dotnet user-secrets init --project backend/AuthServer.Web
+   dotnet user-secrets set "Google:ClientId" "<client id>" --project backend/AuthServer.Web
+   dotnet user-secrets set "Google:ClientSecret" "<client secret>" --project backend/AuthServer.Web
+   ```
+3. Käynnistä auth server. Login- ja Register-sivuille tulee nappi "Kirjaudu Googlella". Ilman avaimia nappia ei näy.
+
+Kehityksessä nappi "Kirjaudu (testi-Google)" toimii aina ilman Googlea (osio 3).
+
+**Toteutus poikkeaa suunnitelmasta yhdessä kohdassa:** ulkoiset tunnukset ovat käyttäjän osa (`User.ExternalIds`, kuten roolit), eivät erillinen aggregaatti. Taulu on silti `user_external_ids`. Näin käyttäjän tila ("salasana tai ulkoinen tunnus") lasketaan suoraan käyttäjästä.
 
 ## 1. Mitä tehdään
 
@@ -78,12 +93,12 @@ Ulkoisen palvelun id:n mäppäys auth serverin käyttäjään. Domain-malli `Use
   - `email_verified = true` tarkoittaa, että osoite oli tilin omistajan hallussa vahvistushetkellä. Gmail-osoitteita ei kierrätetä, mutta muita voidaan: yritys antaa osoitteen uudelle työntekijälle, domain vanhenee ja ostetaan uudelleen, tai Workspace-ylläpitäjä luo osoitteen. `false`-tapauksessa ei koskaan yhdistetä.
   - **A:** yhdistetään automaattisesti, kun `email_verified = true`. Helpoin, mutta luottaa Googlen vanhaan vahvistukseen.
   - **B:** yhdistetään vasta, kun käyttäjä todistaa omistavansa olemassa olevan käyttäjän: sähköpostilinkki nykyiseen osoitteeseen (toimii myös kutsutuille ilman salasanaa) tai vanha salasana. Keycloak toimii näin, Auth0 ei yhdistä oletuksena lainkaan.
-  - Suositus: **B sähköpostilinkillä**, uusi tyyppi `PasswordToken`-mekanismiin. Ei vielä päätetty.
+  - **Päätetty (23.11.2026): A.** Yhdistetään automaattisesti, kun `email_verified = true`; `false`-tapauksessa ei koskaan. Kierrätetyn osoitteen uusi haltija pääsisi käyttäjälle joka tapauksessa "Unohtunut salasana" -toiminnolla, joten B ei olisi suojannut juuri mitään, mutta olisi lisännyt sähköpostin ja klikkauksen. Useimmat palvelut toimivat näin.
   - Riski on vain ensimmäisellä yhdistämiskerralla: `sub` kuuluu Google-tilille, joten kierrätetyn osoitteen uudella haltijalla on eri `sub`.
   - Liittyy ratkaisemattomaan ongelmaan kierrätetyistä osoitteista: [saas-myynti-ja-rekisteroityminen.md](saas-myynti-ja-rekisteroityminen.md), osio 12.
 - ~~Luodaanko uusi käyttäjä automaattisesti?~~ **Päätetty (23.11.2026): kyllä.** Tuntematon Google-käyttäjä saa tunnuksen heti, koska Google on vahvistanut sähköpostin. Kuka tahansa voi jo rekisteröityä sähköpostilla, joten Google on vain nopeampi tapa. Google-nappi on sekä kirjautuminen että rekisteröityminen, eikä `prompt=create` muuta sitä. Uudella käyttäjällä ei ole tenanttia, joten tuote pyytää luomaan sellaisen.
-- **Käyttäjän tila:** `User.Status` on nyt `Active` vain, jos käyttäjällä on salasana (`HasPassword`). Google-käyttäjällä ei ole salasanaa, joten sääntö muuttuu (esim. salasana tai ulkoinen tunnus).
-- Voiko Google-käyttäjä myöhemmin asettaa myös salasanan ("Unohtunut salasana")?
+- **Käyttäjän tila: päätetty (23.11.2026).** `Active`, kun käyttäjällä on salasana tai ulkoinen tunnus; muuten `Invited`.
+- **Salasana Google-käyttäjälle: päätetty (23.11.2026), kyllä.** "Unohtunut salasana" toimii kuten muillekin, ja käyttäjä voi kirjautua kummalla tahansa tavalla.
 
 ## 6. Testaus
 

@@ -1,0 +1,10 @@
+@page
+@model AuthServer.Web.Pages.ExternalLoginModel
+
+<div class="card">
+    <h1 class="card-header">Kirjautuminen</h1>
+    <div class="card-body">
+        <p class="text-danger">@Model.Error</p>
+        <p><a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Takaisin kirjautumiseen</a></p>
+    </div>
+</div>

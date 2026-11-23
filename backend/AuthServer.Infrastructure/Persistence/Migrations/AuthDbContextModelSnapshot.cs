@@ -748,6 +748,46 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserExternalIdEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("provider");
+
+                    b.Property<string>("ProviderUserId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("provider_user_id");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_external_ids");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_external_ids_user_id");
+
+                    b.HasIndex(new[] { "Provider", "ProviderUserId" }, "ix_user_external_ids_provider_user")
+                        .IsUnique()
+                        .HasDatabaseName("ix_user_external_ids_provider_provider_user_id");
+
+                    b.ToTable("user_external_ids", (string)null);
+                });
+
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserRoleEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -940,6 +980,16 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_tenant_domains_tenants_tenant_id");
                 });
 
+            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserExternalIdEntity", b =>
+                {
+                    b.HasOne("AuthServer.Infrastructure.Persistence.Ef.UserEntity", null)
+                        .WithMany("ExternalIds")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_external_ids_users_user_id");
+                });
+
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserRoleEntity", b =>
                 {
                     b.HasOne("AuthServer.Infrastructure.Persistence.Ef.RoleEntity", "Role")
@@ -1009,6 +1059,8 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.UserEntity", b =>
                 {
+                    b.Navigation("ExternalIds");
+
                     b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618

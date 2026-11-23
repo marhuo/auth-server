@@ -8,7 +8,16 @@ namespace AuthServer.Infrastructure.Persistence;
 
 public class UserRepository(AuthDbContext db) : IUserRepository
 {
-    private IQueryable<UserEntity> ReadQuery => db.Users.AsNoTracking().Include(u => u.UserRoles);
+    // Split query: roles and external ids in their own queries, so their rows are not multiplied.
+    private IQueryable<UserEntity> ReadQuery =>
+        db.Users.AsNoTracking().Include(u => u.UserRoles).Include(u => u.ExternalIds).AsSplitQuery();
+
+    public async Task<User?> GetByExternalIdAsync(string provider, string providerUserId)
+    {
+        var entity = await ReadQuery.SingleOrDefaultAsync(u =>
+            u.ExternalIds.Any(x => x.Provider == provider && x.ProviderUserId == providerUserId));
+        return entity?.ToDomain();
+    }
 
     public async Task<User?> GetByIdAsync(Guid id)
     {
@@ -71,6 +80,7 @@ public class UserRepository(AuthDbContext db) : IUserRepository
     {
         var entity = UserEntity.FromDomain(user);
         SyncRoles(entity, user);
+        AddNewExternalIds(entity, user);
 
         db.Users.Add(entity);
         await SaveAsync();
@@ -78,10 +88,15 @@ public class UserRepository(AuthDbContext db) : IUserRepository
 
     public async Task UpdateAsync(User user)
     {
-        var entity = await db.Users.Include(u => u.UserRoles).SingleAsync(u => u.Id == user.Id);
+        var entity = await db.Users
+            .Include(u => u.UserRoles)
+            .Include(u => u.ExternalIds)
+            .AsSplitQuery()
+            .SingleAsync(u => u.Id == user.Id);
 
         entity.UpdateFrom(user);
         SyncRoles(entity, user);
+        AddNewExternalIds(entity, user);
 
         await SaveAsync();
     }
@@ -111,6 +126,26 @@ public class UserRepository(AuthDbContext db) : IUserRepository
 
             entity.UserRoles.Add(added);
             db.UserRoles.Add(added);
+        }
+    }
+
+    // External ids are only added; the domain has no way to remove them. Added explicitly, as in SyncRoles.
+    private void AddNewExternalIds(UserEntity entity, User user)
+    {
+        foreach (var externalId in user.ExternalIds.Where(x =>
+            !entity.ExternalIds.Any(e => e.Provider == x.Provider && e.ProviderUserId == x.ProviderUserId)))
+        {
+            var added = new UserExternalIdEntity
+            {
+                Id = Guid.CreateVersion7(),
+                UserId = entity.Id,
+                Provider = externalId.Provider,
+                ProviderUserId = externalId.ProviderUserId,
+                CreatedAt = externalId.CreatedAt
+            };
+
+            entity.ExternalIds.Add(added);
+            db.UserExternalIds.Add(added);
         }
     }
 

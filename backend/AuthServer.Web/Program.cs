@@ -25,6 +25,7 @@ builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("De
 builder.Services.AddBackgroundJobs(builder.Configuration.GetConnectionString("Jobs")!);
 
 builder.Services.AddAuthServerAuthentication(builder.Configuration["Tokens:Issuer"]!);
+builder.Services.AddGoogleSignIn(builder.Configuration);
 builder.Services.AddAuthorizationPolicies();
 
 // Keys are in the main database, together with the signing keys they protect.

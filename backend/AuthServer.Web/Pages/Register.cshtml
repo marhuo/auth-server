@@ -6,21 +6,26 @@
     <div class="card-body">
         @if (Model.Sent)
         {
-            <p>Lähetimme linkin osoitteeseen <strong>@Model.Email</strong>. Avaa linkki ja aseta salasana, niin tunnus on valmis. Linkki on voimassa 7 päivää.</p>
-            <p>Jos sinulla on jo tunnus, saat sen sijaan ohjeen kirjautumiseen.</p>
-            <p><a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Takaisin kirjautumiseen</a></p>
-        }
+            <p>Lähetimme linkin osoitteeseen <strong>@Model.Email</strong>. Avaa linkki ja aseta salasana, niin tunnus on
+                valmis. Linkki on voimassa 7 päivää.</p>
+                <p>Jos sinulla on jo tunnus, saat sen sijaan ohjeen kirjautumiseen.</p>
+                <p><a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Takaisin kirjautumiseen</a></p>
+            }
         else
-        {
-            <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="ReturnUrl" type="hidden" />
-                <p>Anna sähköpostiosoitteesi, niin lähetämme linkin salasanan asettamiseen.</p>
-                <input asp-for="Email" type="email" placeholder="Sähköposti" autocomplete="username" autofocus required />
-                <partial name="_Turnstile" />
-                <button class="btn btn-primary send-link" type="submit">Jatka</button>
-                <p>Onko sinulla jo tunnus? <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Kirjaudu</a></p>
-            </form>
-        }
+            {
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="ReturnUrl" type="hidden" />
+                    <p>Anna sähköpostiosoitteesi, niin lähetämme linkin salasanan asettamiseen.</p>
+                    <input asp-for="Email" type="email" placeholder="Sähköposti" autocomplete="username" autofocus required />
+                    <partial name="_Turnstile" />
+                    <button class="btn btn-primary" type="submit">Jatka</button>
+                    <partial name="_ExternalLoginButtons" model="Model.ReturnUrl" />
+                    <p class="mt-20">
+                        Onko sinulla jo tunnus?
+                        <a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Kirjaudu</a>
+                    </p>
+                </form>
+            }
+        </div>
     </div>
-</div>

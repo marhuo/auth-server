@@ -41,6 +41,8 @@ export default defineConfig({
 			'/ForgotPassword': 'http://localhost:5028',
 			'/SetPassword': 'http://localhost:5028',
 			'/PasswordSet': 'http://localhost:5028',
+			'/ExternalLogin': 'http://localhost:5028',
+			'/DevExternalLogin': 'http://localhost:5028',
 			'/css': 'http://localhost:5028',
 			'/fonts': 'http://localhost:5028'
 		}

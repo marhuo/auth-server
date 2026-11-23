@@ -13,8 +13,9 @@ public class UserEntity
     public bool Locked { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public virtual List<UserRoleEntity> UserRoles { get; set; } = [];
+    public virtual List<UserExternalIdEntity> ExternalIds { get; set; } = [];
 
-    // Roles are not set here; the repository syncs them.
+    // Roles and external ids are not set here; the repository syncs them.
     public static UserEntity FromDomain(User user)
     {
         var entity = new UserEntity { Id = user.Id, CreatedAt = user.CreatedAt };
@@ -22,7 +23,7 @@ public class UserEntity
         return entity;
     }
 
-    // Roles are not set here; the repository syncs them.
+    // Roles and external ids are not set here; the repository syncs them.
     public void UpdateFrom(User user)
     {
         Email = user.Email;
@@ -33,7 +34,7 @@ public class UserEntity
         Locked = user.Locked;
     }
 
-    // UserRoles must be loaded.
+    // UserRoles and ExternalIds must be loaded.
     public User ToDomain() => new(
         id: Id,
         email: Email,
@@ -44,6 +45,9 @@ public class UserEntity
         locked: Locked,
         roles: UserRoles
             .Select(ur => new UserRole(RoleId: ur.RoleId, TenantId: ur.TenantId, CreatedAt: ur.CreatedAt))
+            .ToList(),
+        externalIds: ExternalIds
+            .Select(x => new UserExternalId(Provider: x.Provider, ProviderUserId: x.ProviderUserId, CreatedAt: x.CreatedAt))
             .ToList(),
         createdAt: CreatedAt);
 }

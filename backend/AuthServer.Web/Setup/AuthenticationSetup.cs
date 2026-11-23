@@ -13,6 +13,7 @@ public static class AuthenticationSetup
     public static IServiceCollection AddAuthServerAuthentication(this IServiceCollection services, string issuer)
     {
         services.AddScoped<UserSession>();
+        services.AddScoped<ExternalSignIn>();
 
         services
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -46,6 +47,51 @@ public static class AuthenticationSetup
                 options.TokenValidationParameters.ValidateAudience = false;
                 options.MapInboundClaims = false;
                 options.RequireHttpsMetadata = false;
+            });
+
+        return services;
+    }
+
+    public const string ExternalScheme = "External";
+    public const string GoogleScheme = "Google";
+
+    public static bool IsGoogleConfigured(IConfiguration configuration) =>
+        !string.IsNullOrEmpty(configuration["Google:ClientId"]);
+
+    // Google sign-in, only when Google:ClientId and Google:ClientSecret are set (user-secrets).
+    // Google's answer is kept briefly in the External cookie until ExternalLogin reads it.
+    public static IServiceCollection AddGoogleSignIn(this IServiceCollection services, IConfiguration configuration)
+    {
+        if (!IsGoogleConfigured(configuration))
+            return services;
+
+        services.AddAuthentication()
+            .AddCookie(ExternalScheme, options =>
+            {
+                options.Cookie.Name = "AuthServer.External";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddOpenIdConnect(GoogleScheme, options =>
+            {
+                options.SignInScheme = ExternalScheme;
+                options.Authority = "https://accounts.google.com";
+                options.ClientId = configuration["Google:ClientId"];
+                options.ClientSecret = configuration["Google:ClientSecret"];
+                options.CallbackPath = "/signin-google"; // The redirect URI in Google Cloud Console.
+                options.ResponseType = "code";
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("email");
+                options.MapInboundClaims = false;
+
+                // E.g. the user cancels on Google's page: back to the login page.
+                options.Events.OnRemoteFailure = context =>
+                {
+                    var returnUrl = context.Properties?.Items.TryGetValue("returnUrl", out var url) == true ? url : null;
+                    context.Response.Redirect(returnUrl is null ? "/Login" : $"/Login?returnUrl={Uri.EscapeDataString(returnUrl)}");
+                    context.HandleResponse();
+                    return Task.CompletedTask;
+                };
             });
 
         return services;

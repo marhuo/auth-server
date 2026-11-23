@@ -37,6 +37,35 @@ public class UserAuthenticationService(
         return status == LoginStatus.Success ? (status, user) : (status, null);
     }
 
+    // Sign-in with an external service, e.g. Google. The first sign-in creates the user, or links the
+    // user with the same email if the service has verified the email.
+    public async Task<(ExternalSignInStatus Status, User? User)> SignInExternalAsync(ExternalIdentity identity)
+    {
+        var now = timeProvider.GetUtcNow();
+        var user = await users.GetByExternalIdAsync(identity.Provider, identity.ProviderUserId);
+
+        if (user is null)
+        {
+            // An unverified email may belong to someone else.
+            if (!identity.EmailVerified)
+                return (ExternalSignInStatus.EmailNotVerified, null);
+
+            user = await users.GetByNormalizedEmailAsync(User.NormalizeEmail(identity.Email));
+            if (user is null)
+            {
+                user = User.CreateExternal(identity: identity, now: now);
+                await users.CreateAsync(user);
+            }
+            else
+            {
+                user.AddExternalId(identity, now);
+                await users.UpdateAsync(user);
+            }
+        }
+
+        return user.CanSignIn(now) ? (ExternalSignInStatus.Success, user) : (ExternalSignInStatus.Locked, null);
+    }
+
     public Task<User?> GetByIdAsync(Guid id) =>
         users.GetByIdAsync(id);
 

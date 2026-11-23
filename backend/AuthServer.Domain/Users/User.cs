@@ -6,8 +6,7 @@ namespace AuthServer.Domain.Users;
 // LockedOut: automatic lockout after failed logins. Locked: locked by an admin.
 public enum LoginStatus { Success, Failed, LockedOut, Locked }
 
-// A user is never deleted: removing access means removing roles. The user and their emails stay,
-// so an email always identifies the same user, and a person can be invited again.
+// A user is never deleted: removing access means removing roles, and a person can be invited again.
 public sealed class User : AggregateRoot
 {
     public const int MaxEmailLength = 254;
@@ -21,6 +20,7 @@ public sealed class User : AggregateRoot
     private const string PasswordKey = "password";
 
     private readonly List<UserRole> _roles;
+    private readonly List<UserExternalId> _externalIds;
 
     [JsonConstructor]
     public User(
@@ -32,6 +32,7 @@ public sealed class User : AggregateRoot
         DateTimeOffset? lockedUntil,
         bool locked,
         IReadOnlyList<UserRole> roles,
+        IReadOnlyList<UserExternalId> externalIds,
         DateTimeOffset createdAt)
         : base(id)
     {
@@ -42,6 +43,7 @@ public sealed class User : AggregateRoot
         LockedUntil = lockedUntil;
         Locked = locked;
         _roles = [.. roles];
+        _externalIds = [.. externalIds];
         CreatedAt = createdAt;
     }
 
@@ -52,7 +54,7 @@ public sealed class User : AggregateRoot
     // is free for others. Identify users by Id, not by email.
     public string NormalizedEmail { get; private set; }
 
-    // Null until the invited user sets a password (later also for users who sign in only externally).
+    // Null until the invited user sets a password, and for users who sign in only externally.
     public string? PasswordHash { get; private set; }
 
     public int FailedLogins { get; private set; }
@@ -64,14 +66,31 @@ public sealed class User : AggregateRoot
     public bool Locked { get; private set; }
 
     public IReadOnlyList<UserRole> Roles => _roles;
+
+    // Accounts in external sign-in services, e.g. Google.
+    public IReadOnlyList<UserExternalId> ExternalIds => _externalIds;
+
     public DateTimeOffset CreatedAt { get; private set; }
 
     [JsonIgnore]
     public bool HasPassword => PasswordHash is not null;
 
-    // Accepting the invitation means setting the first password, so the status follows from it.
+    // E.g. a Google account.
     [JsonIgnore]
-    public UserStatuses Status => HasPassword ? UserStatuses.Active : UserStatuses.Invited;
+    public bool HasExternalAccount => _externalIds.Count > 0;
+
+    // Invited until the user has a way to sign in: a password or an external account.
+    [JsonIgnore]
+    public UserStatuses Status
+    {
+        get
+        {
+            if (HasPassword || HasExternalAccount)
+                return UserStatuses.Active;
+
+            return UserStatuses.Invited;
+        }
+    }
 
     // Whether the automatic lockout is in force.
     public bool IsLockedOut(DateTimeOffset now) => LockedUntil > now;
@@ -98,7 +117,16 @@ public sealed class User : AggregateRoot
             lockedUntil: null,
             locked: false,
             roles: [],
+            externalIds: [],
             createdAt: now);
+    }
+
+    // A user who signs in with an external service for the first time. Active at once.
+    public static User CreateExternal(ExternalIdentity identity, DateTimeOffset now)
+    {
+        var user = CreateInvited(email: identity.Email, now: now);
+        user.AddExternalId(identity, now);
+        return user;
     }
 
     public void SetEmail(string email)
@@ -187,6 +215,17 @@ public sealed class User : AggregateRoot
         _roles.RemoveAll(r => r.RoleId == roleId && r.TenantId == tenantId);
     }
 
+    public bool HasExternalId(string provider, string providerUserId) =>
+        _externalIds.Any(x => x.Provider == provider && x.ProviderUserId == providerUserId);
+
+    public void AddExternalId(ExternalIdentity identity, DateTimeOffset now)
+    {
+        if (HasExternalId(identity.Provider, identity.ProviderUserId))
+            return;
+
+        _externalIds.Add(new UserExternalId(identity.Provider, identity.ProviderUserId, now));
+    }
+
     // Expects a trimmed value.
     public static void ValidateEmail(ErrorCollector errors, string email)
     {
@@ -220,6 +259,6 @@ public sealed class User : AggregateRoot
 
     public static ValidationError EmailTakenError() =>
         new(nameof(Email), ErrorCode.Taken,
-            "Email is used by another user or has been used by one before.",
-            "Sähköposti on toisen käyttäjän käytössä tai se on ollut aiemmin toisen käyttäjän käytössä.");
+            "Email is used by another user.",
+            "Sähköposti on toisen käyttäjän käytössä.");
 }

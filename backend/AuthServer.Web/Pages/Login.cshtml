@@ -7,8 +7,9 @@
         <input asp-for="ReturnUrl" type="hidden" />
         <input asp-for="Email" type="email" placeholder="Sähköposti" autocomplete="username" autofocus required />
         <input asp-for="Password" type="password" placeholder="Salasana" autocomplete="current-password" required />
-        <button class="btn btn-primary login" type="submit">Kirjaudu</button>
+        <button class="btn btn-primary" type="submit">Kirjaudu</button>
         <a asp-page="ForgotPassword">Unohtuiko salasana?</a>
-        <p>Ei tunnusta? <a asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl">Luo tunnus</a></p>
+        <partial name="_ExternalLoginButtons" model="Model.ReturnUrl" />
+        <p class="mt-20">Ei tunnusta? <a asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl">Luo tunnus</a></p>
     </form>
 </div>
