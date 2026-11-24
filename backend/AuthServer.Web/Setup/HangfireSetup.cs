@@ -58,6 +58,11 @@ public static class HangfireSetup
             job => job.RunAsync(),
             Cron.Daily(3));
 
+        jobs.AddOrUpdate<UnusedTenantCleanupJob>(
+            UnusedTenantCleanupJob.JobId,
+            job => job.RunAsync(),
+            Cron.Daily(3, 15));
+
         jobs.AddOrUpdate<UnusedUserCleanupJob>(
             UnusedUserCleanupJob.JobId,
             job => job.RunAsync(),

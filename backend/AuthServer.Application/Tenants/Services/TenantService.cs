@@ -114,6 +114,11 @@ public class TenantService(ITenantRepository tenants, TenantValidator validator,
         await tenants.DeleteAsync(tenant.Id);
     }
 
+    // Deletes tenants that nothing points to, e.g. created in the admin UI and left empty.
+    // Returns the number of deleted tenants.
+    public Task<int> DeleteUnusedAsync() =>
+        tenants.DeleteUnusedAsync(timeProvider.GetUtcNow() - Tenant.UnusedRetention);
+
     private async Task<Tenant> LoadAsync(Guid id) =>
         await tenants.GetByIdAsync(id)
         ?? throw new ValidationException(Errors.NotFound(nameof(id), "Tenant", "Asiakasta"));

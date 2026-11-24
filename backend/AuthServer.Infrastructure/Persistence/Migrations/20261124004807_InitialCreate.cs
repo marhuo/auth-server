@@ -574,6 +574,12 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "ix_tenants_created_at",
+                table: "tenants",
+                column: "created_at",
+                filter: "first_sign_in_at IS NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_tenants_normalized_name",
                 table: "tenants",
                 column: "normalized_name");

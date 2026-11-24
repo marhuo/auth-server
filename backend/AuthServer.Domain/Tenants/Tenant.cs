@@ -12,6 +12,9 @@ public sealed partial class Tenant : AggregateRoot
     public const int MaxSlugLength = 63;
     public const int MaxSuspensionReasonLength = 500;
 
+    // A tenant that nothing points to is deleted this long after creation.
+    public static readonly TimeSpan UnusedRetention = TimeSpan.FromDays(30);
+
     // Slugs that would collide with routes of the auth server.
     private static readonly HashSet<string> ReservedSlugs = ["admin", "connect", "login", "logout", "api"];
 

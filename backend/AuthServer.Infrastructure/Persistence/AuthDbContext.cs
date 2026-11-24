@@ -60,6 +60,9 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
                 .HasMethod("gin")
                 .HasOperators("gin_trgm_ops");
 
+            // Finding unused tenants to delete (TenantRepository.DeleteUnusedAsync).
+            b.HasIndex(e => e.CreatedAt, "ix_tenants_unused_created_at").HasFilter("first_sign_in_at IS NULL");
+
             b.HasMany(e => e.UserRoles).WithOne(e => e.Tenant).HasForeignKey(e => e.TenantId);
         });
 

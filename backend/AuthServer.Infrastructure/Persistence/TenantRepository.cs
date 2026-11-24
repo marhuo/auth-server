@@ -86,6 +86,16 @@ public class TenantRepository(AuthDbContext db) : ITenantRepository
         await transaction.CommitAsync();
     }
 
+    // A tenant that nothing points to: no user roles, clients or domains.
+    public Task<int> DeleteUnusedAsync(DateTimeOffset createdBefore) =>
+        db.Tenants
+            .Where(t => t.FirstSignInAt == null
+                && t.CreatedAt < createdBefore
+                && !t.UserRoles.Any()
+                && !t.Clients.Any()
+                && !db.TenantDomains.Any(d => d.TenantId == t.Id))
+            .ExecuteDeleteAsync();
+
     private async Task SaveAsync()
     {
         try

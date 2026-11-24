@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuthServer.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20261124004322_InitialCreate")]
+    [Migration("20261124004807_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -652,6 +652,10 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.HasIndex(new[] { "Slug" }, "ix_tenants_slug")
                         .IsUnique()
                         .HasDatabaseName("ix_tenants_slug");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "ix_tenants_unused_created_at")
+                        .HasDatabaseName("ix_tenants_created_at")
+                        .HasFilter("first_sign_in_at IS NULL");
 
                     b.ToTable("tenants", (string)null);
                 });

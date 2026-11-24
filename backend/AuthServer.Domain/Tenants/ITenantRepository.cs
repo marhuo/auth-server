@@ -24,4 +24,8 @@ public interface ITenantRepository
 
     // Physically deletes the tenant with its user roles and domains.
     Task DeleteAsync(Guid id);
+
+    // Physically deletes tenants that nothing points to (no user roles, clients or domains) and that
+    // were created before the given time. Returns the number of deleted tenants.
+    Task<int> DeleteUnusedAsync(DateTimeOffset createdBefore);
 }

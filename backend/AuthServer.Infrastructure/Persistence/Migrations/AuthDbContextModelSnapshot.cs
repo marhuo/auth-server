@@ -650,6 +650,10 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_tenants_slug");
 
+                    b.HasIndex(new[] { "CreatedAt" }, "ix_tenants_unused_created_at")
+                        .HasDatabaseName("ix_tenants_created_at")
+                        .HasFilter("first_sign_in_at IS NULL");
+
                     b.ToTable("tenants", (string)null);
                 });
 
