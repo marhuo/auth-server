@@ -215,6 +215,10 @@ public sealed class User : AggregateRoot
         _roles.RemoveAll(r => r.RoleId == roleId && r.TenantId == tenantId);
     }
 
+    // Removes the given roles in one tenant. Returns whether the user had any of them.
+    public bool RemoveRolesInTenant(IReadOnlyCollection<Guid> roleIds, Guid tenantId) =>
+        _roles.RemoveAll(r => r.TenantId == tenantId && roleIds.Contains(r.RoleId)) > 0;
+
     public bool HasExternalId(string provider, string providerUserId) =>
         _externalIds.Any(x => x.Provider == provider && x.ProviderUserId == providerUserId);
 

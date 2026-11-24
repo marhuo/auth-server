@@ -19,6 +19,8 @@ public interface IRoleRepository
 
     Task<bool> AnyForResourceServerAsync(Guid resourceServerId);
 
+    Task<List<Guid>> GetIdsByResourceServerAsync(Guid resourceServerId);
+
     // Whether any user has a role in the tenant.
     Task<bool> AnyRoleInTenantAsync(Guid tenantId);
 

@@ -10,6 +10,7 @@ export * from './userDto';
 export * from './userDtoStatuses';
 export * from './userInviteRequest';
 export * from './userPagedListRequest';
+export * from './userRemoveFromTenantRequest';
 export * from './userRoleDto';
 export * from './userUpdateRequest';
 export * from './tenantCreateRequest';

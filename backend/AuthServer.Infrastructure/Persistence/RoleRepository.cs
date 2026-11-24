@@ -67,6 +67,9 @@ public class RoleRepository(AuthDbContext db) : IRoleRepository
     public Task<bool> AnyForResourceServerAsync(Guid resourceServerId) =>
         db.Roles.AnyAsync(r => r.ResourceServerId == resourceServerId);
 
+    public Task<List<Guid>> GetIdsByResourceServerAsync(Guid resourceServerId) =>
+        db.Roles.Where(r => r.ResourceServerId == resourceServerId).Select(r => r.Id).ToListAsync();
+
     public Task<bool> AnyRoleInTenantAsync(Guid tenantId) =>
         db.UserRoles.AnyAsync(ur => ur.TenantId == tenantId);
 

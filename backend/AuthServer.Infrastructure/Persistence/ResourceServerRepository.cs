@@ -68,6 +68,12 @@ public class ResourceServerRepository(AuthDbContext db) : IResourceServerReposit
             .Select(rs => (bool?)rs.IsAuthServer)
             .SingleOrDefaultAsync();
 
+    public async Task<ResourceServer?> GetByAudienceAsync(string audience)
+    {
+        var entity = await db.ResourceServers.AsNoTracking().SingleOrDefaultAsync(rs => rs.Audience == audience);
+        return entity?.ToDomain();
+    }
+
     public Task<bool> AudienceExistsAsync(string audience, Guid? excludeId = null) =>
         db.ResourceServers.AnyAsync(rs => rs.Audience == audience && rs.Id != excludeId);
 

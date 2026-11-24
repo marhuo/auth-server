@@ -18,6 +18,8 @@ public interface IResourceServerRepository
 
     Task<bool> ExistsAsync(Guid id);
 
+    Task<ResourceServer?> GetByAudienceAsync(string audience);
+
     // Returns null if the resource server does not exist.
     Task<bool?> IsAuthServerAsync(Guid id);
 

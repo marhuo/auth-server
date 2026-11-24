@@ -84,6 +84,15 @@ public class UserValidator(
                 "Auth server -roolin viimeistä haltijaa ei voi poistaa.");
     }
 
+    // Only a product's roles can be removed this way, never the auth server's.
+    public void ValidateRemoveFromTenant(ResourceServer resourceServer)
+    {
+        if (resourceServer.IsAuthServer)
+            throw new ValidationException("ResourceServerAudience", ErrorCode.NotAllowed,
+                "The auth server's roles cannot be removed this way.",
+                "Auth serverin rooleja ei voi poistaa tällä tavalla.");
+    }
+
     // Auth server roles have no tenant; other roles need an existing tenant.
     private async Task ValidateRoleAssignmentAsync(string key, Guid roleId, Guid? tenantId)
     {

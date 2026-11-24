@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AppUserInviteRequest = AuthServer.Application.Users.Messages.UserInviteRequest;
 using AppUserRoleDto = AuthServer.Application.Users.Messages.UserRoleDto;
+using AppUserRemoveFromTenantRequest = AuthServer.Application.Users.Messages.UserRemoveFromTenantRequest;
 
 namespace AuthServer.Web.Controllers.Api;
 
@@ -29,5 +30,20 @@ public class UserController(UserService userService, RoleService roleService) : 
         });
 
         return new UserInviteResponse { UserId = userId };
+    }
+
+    // Removes the user's roles of the product (resourceServer = its audience) in the tenant.
+    // The user's other roles stay; users are never deleted.
+    [HttpDelete("{userId:guid}/tenant/{tenantId:guid}")]
+    public async Task<IActionResult> RemoveFromTenant(Guid userId, Guid tenantId, [FromQuery] string resourceServer)
+    {
+        await userService.RemoveFromTenantAsync(new AppUserRemoveFromTenantRequest
+        {
+            UserId = userId,
+            TenantId = tenantId,
+            ResourceServerAudience = resourceServer
+        });
+
+        return NoContent();
     }
 }

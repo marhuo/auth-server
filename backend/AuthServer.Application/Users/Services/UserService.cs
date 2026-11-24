@@ -2,12 +2,16 @@ using AuthServer.Application.Common.Messages;
 using AuthServer.Application.Users.Messages;
 using AuthServer.Domain.Common;
 using AuthServer.Domain.OAuth;
+using AuthServer.Domain.ResourceServers;
+using AuthServer.Domain.Roles;
 using AuthServer.Domain.Users;
 
 namespace AuthServer.Application.Users.Services;
 
 public class UserService(
     IUserRepository users,
+    IRoleRepository roles,
+    IResourceServerRepository resourceServers,
     IPasswordTokenRepository passwordTokens,
     IRefreshTokenRepository refreshTokens,
     UserValidator validator,
@@ -144,6 +148,25 @@ public class UserService(
         await validator.ValidateRemoveRoleAsync(user, request);
 
         user.RemoveRole(request.RoleId, request.TenantId);
+
+        await users.UpdateAsync(user);
+        await refreshTokens.RevokeRefreshTokensAsync(user.Id, timeProvider.GetUtcNow());
+    }
+
+    // Removes the user's roles of one product in one tenant, e.g. when the user is removed from a
+    // workspace. Other products' roles stay. Also revokes the user's refresh tokens.
+    public async Task RemoveFromTenantAsync(UserRemoveFromTenantRequest request)
+    {
+        var user = await LoadAsync(request.UserId, nameof(request.UserId));
+        var resourceServer = await resourceServers.GetByAudienceAsync(request.ResourceServerAudience)
+            ?? throw new ValidationException(Errors.NotFound(
+                nameof(request.ResourceServerAudience), "Resource server", "Resurssipalvelinta"));
+
+        validator.ValidateRemoveFromTenant(resourceServer);
+
+        var roleIds = await roles.GetIdsByResourceServerAsync(resourceServer.Id);
+        if (!user.RemoveRolesInTenant(roleIds, request.TenantId))
+            return;
 
         await users.UpdateAsync(user);
         await refreshTokens.RevokeRefreshTokensAsync(user.Id, timeProvider.GetUtcNow());
