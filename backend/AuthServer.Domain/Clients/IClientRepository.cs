@@ -29,4 +29,7 @@ public interface IClientRepository
     // When the client becomes deleted in this update, its refresh tokens and authorization
     // codes are removed in the same transaction.
     Task UpdateAsync(Client client);
+
+    // Also deletes the client's tokens and authorization codes.
+    Task DeleteAsync(Guid id);
 }

@@ -28,4 +28,6 @@ public interface IResourceServerRepository
     Task CreateAsync(ResourceServer resourceServer);
 
     Task UpdateAsync(ResourceServer resourceServer);
+
+    Task DeleteAsync(Guid id);
 }

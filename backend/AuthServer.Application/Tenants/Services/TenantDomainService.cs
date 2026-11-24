@@ -54,9 +54,7 @@ public class TenantDomainService(
     {
         var domain = await LoadAsync(tenantId, id);
 
-        domain.Delete(timeProvider.GetUtcNow());
-
-        await domains.UpdateAsync(domain);
+        await domains.DeleteAsync(domain.Id);
     }
 
     // Checks that the verified domains still have their TXT record. Returns the number of domains that

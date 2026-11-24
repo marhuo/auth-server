@@ -17,4 +17,6 @@ public interface ITenantDomainRepository
     Task CreateAsync(TenantDomain domain);
 
     Task UpdateAsync(TenantDomain domain);
+
+    Task DeleteAsync(Guid id);
 }

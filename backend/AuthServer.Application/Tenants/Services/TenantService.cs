@@ -111,9 +111,7 @@ public class TenantService(ITenantRepository tenants, TenantValidator validator,
 
         await validator.ValidateDeleteAsync(tenant);
 
-        tenant.Delete(timeProvider.GetUtcNow());
-
-        await tenants.UpdateAsync(tenant);
+        await tenants.DeleteAsync(tenant.Id);
     }
 
     private async Task<Tenant> LoadAsync(Guid id) =>

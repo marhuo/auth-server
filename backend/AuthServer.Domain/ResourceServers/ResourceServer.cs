@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace AuthServer.Domain.ResourceServers;
 
-public sealed partial class ResourceServer : SoftDeletableAggregateRoot
+public sealed partial class ResourceServer : AggregateRoot
 {
     public const int MinAudienceLength = 4;
     public const int MaxAudienceLength = 200;
@@ -11,8 +11,8 @@ public sealed partial class ResourceServer : SoftDeletableAggregateRoot
     public const int MaxDisplayNameLength = 200;
 
     [JsonConstructor]
-    public ResourceServer(Guid id, string audience, string displayName, bool isAuthServer, DateTimeOffset createdAt, DateTimeOffset? deletedAt)
-        : base(id, deletedAt)
+    public ResourceServer(Guid id, string audience, string displayName, bool isAuthServer, DateTimeOffset createdAt)
+        : base(id)
     {
         Audience = audience;
         DisplayName = displayName;
@@ -44,13 +44,11 @@ public sealed partial class ResourceServer : SoftDeletableAggregateRoot
             audience: audience,
             displayName: displayName,
             isAuthServer: false,
-            createdAt: now,
-            deletedAt: null);
+            createdAt: now);
     }
 
     public void SetAudience(string audience)
     {
-        EnsureNotDeleted();
         audience = audience.Trim();
 
         var errors = new ErrorCollector();
@@ -65,7 +63,6 @@ public sealed partial class ResourceServer : SoftDeletableAggregateRoot
 
     public void SetDisplayName(string displayName)
     {
-        EnsureNotDeleted();
         displayName = displayName.Trim();
 
         var errors = new ErrorCollector();
@@ -76,14 +73,6 @@ public sealed partial class ResourceServer : SoftDeletableAggregateRoot
             return;
 
         DisplayName = displayName;
-    }
-
-    public override void Delete(DateTimeOffset now)
-    {
-        if (IsAuthServer)
-            throw new InvalidOperationException("The auth server resource server cannot be deleted.");
-
-        base.Delete(now);
     }
 
     // Validates changing the audience of this resource server. Used by SetAudience and by

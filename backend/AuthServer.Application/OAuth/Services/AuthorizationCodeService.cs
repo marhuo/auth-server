@@ -1,12 +1,17 @@
 using AuthServer.Domain.Common;
 using AuthServer.Domain.OAuth;
+using AuthServer.Domain.Tenants;
 
 namespace AuthServer.Application.OAuth.Services;
 
 // Authorization codes of the authorization code flow (with PKCE).
-public class AuthorizationCodeService(IAuthorizationCodeRepository codes, TimeProvider timeProvider)
+public class AuthorizationCodeService(
+    IAuthorizationCodeRepository codes,
+    ITenantRepository tenants,
+    TimeProvider timeProvider)
 {
-    // Stores a new code and returns the raw code for the redirect to the client.
+    // Stores a new code and returns the raw code for the redirect to the client. A code with a tenant
+    // means a sign-in to the tenant, so its first sign-in is recorded.
     public async Task<string> CreateAsync(
         Guid clientId,
         Guid userId,
@@ -27,6 +32,10 @@ public class AuthorizationCodeService(IAuthorizationCodeRepository codes, TimePr
             now: timeProvider.GetUtcNow());
 
         await codes.CreateAsync(code);
+
+        if (tenantId is not null)
+            await MarkTenantSignedInAsync(tenantId.Value);
+
         return rawCode;
     }
 
@@ -43,5 +52,12 @@ public class AuthorizationCodeService(IAuthorizationCodeRepository codes, TimePr
 
         // Another request may have used the code after it was read.
         return await codes.TryMarkUsedAsync(code.Id, now) ? code : null;
+    }
+
+    private async Task MarkTenantSignedInAsync(Guid tenantId)
+    {
+        var tenant = await tenants.GetByIdAsync(tenantId);
+        if (tenant is not null && tenant.MarkSignedIn(timeProvider.GetUtcNow()))
+            await tenants.UpdateAsync(tenant);
     }
 }

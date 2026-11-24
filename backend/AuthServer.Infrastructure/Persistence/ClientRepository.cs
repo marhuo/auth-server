@@ -82,23 +82,26 @@ public class ClientRepository(AuthDbContext db) : IClientRepository
     public async Task UpdateAsync(Client client)
     {
         var entity = await db.Clients.Include(c => c.Scopes).SingleAsync(c => c.Id == client.Id);
-        var becomesDeleted = entity.DeletedAt is null && client.Deleted;
 
         entity.UpdateFrom(client);
         await SyncScopesAsync(entity, client.ScopeIds);
 
-        if (!becomesDeleted)
-        {
-            await SaveAsync();
-            return;
-        }
+        await SaveAsync();
+    }
 
-        // Tokens and codes of a deleted client are removed together with the soft delete.
+    // Also deletes the client's tokens and codes, so its access ends at once.
+    public async Task DeleteAsync(Guid id)
+    {
         await using var transaction = await db.Database.BeginTransactionAsync();
 
-        await db.RefreshTokens.IgnoreQueryFilters().Where(t => t.ClientId == client.Id).ExecuteDeleteAsync();
-        await db.AuthorizationCodes.IgnoreQueryFilters().Where(c => c.ClientId == client.Id).ExecuteDeleteAsync();
-        await SaveAsync();
+        await db.RefreshTokens.Where(t => t.ClientId == id).ExecuteDeleteAsync();
+        await db.AuthorizationCodes.Where(c => c.ClientId == id).ExecuteDeleteAsync();
+
+        // Through the tracked entity, so EF also deletes the rows of the client-scope join table.
+        var entity = await db.Clients.Include(c => c.Scopes).SingleAsync(c => c.Id == id);
+        entity.Scopes.Clear();
+        db.Clients.Remove(entity);
+        await db.SaveChangesAsync();
 
         await transaction.CommitAsync();
     }

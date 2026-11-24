@@ -90,6 +90,9 @@ public class ResourceServerRepository(AuthDbContext db) : IResourceServerReposit
         await SaveAsync();
     }
 
+    public Task DeleteAsync(Guid id) =>
+        db.ResourceServers.Where(rs => rs.Id == id).ExecuteDeleteAsync();
+
     private async Task SaveAsync()
     {
         try

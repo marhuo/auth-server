@@ -2,7 +2,7 @@
 
 namespace AuthServer.Infrastructure.Persistence.Ef;
 
-public class RoleEntity : ISoftDeletableEntity
+public class RoleEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";
@@ -11,7 +11,6 @@ public class RoleEntity : ISoftDeletableEntity
     public Guid ResourceServerId { get; set; }
     public virtual ResourceServerEntity ResourceServer { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
 
     public static RoleEntity FromDomain(Role role)
     {
@@ -25,7 +24,6 @@ public class RoleEntity : ISoftDeletableEntity
         Name = role.Name;
         Description = role.Description;
         ResourceServerId = role.ResourceServerId;
-        DeletedAt = role.DeletedAt;
     }
 
     public Role ToDomain() => new(
@@ -33,6 +31,5 @@ public class RoleEntity : ISoftDeletableEntity
         resourceServerId: ResourceServerId,
         name: Name,
         description: Description,
-        createdAt: CreatedAt,
-        deletedAt: DeletedAt);
+        createdAt: CreatedAt);
 }

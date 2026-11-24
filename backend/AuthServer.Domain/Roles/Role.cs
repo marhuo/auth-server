@@ -3,15 +3,15 @@ using System.Text.RegularExpressions;
 
 namespace AuthServer.Domain.Roles;
 
-public sealed partial class Role : SoftDeletableAggregateRoot
+public sealed partial class Role : AggregateRoot
 {
     public const int MinNameLength = 2;
     public const int MaxNameLength = 64;
     public const int MaxDescriptionLength = 300;
 
     [JsonConstructor]
-    public Role(Guid id, Guid resourceServerId, string name, string description, DateTimeOffset createdAt, DateTimeOffset? deletedAt)
-        : base(id, deletedAt)
+    public Role(Guid id, Guid resourceServerId, string name, string description, DateTimeOffset createdAt)
+        : base(id)
     {
         ResourceServerId = resourceServerId;
         Name = name;
@@ -39,13 +39,11 @@ public sealed partial class Role : SoftDeletableAggregateRoot
             resourceServerId: resourceServerId,
             name: name,
             description: description,
-            createdAt: now,
-            deletedAt: null);
+            createdAt: now);
     }
 
     public void SetName(string name)
     {
-        EnsureNotDeleted();
         name = name.Trim();
 
         var errors = new ErrorCollector();
@@ -60,7 +58,6 @@ public sealed partial class Role : SoftDeletableAggregateRoot
 
     public void SetDescription(string description)
     {
-        EnsureNotDeleted();
         description = description.Trim();
 
         var errors = new ErrorCollector();
@@ -75,7 +72,6 @@ public sealed partial class Role : SoftDeletableAggregateRoot
 
     public void SetResourceServerId(Guid resourceServerId)
     {
-        EnsureNotDeleted();
 
         if (resourceServerId == ResourceServerId)
             return;

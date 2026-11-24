@@ -89,9 +89,7 @@ public class ScopeService(IScopeRepository scopes, ScopeValidator validator, Tim
 
         await validator.ValidateDeleteAsync(scope);
 
-        scope.Delete(timeProvider.GetUtcNow());
-
-        await scopes.UpdateAsync(scope);
+        await scopes.DeleteAsync(scope.Id);
     }
 
     private static ValidationException NotFound(string key) =>

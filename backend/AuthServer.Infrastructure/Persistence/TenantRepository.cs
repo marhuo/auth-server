@@ -74,6 +74,18 @@ public class TenantRepository(AuthDbContext db) : ITenantRepository
         await SaveAsync();
     }
 
+    public async Task DeleteAsync(Guid id)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync();
+
+        // Rows that point to the tenant first: all foreign keys are Restrict.
+        await db.UserRoles.Where(ur => ur.TenantId == id).ExecuteDeleteAsync();
+        await db.TenantDomains.Where(d => d.TenantId == id).ExecuteDeleteAsync();
+        await db.Tenants.Where(t => t.Id == id).ExecuteDeleteAsync();
+
+        await transaction.CommitAsync();
+    }
+
     private async Task SaveAsync()
     {
         try

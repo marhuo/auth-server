@@ -1,12 +1,11 @@
 using AuthServer.Application.Tenants.Messages;
 using AuthServer.Domain.Clients;
 using AuthServer.Domain.Common;
-using AuthServer.Domain.Roles;
 using AuthServer.Domain.Tenants;
 
 namespace AuthServer.Application.Tenants.Services;
 
-public class TenantValidator(ITenantRepository tenants, IClientRepository clients, IRoleRepository roles)
+public class TenantValidator(ITenantRepository tenants, IClientRepository clients)
 {
     // A taken slug is not an error here: the service numbers it (Tenant.SlugFromName).
     public void ValidateCreate(TenantCreateRequest request)
@@ -42,21 +41,17 @@ public class TenantValidator(ITenantRepository tenants, IClientRepository client
         errors.ThrowIfAny();
     }
 
+    // Only a tenant nobody has signed in to: a product may have data for a used tenant. Its user roles
+    // (e.g. an invited admin who never came) are deleted with it.
     public async Task ValidateDeleteAsync(Tenant tenant)
     {
-        var errors = new ErrorCollector();
+        if (tenant.FirstSignInAt is not null)
+            throw new ValidationException(Tenant.UsedTenantDeleteError());
 
         if (await clients.AnyForTenantAsync(tenant.Id))
-            errors.Add("id", ErrorCode.NotAllowed,
+            throw new ValidationException("id", ErrorCode.NotAllowed,
                 "The tenant cannot be deleted while it has clients.",
                 "Asiakasta ei voi poistaa, kun sillä on clientteja.");
-
-        if (await roles.AnyRoleInTenantAsync(tenant.Id))
-            errors.Add("id", ErrorCode.NotAllowed,
-                "The tenant cannot be deleted while users have roles in it.",
-                "Asiakasta ei voi poistaa, kun käyttäjillä on siinä rooleja.");
-
-        errors.ThrowIfAny();
     }
 
     // Only the slug is unique; the name is a display name that several tenants may share.

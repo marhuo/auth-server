@@ -33,10 +33,8 @@ public class RefreshTokenRepository(AuthDbContext db) : IRefreshTokenRepository
             .Where(t => t.UserId == userId && t.RevokedAt == null)
             .ExecuteUpdateAsync(s => s.SetProperty(t => t.RevokedAt, now));
 
-    // IgnoreQueryFilters: tokens of deleted clients are hidden by the query filter but must be deleted too.
     public Task<int> DeleteExpiredAsync(DateTimeOffset expiredBefore) =>
         db.RefreshTokens
-            .IgnoreQueryFilters()
             .Where(t => t.ExpiresAt < expiredBefore)
             .ExecuteDeleteAsync();
 }

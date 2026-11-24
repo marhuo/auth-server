@@ -49,6 +49,9 @@ public class TenantDomainRepository(AuthDbContext db) : ITenantDomainRepository
         await db.SaveChangesAsync();
     }
 
+    public Task DeleteAsync(Guid id) =>
+        db.TenantDomains.Where(d => d.Id == id).ExecuteDeleteAsync();
+
     public async Task UpdateAsync(TenantDomain domain)
     {
         var entity = await db.TenantDomains.SingleAsync(d => d.Id == domain.Id);

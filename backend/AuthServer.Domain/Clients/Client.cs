@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace AuthServer.Domain.Clients;
 
-public sealed partial class Client : SoftDeletableAggregateRoot
+public sealed partial class Client : AggregateRoot
 {
     public const int MinClientIdLength = 2;
     public const int MaxClientIdLength = 100;
@@ -45,9 +45,8 @@ public sealed partial class Client : SoftDeletableAggregateRoot
         TimeSpan accessTokenLifetime,
         TimeSpan? idTokenLifetime,
         TimeSpan? refreshTokenLifetime,
-        DateTimeOffset createdAt,
-        DateTimeOffset? deletedAt)
-        : base(id, deletedAt)
+        DateTimeOffset createdAt)
+        : base(id)
     {
         AccessTokenLifetime = accessTokenLifetime;
         IdTokenLifetime = idTokenLifetime;
@@ -151,13 +150,11 @@ public sealed partial class Client : SoftDeletableAggregateRoot
             accessTokenLifetime: accessTokenLifetime,
             idTokenLifetime: idTokenLifetime,
             refreshTokenLifetime: refreshTokenLifetime,
-            createdAt: now,
-            deletedAt: null);
+            createdAt: now);
     }
 
     public void SetClientId(string clientId)
     {
-        EnsureNotDeleted();
         clientId = clientId.Trim();
 
         var errors = new ErrorCollector();
@@ -169,7 +166,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void SetDisplayName(string displayName)
     {
-        EnsureNotDeleted();
         displayName = displayName.Trim();
 
         var errors = new ErrorCollector();
@@ -181,7 +177,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void SetTenantId(Guid? tenantId)
     {
-        EnsureNotDeleted();
 
         var errors = new ErrorCollector();
         ValidateTenantId(errors, tenantId);
@@ -193,7 +188,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
     // A blank value clears the address.
     public void SetInitiateLoginUri(string? uri)
     {
-        EnsureNotDeleted();
         uri = string.IsNullOrWhiteSpace(uri) ? null : uri.Trim();
 
         var errors = new ErrorCollector();
@@ -205,7 +199,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void ChangeSecret(string newSecret)
     {
-        EnsureNotDeleted();
 
         var errors = new ErrorCollector();
         ValidateChangeSecret(errors, newSecret);
@@ -217,7 +210,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
     // Whether the scope belongs to the client's resource server is checked by ClientValidator.
     public void AddScope(Guid scopeId)
     {
-        EnsureNotDeleted();
 
         if (_scopeIds.Contains(scopeId))
             return;
@@ -227,7 +219,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void RemoveScope(Guid scopeId)
     {
-        EnsureNotDeleted();
 
         var errors = new ErrorCollector();
         ValidateRemoveScope(errors, scopeId);
@@ -238,7 +229,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void AddRedirectUri(string uri)
     {
-        EnsureNotDeleted();
         uri = uri.Trim();
 
         var errors = new ErrorCollector();
@@ -250,7 +240,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void RemoveRedirectUri(string uri)
     {
-        EnsureNotDeleted();
         uri = uri.Trim();
 
         var errors = new ErrorCollector();
@@ -262,7 +251,6 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void AddPostLogoutRedirectUri(string uri)
     {
-        EnsureNotDeleted();
         uri = uri.Trim();
 
         var errors = new ErrorCollector();
@@ -274,13 +262,11 @@ public sealed partial class Client : SoftDeletableAggregateRoot
 
     public void RemovePostLogoutRedirectUri(string uri)
     {
-        EnsureNotDeleted();
         _postLogoutRedirectUris.Remove(uri.Trim());
     }
 
     public void Deactivate()
     {
-        EnsureNotDeleted();
         IsActive = false;
     }
 

@@ -38,8 +38,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     audience = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     display_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     is_auth_server = table.Column<bool>(type: "boolean", nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,8 +74,8 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     slug = table.Column<string>(type: "character varying(63)", maxLength: 63, nullable: false),
                     suspended_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     suspension_reason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    first_sign_in_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -94,6 +93,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     failed_logins = table.Column<int>(type: "integer", nullable: false),
                     locked_until = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     locked = table.Column<bool>(type: "boolean", nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -109,8 +109,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     description = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
                     resource_server_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -133,8 +132,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     display_name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     resource_server_id = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    is_standard = table.Column<bool>(type: "boolean", nullable: false),
-                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    is_standard = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -166,8 +164,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     initiate_login_uri = table.Column<string>(type: "text", nullable: true),
                     access_token_lifetime = table.Column<TimeSpan>(type: "interval", nullable: false),
                     id_token_lifetime = table.Column<TimeSpan>(type: "interval", nullable: true),
-                    refresh_token_lifetime = table.Column<TimeSpan>(type: "interval", nullable: true),
-                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    refresh_token_lifetime = table.Column<TimeSpan>(type: "interval", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -195,8 +192,7 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     name = table.Column<string>(type: "character varying(253)", maxLength: 253, nullable: false),
                     verification_code = table.Column<string>(type: "text", nullable: false),
                     verified_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -409,37 +405,32 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "ix_clients_client_id",
                 table: "clients",
                 column: "client_id",
-                unique: true,
-                filter: "deleted_at IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_clients_client_id1",
                 table: "clients",
-                column: "client_id",
-                filter: "deleted_at IS NULL")
+                column: "client_id")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_clients_display_name",
                 table: "clients",
-                column: "display_name",
-                filter: "deleted_at IS NULL")
+                column: "display_name")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_clients_post_logout_redirect_uris",
                 table: "clients",
-                column: "post_logout_redirect_uris",
-                filter: "deleted_at IS NULL")
+                column: "post_logout_redirect_uris")
                 .Annotation("Npgsql:IndexMethod", "gin");
 
             migrationBuilder.CreateIndex(
                 name: "ix_clients_target_resource_server_id",
                 table: "clients",
-                column: "target_resource_server_id",
-                filter: "deleted_at IS NULL");
+                column: "target_resource_server_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_clients_tenant_id",
@@ -492,28 +483,24 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "ix_resource_servers_audience",
                 table: "resource_servers",
                 column: "audience",
-                unique: true,
-                filter: "deleted_at IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_resource_servers_audience1",
                 table: "resource_servers",
-                column: "audience",
-                filter: "deleted_at IS NULL")
+                column: "audience")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_resource_servers_display_name",
                 table: "resource_servers",
-                column: "display_name",
-                filter: "deleted_at IS NULL");
+                column: "display_name");
 
             migrationBuilder.CreateIndex(
                 name: "ix_roles_description",
                 table: "roles",
-                column: "description",
-                filter: "deleted_at IS NULL")
+                column: "description")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
@@ -521,28 +508,24 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "ix_roles_name",
                 table: "roles",
                 column: "name",
-                unique: true,
-                filter: "deleted_at IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_roles_name1",
                 table: "roles",
-                column: "name",
-                filter: "deleted_at IS NULL")
+                column: "name")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_roles_resource_server_id",
                 table: "roles",
-                column: "resource_server_id",
-                filter: "deleted_at IS NULL");
+                column: "resource_server_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_scopes_display_name",
                 table: "scopes",
-                column: "display_name",
-                filter: "deleted_at IS NULL")
+                column: "display_name")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
@@ -550,22 +533,19 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "ix_scopes_name",
                 table: "scopes",
                 column: "name",
-                unique: true,
-                filter: "deleted_at IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_scopes_name1",
                 table: "scopes",
-                column: "name",
-                filter: "deleted_at IS NULL")
+                column: "name")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_scopes_resource_server_id",
                 table: "scopes",
-                column: "resource_server_id",
-                filter: "deleted_at IS NULL");
+                column: "resource_server_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_signing_keys_is_active",
@@ -585,27 +565,24 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 table: "tenant_domains",
                 column: "name",
                 unique: true,
-                filter: "verified_at IS NOT NULL AND deleted_at IS NULL");
+                filter: "verified_at IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "ix_tenant_domains_tenant_id_name",
                 table: "tenant_domains",
                 columns: new[] { "tenant_id", "name" },
-                unique: true,
-                filter: "deleted_at IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_tenants_normalized_name",
                 table: "tenants",
-                column: "normalized_name",
-                filter: "deleted_at IS NULL");
+                column: "normalized_name");
 
             migrationBuilder.CreateIndex(
                 name: "ix_tenants_slug",
                 table: "tenants",
                 column: "slug",
-                unique: true,
-                filter: "deleted_at IS NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_user_external_ids_provider_provider_user_id",
@@ -654,6 +631,11 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 column: "normalized_email")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_status_created_at",
+                table: "users",
+                columns: new[] { "status", "created_at" });
         }
 
         /// <inheritdoc />

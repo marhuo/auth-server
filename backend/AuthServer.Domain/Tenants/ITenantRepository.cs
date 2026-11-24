@@ -21,4 +21,7 @@ public interface ITenantRepository
     Task CreateAsync(Tenant tenant);
 
     Task UpdateAsync(Tenant tenant);
+
+    // Physically deletes the tenant with its user roles and domains.
+    Task DeleteAsync(Guid id);
 }

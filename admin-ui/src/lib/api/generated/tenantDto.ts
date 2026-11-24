@@ -9,5 +9,6 @@ export interface TenantDto {
     slug: string;
     suspendedAt: string | null;
     suspensionReason: string | null;
+    firstSignInAt: string | null;
     createdAt: string;
 }

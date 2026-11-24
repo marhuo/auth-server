@@ -4,7 +4,8 @@ using System.Text.RegularExpressions;
 
 namespace AuthServer.Domain.Tenants;
 
-public sealed partial class Tenant : SoftDeletableAggregateRoot
+// Deleted physically, and only if nobody has signed in to it (FirstSignInAt).
+public sealed partial class Tenant : AggregateRoot
 {
     public const int MinNameLength = 1;
     public const int MaxNameLength = 200;
@@ -22,15 +23,16 @@ public sealed partial class Tenant : SoftDeletableAggregateRoot
         string slug,
         DateTimeOffset? suspendedAt,
         string? suspensionReason,
-        DateTimeOffset createdAt,
-        DateTimeOffset? deletedAt)
-        : base(id, deletedAt)
+        DateTimeOffset? firstSignInAt,
+        DateTimeOffset createdAt)
+        : base(id)
     {
         Name = name;
         NormalizedName = normalizedName;
         Slug = slug;
         SuspendedAt = suspendedAt;
         SuspensionReason = suspensionReason;
+        FirstSignInAt = firstSignInAt;
         CreatedAt = createdAt;
     }
 
@@ -45,6 +47,10 @@ public sealed partial class Tenant : SoftDeletableAggregateRoot
 
     public DateTimeOffset? SuspendedAt { get; private set; }
     public string? SuspensionReason { get; private set; }
+
+    // When a user first signed in to an app inside this tenant. Null: the tenant has never been used.
+    public DateTimeOffset? FirstSignInAt { get; private set; }
+
     public DateTimeOffset CreatedAt { get; private set; }
 
     [JsonIgnore]
@@ -68,13 +74,27 @@ public sealed partial class Tenant : SoftDeletableAggregateRoot
             slug: slug,
             suspendedAt: null,
             suspensionReason: null,
-            createdAt: now,
-            deletedAt: null);
+            firstSignInAt: null,
+            createdAt: now);
     }
+
+    // Returns false if somebody has signed in before: then nothing changes.
+    public bool MarkSignedIn(DateTimeOffset now)
+    {
+        if (FirstSignInAt is not null)
+            return false;
+
+        FirstSignInAt = now;
+        return true;
+    }
+
+    public static ValidationError UsedTenantDeleteError() =>
+        new("id", ErrorCode.NotAllowed,
+            "The tenant cannot be deleted because users have signed in to it.",
+            "Asiakasta ei voi poistaa, koska siihen on kirjauduttu.");
 
     public void SetName(string name)
     {
-        EnsureNotDeleted();
         name = name.Trim();
 
         var errors = new ErrorCollector();
@@ -90,7 +110,6 @@ public sealed partial class Tenant : SoftDeletableAggregateRoot
 
     public void SetSlug(string slug)
     {
-        EnsureNotDeleted();
         slug = NormalizeSlug(slug);
 
         var errors = new ErrorCollector();
@@ -106,7 +125,6 @@ public sealed partial class Tenant : SoftDeletableAggregateRoot
     // Suspending an already suspended tenant only updates the reason.
     public void Suspend(string reason, DateTimeOffset now)
     {
-        EnsureNotDeleted();
         reason = reason.Trim();
 
         var errors = new ErrorCollector();
@@ -119,7 +137,6 @@ public sealed partial class Tenant : SoftDeletableAggregateRoot
 
     public void Unsuspend()
     {
-        EnsureNotDeleted();
         SuspendedAt = null;
         SuspensionReason = null;
     }

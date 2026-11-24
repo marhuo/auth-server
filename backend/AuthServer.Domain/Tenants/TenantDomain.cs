@@ -6,7 +6,7 @@ namespace AuthServer.Domain.Tenants;
 
 // A domain a tenant has added, e.g. "acme.fi". It is verified when the domain's DNS has the TXT record
 // TxtRecord: only the owner of the domain can add it. A domain is verified for one tenant at a time.
-public sealed partial class TenantDomain : SoftDeletableAggregateRoot
+public sealed partial class TenantDomain : AggregateRoot
 {
     public const int MaxNameLength = 253;
     public const string TxtRecordPrefix = "authserver-domain-verification=";
@@ -18,9 +18,8 @@ public sealed partial class TenantDomain : SoftDeletableAggregateRoot
         string name,
         string verificationCode,
         DateTimeOffset? verifiedAt,
-        DateTimeOffset createdAt,
-        DateTimeOffset? deletedAt)
-        : base(id, deletedAt)
+        DateTimeOffset createdAt)
+        : base(id)
     {
         TenantId = tenantId;
         Name = name;
@@ -59,22 +58,19 @@ public sealed partial class TenantDomain : SoftDeletableAggregateRoot
             name: name,
             verificationCode: OpaqueToken.Generate(),
             verifiedAt: null,
-            createdAt: now,
-            deletedAt: null);
+            createdAt: now);
     }
 
     public bool HasTxtRecord(IEnumerable<string> txtRecords) => txtRecords.Contains(TxtRecord);
 
     public void MarkVerified(DateTimeOffset now)
     {
-        EnsureNotDeleted();
         VerifiedAt ??= now;
     }
 
     // The TXT record has disappeared, e.g. the domain has a new owner.
     public void MarkUnverified()
     {
-        EnsureNotDeleted();
         VerifiedAt = null;
     }
 

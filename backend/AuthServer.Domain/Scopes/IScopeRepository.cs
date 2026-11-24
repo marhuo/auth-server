@@ -31,4 +31,6 @@ public interface IScopeRepository
     Task CreateAsync(Scope scope);
 
     Task UpdateAsync(Scope scope);
+
+    Task DeleteAsync(Guid id);
 }

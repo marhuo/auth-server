@@ -51,11 +51,13 @@
 			});
 		}
 
-		items.push({
-			title: 'Poista',
-			icon: 'ic:outline-delete',
-			onClick: () => (deleteDialogOpen = true)
-		});
+		if (model.canDelete) {
+			items.push({
+				title: 'Poista',
+				icon: 'ic:outline-delete',
+				onClick: () => (deleteDialogOpen = true)
+			});
+		}
 
 		return items;
 	});
@@ -117,6 +119,19 @@
 						<div>
 							<div class="text-xs opacity-60">Luotu</div>
 							<div>{formatIsoDateTime(model.createdAt)}</div>
+						</div>
+					</li>
+
+					<li class="list-row">
+						<div>
+							<div class="text-xs opacity-60">Ensimmäinen kirjautuminen</div>
+							{#if model.firstSignInAt}
+								<div>{formatIsoDateTime(model.firstSignInAt)}</div>
+							{:else}
+								<div>
+									<span class="badge badge-soft badge-sm badge-warning">Ei koskaan</span>
+								</div>
+							{/if}
 						</div>
 					</li>
 				</ul>
@@ -279,7 +294,8 @@
 			onDelete={model.delete}
 			onDeleted={() => goto(resolve('/tenants'), { replace: true })}
 		>
-			Oletko varma, että haluat poistaa tenantin <strong>{model.name}</strong>?
+			Oletko varma, että haluat poistaa tenantin <strong>{model.name}</strong>? Tenantti, sen
+			domainit ja käyttäjien roolit siinä poistetaan pysyvästi.
 		</DeleteDialog>
 	{/if}
 

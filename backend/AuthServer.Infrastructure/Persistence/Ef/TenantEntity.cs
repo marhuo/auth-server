@@ -2,19 +2,19 @@
 
 namespace AuthServer.Infrastructure.Persistence.Ef;
 
-public class TenantEntity : ISoftDeletableEntity
+public class TenantEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";
     public string NormalizedName { get; set; } = "";
-    /// <summary>
-    /// Short url friendly name
-    /// </summary>
+
+    // Short url-friendly name.
     public string Slug { get; set; } = "";
+
     public DateTimeOffset? SuspendedAt { get; set; }
     public string? SuspensionReason { get; set; }
+    public DateTimeOffset? FirstSignInAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
     public virtual List<UserRoleEntity> UserRoles { get; set; } = [];
     public virtual List<ClientEntity> Clients { get; set; } = [];
 
@@ -32,7 +32,7 @@ public class TenantEntity : ISoftDeletableEntity
         Slug = tenant.Slug;
         SuspendedAt = tenant.SuspendedAt;
         SuspensionReason = tenant.SuspensionReason;
-        DeletedAt = tenant.DeletedAt;
+        FirstSignInAt = tenant.FirstSignInAt;
     }
 
     public Tenant ToDomain() => new(
@@ -42,6 +42,6 @@ public class TenantEntity : ISoftDeletableEntity
         slug: Slug,
         suspendedAt: SuspendedAt,
         suspensionReason: SuspensionReason,
-        createdAt: CreatedAt,
-        deletedAt: DeletedAt);
+        firstSignInAt: FirstSignInAt,
+        createdAt: CreatedAt);
 }

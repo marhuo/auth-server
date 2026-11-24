@@ -2,7 +2,7 @@ using AuthServer.Domain.Tenants;
 
 namespace AuthServer.Infrastructure.Persistence.Ef;
 
-public class TenantDomainEntity : ISoftDeletableEntity
+public class TenantDomainEntity
 {
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
@@ -10,7 +10,6 @@ public class TenantDomainEntity : ISoftDeletableEntity
     public string VerificationCode { get; set; } = "";
     public DateTimeOffset? VerifiedAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
 
     public static TenantDomainEntity FromDomain(TenantDomain domain)
     {
@@ -25,7 +24,6 @@ public class TenantDomainEntity : ISoftDeletableEntity
         Name = domain.Name;
         VerificationCode = domain.VerificationCode;
         VerifiedAt = domain.VerifiedAt;
-        DeletedAt = domain.DeletedAt;
     }
 
     public TenantDomain ToDomain() => new(
@@ -34,6 +32,5 @@ public class TenantDomainEntity : ISoftDeletableEntity
         name: Name,
         verificationCode: VerificationCode,
         verifiedAt: VerifiedAt,
-        createdAt: CreatedAt,
-        deletedAt: DeletedAt);
+        createdAt: CreatedAt);
 }

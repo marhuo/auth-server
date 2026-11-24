@@ -81,9 +81,7 @@ public class ClientService(IClientRepository clients, ClientValidator validator,
     {
         var client = await LoadAsync(id);
 
-        client.Delete(timeProvider.GetUtcNow());
-
-        await clients.UpdateAsync(client);
+        await clients.DeleteAsync(client.Id);
     }
 
     public async Task DeactivateAsync(Guid id)

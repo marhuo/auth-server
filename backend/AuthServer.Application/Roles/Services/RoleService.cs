@@ -83,8 +83,6 @@ public class RoleService(IRoleRepository roles, RoleValidator validator, TimePro
 
         await validator.ValidateDeleteAsync(role);
 
-        role.Delete(timeProvider.GetUtcNow());
-
-        await roles.UpdateAsync(role);
+        await roles.DeleteAsync(role.Id);
     }
 }

@@ -70,9 +70,6 @@ public class RoleRepository(AuthDbContext db) : IRoleRepository
     public Task<List<Guid>> GetIdsByResourceServerAsync(Guid resourceServerId) =>
         db.Roles.Where(r => r.ResourceServerId == resourceServerId).Select(r => r.Id).ToListAsync();
 
-    public Task<bool> AnyRoleInTenantAsync(Guid tenantId) =>
-        db.UserRoles.AnyAsync(ur => ur.TenantId == tenantId);
-
     public Task<List<string>> GetAuthServerRoleNamesAsync(Guid userId) =>
         db.UserRoles
             .Where(ur => ur.UserId == userId && ur.Role.ResourceServer.IsAuthServer)
@@ -110,6 +107,9 @@ public class RoleRepository(AuthDbContext db) : IRoleRepository
         entity.UpdateFrom(role);
         await SaveAsync();
     }
+
+    public Task DeleteAsync(Guid id) =>
+        db.Roles.Where(r => r.Id == id).ExecuteDeleteAsync();
 
     private async Task SaveAsync()
     {

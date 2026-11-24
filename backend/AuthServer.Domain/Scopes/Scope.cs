@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace AuthServer.Domain.Scopes;
 
-public sealed partial class Scope : SoftDeletableAggregateRoot
+public sealed partial class Scope : AggregateRoot
 {
     public const int MinNameLength = 4;
     public const int MaxNameLength = 200;
@@ -15,8 +15,8 @@ public sealed partial class Scope : SoftDeletableAggregateRoot
         ["openid", "profile", "email", "address", "phone", "offline_access"];
 
     [JsonConstructor]
-    public Scope(Guid id, string name, string displayName, Guid? resourceServerId, bool isStandard, DateTimeOffset createdAt, DateTimeOffset? deletedAt)
-        : base(id, deletedAt)
+    public Scope(Guid id, string name, string displayName, Guid? resourceServerId, bool isStandard, DateTimeOffset createdAt)
+        : base(id)
     {
         Name = name;
         DisplayName = displayName;
@@ -52,13 +52,11 @@ public sealed partial class Scope : SoftDeletableAggregateRoot
             displayName: displayName,
             resourceServerId: resourceServerId,
             isStandard: false,
-            createdAt: now,
-            deletedAt: null);
+            createdAt: now);
     }
 
     public void SetName(string name)
     {
-        EnsureNotDeleted();
         name = name.Trim();
 
         if (name == Name)
@@ -75,7 +73,6 @@ public sealed partial class Scope : SoftDeletableAggregateRoot
 
     public void SetDisplayName(string displayName)
     {
-        EnsureNotDeleted();
         displayName = displayName.Trim();
 
         var errors = new ErrorCollector();
@@ -90,7 +87,6 @@ public sealed partial class Scope : SoftDeletableAggregateRoot
 
     public void SetResourceServerId(Guid resourceServerId)
     {
-        EnsureNotDeleted();
 
         if (resourceServerId == ResourceServerId)
             return;
@@ -98,12 +94,6 @@ public sealed partial class Scope : SoftDeletableAggregateRoot
         EnsureNotStandard();
 
         ResourceServerId = resourceServerId;
-    }
-
-    public override void Delete(DateTimeOffset now)
-    {
-        EnsureNotStandard();
-        base.Delete(now);
     }
 
     // Expects a trimmed value.

@@ -2,7 +2,7 @@
 
 namespace AuthServer.Infrastructure.Persistence.Ef;
 
-public class ClientEntity : ISoftDeletableEntity
+public class ClientEntity
 {
     public Guid Id { get; set; }
     public ClientTypes Type { get; set; }
@@ -22,7 +22,6 @@ public class ClientEntity : ISoftDeletableEntity
     public TimeSpan AccessTokenLifetime { get; set; }
     public TimeSpan? IdTokenLifetime { get; set; }
     public TimeSpan? RefreshTokenLifetime { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
 
     // Scopes are not set here; the repository syncs them because it needs the scope entities.
     public static ClientEntity FromDomain(Client client)
@@ -52,7 +51,6 @@ public class ClientEntity : ISoftDeletableEntity
         AccessTokenLifetime = client.AccessTokenLifetime;
         IdTokenLifetime = client.IdTokenLifetime;
         RefreshTokenLifetime = client.RefreshTokenLifetime;
-        DeletedAt = client.DeletedAt;
     }
 
     // Scopes must be loaded.
@@ -72,6 +70,5 @@ public class ClientEntity : ISoftDeletableEntity
         accessTokenLifetime: AccessTokenLifetime,
         idTokenLifetime: IdTokenLifetime,
         refreshTokenLifetime: RefreshTokenLifetime,
-        createdAt: CreatedAt,
-        deletedAt: DeletedAt);
+        createdAt: CreatedAt);
 }

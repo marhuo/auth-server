@@ -103,9 +103,7 @@ public class ResourceServerService(
 
         await validator.ValidateDeleteAsync(resourceServer);
 
-        resourceServer.Delete(timeProvider.GetUtcNow());
-
-        await resourceServers.UpdateAsync(resourceServer);
+        await resourceServers.DeleteAsync(resourceServer.Id);
     }
 
     private static ValidationException NotFound(string key) =>

@@ -9,6 +9,10 @@ public class TenantDto
     public required string Slug { get; init; }
     public required DateTimeOffset? SuspendedAt { get; init; }
     public required string? SuspensionReason { get; init; }
+
+    // Null: nobody has signed in to the tenant, so it can be deleted.
+    public required DateTimeOffset? FirstSignInAt { get; init; }
+
     public required DateTimeOffset CreatedAt { get; init; }
 
     public static TenantDto ToDto(Tenant tenant) => new()
@@ -18,6 +22,7 @@ public class TenantDto
         Slug = tenant.Slug,
         SuspendedAt = tenant.SuspendedAt,
         SuspensionReason = tenant.SuspensionReason,
+        FirstSignInAt = tenant.FirstSignInAt,
         CreatedAt = tenant.CreatedAt
     };
 }

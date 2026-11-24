@@ -55,6 +55,16 @@ export class TenantDetailsModel {
 		return this._suspendedAt !== null;
 	}
 
+	private _firstSignInAt = $state<string | null>(null);
+	get firstSignInAt() {
+		return this._firstSignInAt;
+	}
+
+	// Only a tenant nobody has signed in to can be deleted (the backend checks this too).
+	get canDelete() {
+		return this._firstSignInAt === null;
+	}
+
 	// Verified by the tenant through its product (DNS TXT record).
 	private _domains = $state<TenantDomainDto[]>([]);
 	get domains() {
@@ -78,6 +88,7 @@ export class TenantDetailsModel {
 			this._suspendedAt = tenant.suspendedAt;
 			this._suspensionReason = tenant.suspensionReason;
 			this._createdAt = tenant.createdAt;
+			this._firstSignInAt = tenant.firstSignInAt;
 			this._notFound = false;
 		} finally {
 			this._loading = false;

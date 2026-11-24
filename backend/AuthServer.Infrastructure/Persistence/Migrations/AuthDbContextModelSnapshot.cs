@@ -119,10 +119,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -179,32 +175,27 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
 
                     b.HasIndex(new[] { "ClientId" }, "ix_clients_client_id")
                         .IsUnique()
-                        .HasDatabaseName("ix_clients_client_id")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_clients_client_id");
 
                     b.HasIndex(new[] { "ClientId" }, "ix_clients_client_id_trgm")
-                        .HasDatabaseName("ix_clients_client_id1")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_clients_client_id1");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "ClientId" }, "ix_clients_client_id_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "ClientId" }, "ix_clients_client_id_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "DisplayName" }, "ix_clients_display_name_trgm")
-                        .HasDatabaseName("ix_clients_display_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_clients_display_name");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "DisplayName" }, "ix_clients_display_name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "DisplayName" }, "ix_clients_display_name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "PostLogoutRedirectUris" }, "ix_clients_post_logout_redirect_uris")
-                        .HasDatabaseName("ix_clients_post_logout_redirect_uris")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_clients_post_logout_redirect_uris");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "PostLogoutRedirectUris" }, "ix_clients_post_logout_redirect_uris"), "gin");
 
                     b.HasIndex(new[] { "TargetResourceServerId" }, "ix_clients_target_resource_server_id")
-                        .HasDatabaseName("ix_clients_target_resource_server_id")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_clients_target_resource_server_id");
 
                     b.ToTable("clients", (string)null);
                 });
@@ -357,10 +348,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -376,19 +363,16 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
 
                     b.HasIndex(new[] { "Audience" }, "ix_resource_servers_audience")
                         .IsUnique()
-                        .HasDatabaseName("ix_resource_servers_audience")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_resource_servers_audience");
 
                     b.HasIndex(new[] { "Audience" }, "ix_resource_servers_audience_trgm")
-                        .HasDatabaseName("ix_resource_servers_audience1")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_resource_servers_audience1");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Audience" }, "ix_resource_servers_audience_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Audience" }, "ix_resource_servers_audience_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "DisplayName" }, "ix_resource_servers_display_name")
-                        .HasDatabaseName("ix_resource_servers_display_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_resource_servers_display_name");
 
                     b.ToTable("resource_servers", null, t =>
                         {
@@ -406,10 +390,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -431,27 +411,23 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasName("pk_roles");
 
                     b.HasIndex(new[] { "Description" }, "ix_roles_description_trgm")
-                        .HasDatabaseName("ix_roles_description")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_roles_description");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Description" }, "ix_roles_description_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Description" }, "ix_roles_description_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "Name" }, "ix_roles_name")
                         .IsUnique()
-                        .HasDatabaseName("ix_roles_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_roles_name");
 
                     b.HasIndex(new[] { "Name" }, "ix_roles_name_trgm")
-                        .HasDatabaseName("ix_roles_name1")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_roles_name1");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Name" }, "ix_roles_name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Name" }, "ix_roles_name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "ResourceServerId" }, "ix_roles_resource_server_id")
-                        .HasDatabaseName("ix_roles_resource_server_id")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_roles_resource_server_id");
 
                     b.ToTable("roles", null, t =>
                         {
@@ -469,10 +445,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -498,27 +470,23 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasName("pk_scopes");
 
                     b.HasIndex(new[] { "DisplayName" }, "ix_scopes_display_name_trgm")
-                        .HasDatabaseName("ix_scopes_display_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_scopes_display_name");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "DisplayName" }, "ix_scopes_display_name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "DisplayName" }, "ix_scopes_display_name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "Name" }, "ix_scopes_name")
                         .IsUnique()
-                        .HasDatabaseName("ix_scopes_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_scopes_name");
 
                     b.HasIndex(new[] { "Name" }, "ix_scopes_name_trgm")
-                        .HasDatabaseName("ix_scopes_name1")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_scopes_name1");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Name" }, "ix_scopes_name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Name" }, "ix_scopes_name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "ResourceServerId" }, "ix_scopes_resource_server_id")
-                        .HasDatabaseName("ix_scopes_resource_server_id")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_scopes_resource_server_id");
 
                     b.ToTable("scopes", null, t =>
                         {
@@ -591,10 +559,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(253)
@@ -619,13 +583,12 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
 
                     b.HasIndex(new[] { "TenantId", "Name" }, "ix_tenant_domains_tenant_id_name")
                         .IsUnique()
-                        .HasDatabaseName("ix_tenant_domains_tenant_id_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_tenant_domains_tenant_id_name");
 
                     b.HasIndex(new[] { "Name" }, "ix_tenant_domains_verified_name")
                         .IsUnique()
                         .HasDatabaseName("ix_tenant_domains_name")
-                        .HasFilter("verified_at IS NOT NULL AND deleted_at IS NULL");
+                        .HasFilter("verified_at IS NOT NULL");
 
                     b.ToTable("tenant_domains", (string)null);
                 });
@@ -641,9 +604,9 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
+                    b.Property<DateTimeOffset?>("FirstSignInAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
+                        .HasColumnName("first_sign_in_at");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -675,20 +638,17 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasName("pk_tenants");
 
                     b.HasIndex(new[] { "NormalizedName" }, "ix_tenants_normalized_name")
-                        .HasDatabaseName("ix_tenants_normalized_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_tenants_normalized_name");
 
                     b.HasIndex(new[] { "NormalizedName" }, "ix_tenants_normalized_name_trgm")
-                        .HasDatabaseName("ix_tenants_normalized_name")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_tenants_normalized_name");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "NormalizedName" }, "ix_tenants_normalized_name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "NormalizedName" }, "ix_tenants_normalized_name_trgm"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "Slug" }, "ix_tenants_slug")
                         .IsUnique()
-                        .HasDatabaseName("ix_tenants_slug")
-                        .HasFilter("deleted_at IS NULL");
+                        .HasDatabaseName("ix_tenants_slug");
 
                     b.ToTable("tenants", (string)null);
                 });
@@ -732,6 +692,10 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
                     b.HasKey("Id")
                         .HasName("pk_users");
 
@@ -744,6 +708,9 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "NormalizedEmail" }, "ix_users_normalized_email_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "NormalizedEmail" }, "ix_users_normalized_email_trgm"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex(new[] { "Status", "CreatedAt" }, "ix_users_status_created_at")
+                        .HasDatabaseName("ix_users_status_created_at");
 
                     b.ToTable("users", (string)null);
                 });

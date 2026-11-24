@@ -2,7 +2,7 @@
 
 namespace AuthServer.Infrastructure.Persistence.Ef;
 
-public class ResourceServerEntity : ISoftDeletableEntity
+public class ResourceServerEntity
 {
     public Guid Id { get; set; }
     public string Audience { get; set; } = "";
@@ -12,7 +12,6 @@ public class ResourceServerEntity : ISoftDeletableEntity
     public virtual List<ClientEntity> Clients { get; set; } = [];
     public bool IsAuthServer { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
 
     public static ResourceServerEntity FromDomain(ResourceServer resourceServer)
     {
@@ -30,7 +29,6 @@ public class ResourceServerEntity : ISoftDeletableEntity
     {
         Audience = resourceServer.Audience;
         DisplayName = resourceServer.DisplayName;
-        DeletedAt = resourceServer.DeletedAt;
     }
 
     public ResourceServer ToDomain() => new(
@@ -38,6 +36,5 @@ public class ResourceServerEntity : ISoftDeletableEntity
         audience: Audience,
         displayName: DisplayName,
         isAuthServer: IsAuthServer,
-        createdAt: CreatedAt,
-        deletedAt: DeletedAt);
+        createdAt: CreatedAt);
 }

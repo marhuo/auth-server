@@ -23,10 +23,8 @@ public class AuthorizationCodeRepository(AuthDbContext db) : IAuthorizationCodeR
             .Where(c => c.Id == id && c.UsedAt == null)
             .ExecuteUpdateAsync(s => s.SetProperty(c => c.UsedAt, now)) == 1;
 
-    // IgnoreQueryFilters: codes of deleted clients are hidden by the query filter but must be deleted too.
     public Task<int> DeleteExpiredAsync(DateTimeOffset expiredBefore) =>
         db.AuthorizationCodes
-            .IgnoreQueryFilters()
             .Where(c => c.ExpiresAt < expiredBefore)
             .ExecuteDeleteAsync();
 }

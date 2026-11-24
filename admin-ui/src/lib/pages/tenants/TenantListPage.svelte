@@ -3,6 +3,7 @@
 	import { getTenantPagedList } from '#lib/api/tenantApi.js';
 	import CompactPagination from '#lib/components/CompactPagination.svelte';
 	import { PagedList } from '#lib/models/PagedList.svelte.js';
+	import { formatIsoDateTime } from '#lib/utils/dateUtils.ts';
 	import { resolve } from '$app/paths';
 	import Icon from '@iconify/svelte';
 
@@ -39,6 +40,7 @@
 			<thead>
 				<tr>
 					<th>Nimi</th>
+					<th>Ensimmäinen kirjautuminen</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -46,6 +48,13 @@
 					<tr class="hover:bg-base-200">
 						<td>
 							<a href={resolve('/tenants/[id]', { id: tenant.id })} class="link">{tenant.name}</a>
+						</td>
+						<td>
+							{#if tenant.firstSignInAt}
+								{formatIsoDateTime(tenant.firstSignInAt)}
+							{:else}
+								<span class="badge badge-soft badge-sm badge-warning">Ei koskaan</span>
+							{/if}
 						</td>
 					</tr>
 				{/each}

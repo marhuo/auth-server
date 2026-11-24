@@ -172,6 +172,14 @@ public class UserService(
         await refreshTokens.RevokeRefreshTokensAsync(user.Id, timeProvider.GetUtcNow());
     }
 
+    // Deletes users who never started using their account, e.g. an unfinished registration.
+    // Returns the number of deleted users.
+    public Task<int> DeleteUnusedInvitedAsync()
+    {
+        var now = timeProvider.GetUtcNow();
+        return users.DeleteUnusedInvitedAsync(now - User.UnusedInvitedRetention, now);
+    }
+
     private async Task<User> LoadAsync(Guid id, string key) =>
         await users.GetByIdAsync(id)
         ?? throw new ValidationException(Errors.NotFound(key, "User", "Käyttäjää"));

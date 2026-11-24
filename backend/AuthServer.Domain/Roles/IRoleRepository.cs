@@ -21,8 +21,6 @@ public interface IRoleRepository
 
     Task<List<Guid>> GetIdsByResourceServerAsync(Guid resourceServerId);
 
-    // Whether any user has a role in the tenant.
-    Task<bool> AnyRoleInTenantAsync(Guid tenantId);
 
     // Names of the user's auth server roles.
     Task<List<string>> GetAuthServerRoleNamesAsync(Guid userId);
@@ -39,4 +37,6 @@ public interface IRoleRepository
     Task CreateAsync(Role role);
 
     Task UpdateAsync(Role role);
+
+    Task DeleteAsync(Guid id);
 }

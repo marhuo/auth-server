@@ -6,12 +6,16 @@ namespace AuthServer.Domain.Users;
 // LockedOut: automatic lockout after failed logins. Locked: locked by an admin.
 public enum LoginStatus { Success, Failed, LockedOut, Locked }
 
-// A user is never deleted: removing access means removing roles, and a person can be invited again.
+// Removing access means removing roles, and a person can be invited again. Only a user who never
+// became Active is deleted (IUserRepository.DeleteUnusedInvitedAsync).
 public sealed class User : AggregateRoot
 {
     public const int MaxEmailLength = 254;
     public const int MinPasswordLength = 8;
     public const int MaxPasswordLength = 128;
+
+    // An Invited user without roles is deleted this long after creation (registration not finished).
+    public static readonly TimeSpan UnusedInvitedRetention = TimeSpan.FromDays(30);
 
     public const int MaxFailedLogins = 10;
     public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
@@ -31,6 +35,7 @@ public sealed class User : AggregateRoot
         int failedLogins,
         DateTimeOffset? lockedUntil,
         bool locked,
+        UserStatuses status,
         IReadOnlyList<UserRole> roles,
         IReadOnlyList<UserExternalId> externalIds,
         DateTimeOffset createdAt)
@@ -42,6 +47,7 @@ public sealed class User : AggregateRoot
         FailedLogins = failedLogins;
         LockedUntil = lockedUntil;
         Locked = locked;
+        Status = status;
         _roles = [.. roles];
         _externalIds = [.. externalIds];
         CreatedAt = createdAt;
@@ -75,22 +81,9 @@ public sealed class User : AggregateRoot
     [JsonIgnore]
     public bool HasPassword => PasswordHash is not null;
 
-    // E.g. a Google account.
-    [JsonIgnore]
-    public bool HasExternalAccount => _externalIds.Count > 0;
-
-    // Invited until the user has a way to sign in: a password or an external account.
-    [JsonIgnore]
-    public UserStatuses Status
-    {
-        get
-        {
-            if (HasPassword || HasExternalAccount)
-                return UserStatuses.Active;
-
-            return UserStatuses.Invited;
-        }
-    }
+    // Invited until the user has a way to sign in: a password (SetPassword) or an external account
+    // (AddExternalId). Stored, so never-activated users can be found in the database.
+    public UserStatuses Status { get; private set; }
 
     // Whether the automatic lockout is in force.
     public bool IsLockedOut(DateTimeOffset now) => LockedUntil > now;
@@ -116,6 +109,7 @@ public sealed class User : AggregateRoot
             failedLogins: 0,
             lockedUntil: null,
             locked: false,
+            status: UserStatuses.Invited,
             roles: [],
             externalIds: [],
             createdAt: now);
@@ -165,6 +159,7 @@ public sealed class User : AggregateRoot
         PasswordHash = hasher.Hash(password);
         LockedUntil = null;
         FailedLogins = 0;
+        Status = UserStatuses.Active;
     }
 
     // Checks the password and applies the lockout policy: after MaxFailedLogins failed attempts
@@ -228,6 +223,7 @@ public sealed class User : AggregateRoot
             return;
 
         _externalIds.Add(new UserExternalId(identity.Provider, identity.ProviderUserId, now));
+        Status = UserStatuses.Active;
     }
 
     // Expects a trimmed value.

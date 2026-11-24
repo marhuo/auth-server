@@ -11,6 +11,7 @@ public class UserEntity
     public int FailedLogins { get; set; }
     public DateTimeOffset? LockedUntil { get; set; }
     public bool Locked { get; set; }
+    public UserStatuses Status { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public virtual List<UserRoleEntity> UserRoles { get; set; } = [];
     public virtual List<UserExternalIdEntity> ExternalIds { get; set; } = [];
@@ -32,6 +33,7 @@ public class UserEntity
         FailedLogins = user.FailedLogins;
         LockedUntil = user.LockedUntil;
         Locked = user.Locked;
+        Status = user.Status;
     }
 
     // UserRoles and ExternalIds must be loaded.
@@ -43,6 +45,7 @@ public class UserEntity
         failedLogins: FailedLogins,
         lockedUntil: LockedUntil,
         locked: Locked,
+        status: Status,
         roles: UserRoles
             .Select(ur => new UserRole(RoleId: ur.RoleId, TenantId: ur.TenantId, CreatedAt: ur.CreatedAt))
             .ToList(),

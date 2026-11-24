@@ -119,6 +119,9 @@ public class ScopeRepository(AuthDbContext db) : IScopeRepository
         await SaveAsync();
     }
 
+    public Task DeleteAsync(Guid id) =>
+        db.Scopes.Where(s => s.Id == id).ExecuteDeleteAsync();
+
     private async Task SaveAsync()
     {
         try

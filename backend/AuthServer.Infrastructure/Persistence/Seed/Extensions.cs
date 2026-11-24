@@ -206,6 +206,7 @@ public static class Extensions
             PasswordHash = passwordHasher.Hash(password),
             Email = email,
             NormalizedEmail = normalizedEmail,
+            Status = UserStatuses.Active,
             CreatedAt = DateTimeOffset.UtcNow
         });
 

@@ -2,7 +2,7 @@
 
 namespace AuthServer.Infrastructure.Persistence.Ef;
 
-public class ScopeEntity : ISoftDeletableEntity
+public class ScopeEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";
@@ -12,7 +12,6 @@ public class ScopeEntity : ISoftDeletableEntity
     public virtual ResourceServerEntity? ResourceServer { get; set; }
     public virtual List<ClientEntity> Clients { get; set; } = [];
     public bool IsStandard { get; set; }
-    public DateTimeOffset? DeletedAt { get; set; }
 
     public static ScopeEntity FromDomain(Scope scope)
     {
@@ -31,7 +30,6 @@ public class ScopeEntity : ISoftDeletableEntity
         Name = scope.Name;
         DisplayName = scope.DisplayName;
         ResourceServerId = scope.ResourceServerId;
-        DeletedAt = scope.DeletedAt;
     }
 
     public Scope ToDomain() => new(
@@ -40,6 +38,5 @@ public class ScopeEntity : ISoftDeletableEntity
         displayName: DisplayName,
         resourceServerId: ResourceServerId,
         isStandard: IsStandard,
-        createdAt: CreatedAt,
-        deletedAt: DeletedAt);
+        createdAt: CreatedAt);
 }
