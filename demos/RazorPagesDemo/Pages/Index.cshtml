@@ -4,24 +4,32 @@
     ViewData["Title"] = "Etusivu";
 }
 
-<div class="card">
-    <h1>Razor Pages demo</h1>
-    <p>Muistiinpanot koko tiimille. Kokeile ilmaiseksi, osta kun olet valmis.</p>
+<div class="card bg-base-100 border-base-300 w-full max-w-md border">
+    <div class="card-body">
+        <h1 class="card-title text-2xl">Razor Pages demo</h1>
+        <p>Muistiinpanot koko tiimille. Kokeile ilmaiseksi, osta kun olet valmis.</p>
 
-    @if (Model.Error is not null)
-    {
-        <p class="error">@Model.Error</p>
-    }
+        @if (Model.Error is not null)
+        {
+            <p class="text-error">@Model.Error</p>
+        }
 
-    <a class="button" asp-controller="Account" asp-action="Register">Kokeile ilmaiseksi</a>
-    <a class="button secondary" asp-controller="Account" asp-action="Login">Kirjaudu</a>
+        <div class="card-actions mt-2">
+            <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Kokeile ilmaiseksi</a>
+            <a class="btn btn-secondary" asp-controller="Account" asp-action="Login">Kirjaudu</a>
+        </div>
+    </div>
 </div>
 
 <div class="explain">
     <h2>Mitä tässä tapahtuu</h2>
     <p>Tämä on tuotteen kotisivu. Napit ovat pelkkiä linkkejä:</p>
     <ul>
-        <li><strong>Kokeile</strong> vie autentikointipalvelimen rekisteröitymissivulle (tunnuksen luonti), <strong>Kirjaudu</strong> sen kirjautumissivulle.</li>
-        <li>Jos sinulla ei vielä ole tenanttia sovelluksessa, sovellus pyytää luomaan sellaisen. Muuten pääset suoraan tenanttiisi. Jos kuulut useaan tenanttiin, valitset autentikointipalvelimella, minkä tenantin sisällä toimit.</li>
-    </ul>
-</div>
+        <li><strong>Kokeile</strong> vie autentikointipalvelimen rekisteröitymissivulle (tunnuksen luonti),
+            <strong>Kirjaudu</strong> sen kirjautumissivulle.
+        </li>
+        <li>Jos sinulla ei vielä ole tenanttia sovelluksessa, sovellus pyytää luomaan sellaisen. Muuten pääset suoraan
+            tenanttiisi. Jos kuulut useaan tenanttiin, valitset autentikointipalvelimella, minkä tenantin sisällä
+            toimit.</li>
+        </ul>
+    </div>

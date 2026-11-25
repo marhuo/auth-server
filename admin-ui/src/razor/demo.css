@@ -1,0 +1,29 @@
+/* The Razor Pages demo. Built into demos/RazorPagesDemo/wwwroot/css/site.css by "npm run css:demo"
+   (run by the demo build). */
+@import 'tailwindcss' source(none);
+@import './roboto.css';
+@import '../theme.css';
+
+@source '../../../demos/RazorPagesDemo/Pages';
+
+@layer components {
+	/* The "Mitä tässä tapahtuu" boxes. */
+	.explain {
+		@apply flex flex-col gap-1 rounded-box border border-dashed border-base-300 bg-base-100 p-4 text-sm;
+	}
+	.explain h2 {
+		@apply font-semibold;
+	}
+	.explain ol {
+		@apply list-decimal pl-5;
+	}
+	.explain ul {
+		@apply list-disc pl-5;
+	}
+}
+
+@layer base {
+	code {
+		@apply rounded bg-base-200 px-1 text-sm break-all;
+	}
+}

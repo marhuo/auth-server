@@ -8,13 +8,17 @@ using RazorPagesDemo.Controllers;
 var builder = WebApplication.CreateBuilder(args);
 var authServer = builder.Configuration.GetSection("AuthServer");
 
-builder.Services.AddRazorPages(options =>
+var razorPages = builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/App");
     options.Conventions.AuthorizePage("/App/Users", Roles.TenantAdminPolicy);
     options.Conventions.AuthorizePage("/App/Domains", Roles.TenantAdminPolicy);
     options.Conventions.AuthorizePage("/CreateTenant");
 });
+
+// Development: a changed .cshtml file shows on page refresh, without a restart.
+if (builder.Environment.IsDevelopment())
+    razorPages.AddRazorRuntimeCompilation();
 builder.Services.AddControllers(); // AccountController: sign-in actions without a page.
 
 // Sign-in through the auth server.

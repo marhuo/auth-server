@@ -1,0 +1,5 @@
+/* Development only: demo.css plus all daisyUI components, so any daisyUI class works without a build.
+   Utility classes come from Tailwind in the browser (_TailwindDev.cshtml). */
+@import './demo.css';
+
+@source '../../node_modules/daisyui/components';

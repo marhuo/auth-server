@@ -1,24 +1,26 @@
 @page
 @model AuthServer.Web.Pages.DevExternalLoginModel
-
-<div class="card">
-    <h1 class="card-header">Testi-Google</h1>
-    <form method="post" class="card-body">
-        <p>Vain kehityksessä. Kirjoita, mitä Google kertoisi käyttäjästä.</p>
-        <p>Käyttäjä tunnistetaan sub-arvosta, ei sähköpostista: sama sub on aina sama käyttäjä.</p>
-        @if (Model.Error is not null)
-        {
-            <p class="text-danger">@Model.Error</p>
-        }
-        <input asp-for="ReturnUrl" type="hidden" />
-        <label>Googlen käyttäjä-id (sub)
-            <input asp-for="Sub" type="text" required />
-        </label>
-        <label>Sähköposti
-            <input asp-for="Email" type="email" required />
-        </label>
-        <label><input asp-for="EmailVerified" type="checkbox" /> Google on vahvistanut sähköpostin</label>
-        <button class="btn btn-primary" type="submit">Kirjaudu</button>
-        <p><a asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Takaisin kirjautumiseen</a></p>
-    </form>
-</div>
+<h1 class="card-title justify-center text-2xl">Testi-Google</h1>
+<form method="post" class="flex flex-col gap-4">
+    <p>Vain kehityksessä. Kirjoita, mitä Google kertoisi käyttäjästä.</p>
+    <p>Käyttäjä tunnistetaan sub-arvosta, ei sähköpostista: sama sub on aina sama käyttäjä.</p>
+    @if (Model.Error is not null)
+    {
+        <p class="text-error">@Model.Error</p>
+    }
+    <input asp-for="ReturnUrl" type="hidden" />
+    <label class="flex flex-col gap-1">
+        <span class="label">Googlen käyttäjä-id (sub)</span>
+        <input asp-for="Sub" type="text" class="input w-full" required />
+    </label>
+    <label class="flex flex-col gap-1">
+        <span class="label">Sähköposti</span>
+        <input asp-for="Email" type="email" class="input w-full" required />
+    </label>
+    <label class="label">
+        <input asp-for="EmailVerified" type="checkbox" class="checkbox" />
+        Google on vahvistanut sähköpostin
+    </label>
+    <button class="btn btn-primary" type="submit">Kirjaudu</button>
+    <a class="link text-sm" asp-page="Login" asp-route-returnUrl="@Model.ReturnUrl">Takaisin kirjautumiseen</a>
+</form>

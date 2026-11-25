@@ -1,0 +1,18 @@
+/* The auth server's Razor pages (sign-in, registration). Built into
+   backend/AuthServer.Web/wwwroot/css/auth.css by "npm run css:auth" (run by the backend build). */
+@import 'tailwindcss' source(none);
+@import './roboto.css';
+@import '../theme.css';
+@import './google-button.css';
+
+@source '../../../backend/AuthServer.Web/Pages';
+
+/* Form errors from asp-validation-summary: hidden when there are none. */
+.validation-summary-valid {
+	display: none;
+}
+.validation-summary-errors ul {
+	margin: 0;
+	padding-left: 1.25rem;
+	list-style: disc;
+}

@@ -4,28 +4,35 @@
     ViewData["Title"] = "Luo tenantti";
 }
 
-<div class="card">
-    <h1>Tervetuloa, @User.Email()</h1>
-    <p>Sinulla ei vielä ole tenanttia sovelluksessa. Anna sille nimi, niin pääset alkuun.</p>
-    <form method="post">
-        <label for="name">Yrityksen tai tiimin nimi</label>
-        <input id="name" type="text" asp-for="Name" required />
+<div class="card bg-base-100 border-base-300 w-full max-w-md border">
+    <div class="card-body">
+        <h1 class="card-title text-2xl">Tervetuloa, @User.Email()</h1>
+        <p>Sinulla ei vielä ole tenanttia sovelluksessa. Anna sille nimi, niin pääset alkuun.</p>
+        <form method="post" class="flex flex-col gap-4">
+            <label class="flex flex-col gap-1">
+                <span class="label">Yrityksen tai tiimin nimi</span>
+                <input type="text" class="input w-full" asp-for="Name" required />
+            </label>
 
-        @if (Model.Error is not null)
-        {
-            <p class="error">@Model.Error</p>
-        }
+            @if (Model.Error is not null)
+            {
+                <p class="text-error">@Model.Error</p>
+            }
 
-        <button type="submit">Luo tenantti</button>
-    </form>
+            <button class="btn btn-primary self-start" type="submit">Luo tenantti</button>
+        </form>
+    </div>
 </div>
 
 <div class="explain">
     <h2>Mitä tässä tapahtuu</h2>
     <ol>
-        <li>Olet kirjautunut, mutta tokenissasi ei ole <code>tenant_id</code>:tä, koska sinulla ei vielä ole tenanttia sovelluksessa. Siksi päädyit tälle sivulle.</li>
-        <li>Kun painat Luo, sovelluksen palvelin kutsuu <code>POST api/tenant</code>: luo tenantti tällä nimellä ja anna sinulle (sähköposti tokenista) rooli <code>@Roles.TenantAdmin</code>.</li>
-        <li>Sovellus hakee sinulle uuden tokenin autentikointipalvelimelta. Salasanaa ei kysytä, koska olet jo kirjautunut siellä. Uudessa tokenissa on tenantti ja rooli.</li>
-    </ol>
-    <p>Jos kirjaudut myöhemmin uudelleen, päädyt suoraan tenanttiisi. Uutta tenanttia ei synny.</p>
-</div>
+        <li>Olet kirjautunut, mutta tokenissasi ei ole <code>tenant_id</code>:tä, koska sinulla ei vielä ole tenanttia
+            sovelluksessa. Siksi päädyit tälle sivulle.</li>
+            <li>Kun painat Luo, sovelluksen palvelin kutsuu <code>POST api/tenant</code>: luo tenantti tällä nimellä ja anna
+                sinulle (sähköposti tokenista) rooli <code>@Roles.TenantAdmin</code>.</li>
+                <li>Sovellus hakee sinulle uuden tokenin autentikointipalvelimelta. Salasanaa ei kysytä, koska olet jo
+                    kirjautunut siellä. Uudessa tokenissa on tenantti ja rooli.</li>
+                </ol>
+                <p>Jos kirjaudut myöhemmin uudelleen, päädyt suoraan tenanttiisi. Uutta tenanttia ei synny.</p>
+            </div>

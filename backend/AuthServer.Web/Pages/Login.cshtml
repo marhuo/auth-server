@@ -1,15 +1,13 @@
 ﻿@page
 @model AuthServer.Web.Pages.LoginModel
-<div class="card">
-    <h1 class="card-header">@(ViewData["Title"] ?? "AuthServer")</h1>
-    <form method="post" class="card-body">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input asp-for="ReturnUrl" type="hidden" />
-        <input asp-for="Email" type="email" placeholder="Sähköposti" autocomplete="username" autofocus required />
-        <input asp-for="Password" type="password" placeholder="Salasana" autocomplete="current-password" required />
-        <button class="btn btn-primary" type="submit">Kirjaudu</button>
-        <a asp-page="ForgotPassword">Unohtuiko salasana?</a>
-        <partial name="_ExternalLoginButtons" model="Model.ReturnUrl" />
-        <p class="mt-20">Ei tunnusta? <a asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl">Luo tunnus</a></p>
-    </form>
-</div>
+<h1 class="card-title justify-center text-2xl">@(ViewData["Title"] ?? "AuthServer")</h1>
+<form method="post" class="flex flex-col gap-4">
+    <div asp-validation-summary="ModelOnly" class="text-error"></div>
+    <input asp-for="ReturnUrl" type="hidden" />
+    <input asp-for="Email" type="email" class="input w-full" placeholder="Sähköposti" autocomplete="username" autofocus required />
+    <input asp-for="Password" type="password" class="input w-full" placeholder="Salasana" autocomplete="current-password" required />
+    <button class="btn btn-primary" type="submit">Kirjaudu</button>
+    <a class="link text-sm" asp-page="ForgotPassword">Unohtuiko salasana?</a>
+    <partial name="_ExternalLoginButtons" model="Model.ReturnUrl" />
+    <p class="text-sm">Ei tunnusta? <a class="link" asp-page="Register" asp-route-returnUrl="@Model.ReturnUrl">Luo tunnus</a></p>
+</form>

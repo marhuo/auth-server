@@ -4,35 +4,39 @@
     ViewData["Title"] = "Sovellus";
 }
 
-<div class="card">
-    <h1>@User.TenantName()</h1>
-    @if (Model.Tenant?.Paid == true)
-    {
-        <p><span class="badge ok">Maksettu</span> Kaikki ominaisuudet ovat käytössä.</p>
-    }
-    else
-    {
-        @if (User.IsTenantAdmin())
+<div class="card bg-base-100 border-base-300 border">
+    <div class="card-body">
+        <h1 class="card-title text-2xl">@User.TenantName()</h1>
+        @if (Model.Tenant?.Paid == true)
         {
-            <p><span class="badge warn">Kokeilu</span> Osta täysversio <a href="/App/Billing">Laskutus</a>-sivulta.</p>
+            <p><span class="badge badge-success">Maksettu</span> Kaikki ominaisuudet ovat käytössä.</p>
         }
         else
         {
-            <p><span class="badge warn">Kokeilu</span> Tenantin ylläpitäjä voi ostaa täysversion.</p>
+            @if (User.IsTenantAdmin())
+            {
+                <p><span class="badge badge-warning">Kokeilu</span> Osta täysversio <a class="link" href="/App/Billing">Laskutus</a>-sivulta.</p>
+            }
+            else
+            {
+                <p><span class="badge badge-warning">Kokeilu</span> Tenantin ylläpitäjä voi ostaa täysversion.</p>
+            }
         }
-    }
-    <p>Tähän tulisivat tenantin muistiinpanot. Itse sovellus ei ole demossa olennainen.</p>
+        <p>Tähän tulisivat tenantin muistiinpanot. Itse sovellus ei ole demossa olennainen.</p>
+    </div>
 </div>
 
-<div class="card">
-    <h2>Mitä sovellus tietää sinusta</h2>
-    <table>
-        <tr><td>Sähköposti (<code>email</code>)</td><td>@User.Email()</td></tr>
-        <tr><td>Tenantin id (<code>tenant_id</code>)</td><td>@User.TenantId()</td></tr>
-        <tr><td>Roolit tässä tenantissa (<code>role</code>)</td><td>@string.Join(", ", User.RoleNames())</td></tr>
-        <tr><td>Tenantin nimi</td><td>@User.TenantName()</td></tr>
-        <tr><td>Tilaus</td><td>@(Model.Tenant?.Paid == true ? "Maksettu" : "Kokeilu")</td></tr>
-    </table>
+<div class="card bg-base-100 border-base-300 border">
+    <div class="card-body">
+        <h2 class="card-title">Mitä sovellus tietää sinusta</h2>
+        <table class="table">
+            <tr><td>Sähköposti (<code>email</code>)</td><td>@User.Email()</td></tr>
+            <tr><td>Tenantin id (<code>tenant_id</code>)</td><td>@User.TenantId()</td></tr>
+            <tr><td>Roolit tässä tenantissa (<code>role</code>)</td><td>@string.Join(", ", User.RoleNames())</td></tr>
+            <tr><td>Tenantin nimi</td><td>@User.TenantName()</td></tr>
+            <tr><td>Tilaus</td><td>@(Model.Tenant?.Paid == true ? "Maksettu" : "Kokeilu")</td></tr>
+        </table>
+    </div>
 </div>
 
 <div class="explain">

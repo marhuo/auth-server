@@ -12,7 +12,11 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages();
+var razorPages = builder.Services.AddRazorPages();
+
+// Development: a changed .cshtml file shows on page refresh, without a restart.
+if (builder.Environment.IsDevelopment())
+    razorPages.AddRazorRuntimeCompilation();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

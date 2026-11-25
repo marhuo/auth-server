@@ -4,26 +4,30 @@
     ViewData["Title"] = "Käyttäjät";
 }
 
-<div class="card">
-    <h1>Kutsu käyttäjä</h1>
-    <form method="post">
-        <label for="email">Sähköposti</label>
-        <input id="email" type="email" asp-for="Email" required />
+<div class="card bg-base-100 border-base-300 border">
+    <div class="card-body">
+        <h1 class="card-title text-2xl">Kutsu käyttäjä</h1>
+        <form method="post" class="flex flex-col gap-4">
+            <label class="flex flex-col gap-1">
+                <span class="label">Sähköposti</span>
+                <input type="email" class="input w-full" asp-for="Email" required />
+            </label>
 
-        @if (Model.Error is not null)
-        {
-            <p class="error">@Model.Error</p>
-        }
-        @if (Model.InvitedEmail is not null)
-        {
-            <p>
-                <strong>@Model.InvitedEmail</strong> sai roolin <code>@Roles.User</code>.
-                Uuden käyttäjän kutsulinkki löytyy autentikointipalvelimen lokista (rivi <code>Invite for @Model.InvitedEmail</code>).
-            </p>
-        }
+            @if (Model.Error is not null)
+            {
+                <p class="text-error">@Model.Error</p>
+            }
+            @if (Model.InvitedEmail is not null)
+            {
+                <p>
+                    <strong>@Model.InvitedEmail</strong> sai roolin <code>@Roles.User</code>.
+                    Uuden käyttäjän kutsulinkki löytyy autentikointipalvelimen lokista (rivi <code>Invite for @Model.InvitedEmail</code>).
+                </p>
+            }
 
-        <button type="submit">Kutsu käyttäjäksi</button>
-    </form>
+            <button class="btn btn-primary self-start" type="submit">Kutsu käyttäjäksi</button>
+        </form>
+    </div>
 </div>
 
 <div class="explain">

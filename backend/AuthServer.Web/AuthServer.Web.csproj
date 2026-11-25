@@ -15,6 +15,7 @@
     <PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.15" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -39,6 +40,12 @@
     <ProjectReference Include="..\AuthServer.Domain\AuthServer.Domain.csproj" />
     <ProjectReference Include="..\AuthServer.Infrastructure\AuthServer.Infrastructure.csproj" />
   </ItemGroup>
+
+  <!-- Builds wwwroot/css/auth.css (Tailwind + daisyUI) from admin-ui/src/razor/auth.css. The file is
+       committed, so the build works without npm too. -->
+  <Target Name="BuildAuthCss" BeforeTargets="BeforeBuild" Condition="Exists('../../admin-ui/node_modules')">
+    <Exec WorkingDirectory="../../admin-ui" Command="npm run css:auth" />
+  </Target>
 
   <Target Name="RunTypeGen" AfterTargets="Build">
     <Exec Command="dotnet typegen generate" />

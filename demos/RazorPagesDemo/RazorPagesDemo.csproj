@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.15" />
   </ItemGroup>
+
+  <!-- Builds wwwroot/css/site.css (Tailwind + daisyUI, the admin UI theme) from admin-ui/src/razor/demo.css.
+       The file is committed, so the build works without npm too. -->
+  <Target Name="BuildDemoCss" BeforeTargets="BeforeBuild" Condition="Exists('../../admin-ui/node_modules')">
+    <Exec WorkingDirectory="../../admin-ui" Command="npm run css:demo" />
+  </Target>
 
 </Project>

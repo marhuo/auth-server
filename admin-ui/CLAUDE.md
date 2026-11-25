@@ -110,7 +110,8 @@ Page state and logic live in classes in `.svelte.ts` files next to the page; the
 ### Styling
 
 - Use daisyUI component classes and Tailwind utilities. Avoid `<style>` blocks and hard-coded colors; use theme tokens (`base-100/200/300`, `primary`, `accent`, `error`, …).
-- Custom themes `auth-light` (default) and `auth-dark` (prefers-dark) are defined in `src/routes/layout.css`. Global style tweaks go there too.
+- Custom themes `auth-light` (default) and `auth-dark` (prefers-dark) are defined in `src/theme.css`. Global style tweaks go there too.
+- `src/theme.css` is shared with the Razor pages of the backend and `demos/RazorPagesDemo`. Their inputs are `src/razor/auth.css` and `src/razor/demo.css`; `npm run css:auth` / `npm run css:demo` build them with the Tailwind CLI into the apps' `wwwroot/css`. The backend and demo builds run these automatically, and the output is committed. In development the apps load `css/dev.css` instead (all daisyUI classes, from `src/razor/*.dev.css`) and run Tailwind in the browser (`_Styles.cshtml`), so new classes work on page refresh without a build.
 - Icons: `<Icon icon="ic:..." />` from `@iconify/svelte`, using the Google Material `ic:` set.
 
 ## Rules
