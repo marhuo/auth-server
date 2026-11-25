@@ -47,7 +47,7 @@ public class UserValidator(
 
         // Locking a user must not remove the last active admin.
         if (request.Locked && !user.Locked)
-            await ValidateNotLastAdminAsync(user.Id, nameof(request.Locked));
+            await ValidateNotLastAuthServerAdminAsync(user.Id, nameof(request.Locked));
 
         var normalized = User.NormalizeEmail(request.Email);
         if (normalized != user.NormalizedEmail && await users.EmailTakenAsync(normalized, excludeUserId: user.Id))
@@ -117,7 +117,7 @@ public class UserValidator(
     }
 
     // Every auth server role the user holds must have another holder who is not locked.
-    private async Task ValidateNotLastAdminAsync(Guid userId, string key)
+    private async Task ValidateNotLastAuthServerAdminAsync(Guid userId, string key)
     {
         foreach (var roleId in await roles.GetAuthServerRoleIdsAsync(userId))
         {

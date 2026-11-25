@@ -25,8 +25,6 @@ public interface IRoleRepository
     // Names of the user's auth server roles.
     Task<List<string>> GetAuthServerRoleNamesAsync(Guid userId);
 
-    // Names of the user's roles in the tenant.
-    Task<List<string>> GetTenantRoleNamesAsync(Guid userId, Guid tenantId);
 
     // Ids of the auth server roles the user holds.
     Task<List<Guid>> GetAuthServerRoleIdsAsync(Guid userId);

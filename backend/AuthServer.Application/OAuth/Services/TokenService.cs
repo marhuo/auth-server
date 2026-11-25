@@ -44,12 +44,15 @@ public class TokenService(
         {
             claims["tenant_id"] = tenant.ToString();
 
-            if (userId is { } user)
+            if (userId is { } id)
             {
-                var roles = await roleRepository.GetTenantRoleNamesAsync(user, tenant);
-                if (roles.Count > 0)
+                var user = await users.GetByIdAsync(id)
+                    ?? throw new InvalidOperationException($"User {id} was not found when creating an access token.");
+
+                var roles = await GetTenantRoleNamesAsync(user, tenant);
+                if (roles.Length > 0)
                 {
-                    claims["role"] = roles.ToArray();
+                    claims["role"] = roles;
                 }
             }
         }
@@ -79,10 +82,10 @@ public class TokenService(
         {
             claims["tenant_id"] = tenant.ToString();
 
-            var roles = await roleRepository.GetTenantRoleNamesAsync(user.Id, tenant);
-            if (roles.Count > 0)
+            var roles = await GetTenantRoleNamesAsync(user, tenant);
+            if (roles.Length > 0)
             {
-                claims["role"] = roles.ToArray();
+                claims["role"] = roles;
             }
         }
 
@@ -166,4 +169,15 @@ public class TokenService(
     // JSON Web Key Set of the signing keys (/.well-known/jwks.json).
     public async Task<object> GetJwksAsync() =>
         new { keys = await signingKeys.GetPublicJwksAsync() };
+
+    // The names of the user's roles in the tenant (the role claim).
+    private async Task<string[]> GetTenantRoleNamesAsync(User user, Guid tenantId)
+    {
+        var roleIds = user.Roles.Where(r => r.TenantId == tenantId).Select(r => r.RoleId).ToList();
+        if (roleIds.Count == 0)
+            return [];
+
+        var roles = await roleRepository.GetByIdsAsync(roleIds);
+        return roles.Select(r => r.Name).ToArray();
+    }
 }

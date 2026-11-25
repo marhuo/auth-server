@@ -76,12 +76,6 @@ public class RoleRepository(AuthDbContext db) : IRoleRepository
             .Select(ur => ur.Role.Name)
             .ToListAsync();
 
-    public Task<List<string>> GetTenantRoleNamesAsync(Guid userId, Guid tenantId) =>
-        db.UserRoles
-            .Where(ur => ur.UserId == userId && ur.TenantId == tenantId)
-            .Select(ur => ur.Role.Name)
-            .ToListAsync();
-
     public Task<List<Guid>> GetAuthServerRoleIdsAsync(Guid userId) =>
         db.UserRoles
             .Where(ur => ur.UserId == userId && ur.Role.ResourceServer.IsAuthServer)

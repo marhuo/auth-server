@@ -141,7 +141,7 @@ Hangfire recurring jobs are classes in `Web/Jobs/` (namespace `AuthServer.Web.Jo
 **Repositories**
 
 - Repositories implement the domain interface and return domain objects, never EF entities.
-- A query method belongs to the repository of the aggregate it reads, not of the aggregate it is filtered by. E.g. a user's role names are in `IRoleRepository` (`GetTenantRoleNamesAsync(userId, tenantId)`), and revoking a user's refresh tokens is in `IRefreshTokenRepository`.
+- A query method belongs to the repository of the aggregate it reads, not of the aggregate it is filtered by. E.g. a user's auth server role names are in `IRoleRepository` (`GetAuthServerRoleNamesAsync(userId)`), and revoking a user's refresh tokens is in `IRefreshTokenRepository`.
 - Methods that insert new data are named `CreateXxxAsync` / `CreateAsync`, never `Add...`/`Insert...` (e.g. `CreateAsync(Role role)`, `CreateAsync(SignInCode code)`). Updates are `UpdateAsync`, deletes `DeleteAsync(Guid id)`.
 - Read queries use `AsNoTracking()`.
 - Register repositories in `Infrastructure/DependencyInjection.cs`.
