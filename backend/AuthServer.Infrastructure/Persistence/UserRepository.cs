@@ -76,6 +76,12 @@ public class UserRepository(AuthDbContext db) : IUserRepository
     public Task<bool> EmailTakenAsync(string normalizedEmail, Guid? excludeUserId = null) =>
         db.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail && u.Id != excludeUserId);
 
+    public Task<bool> HasOtherActiveHolderAsync(Guid roleId, Guid userId) =>
+        db.UserRoles.AnyAsync(ur =>
+            ur.RoleId == roleId
+            && ur.UserId != userId
+            && !ur.User.Locked);
+
     public async Task<int> DeleteUnusedInvitedAsync(DateTimeOffset createdBefore)
     {
         var userIds = db.Users

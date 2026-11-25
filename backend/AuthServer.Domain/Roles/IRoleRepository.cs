@@ -31,8 +31,6 @@ public interface IRoleRepository
     // Ids of the auth server roles the user holds.
     Task<List<Guid>> GetAuthServerRoleIdsAsync(Guid userId);
 
-    // Whether another user who can sign in (not locked by an admin) holds the role.
-    Task<bool> HasOtherActiveHolderAsync(Guid roleId, Guid userId);
 
     Task CreateAsync(Role role);
 

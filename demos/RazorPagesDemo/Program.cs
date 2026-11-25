@@ -62,6 +62,13 @@ builder.Services.AddAuthentication(options =>
         options.TokenValidationParameters.RoleClaimType = "role";
 
         // Tenant switch: sends the chosen tenant to the auth server.
+        // The auth server redirects back after sign-out only when it knows the client (client_id).
+        options.Events.OnRedirectToIdentityProviderForSignOut = context =>
+        {
+            context.ProtocolMessage.ClientId = context.Options.ClientId;
+            return Task.CompletedTask;
+        };
+
         options.Events.OnRedirectToIdentityProvider = context =>
         {
             if (context.Properties.Items.TryGetValue(AccountController.TenantParameter, out var tenantId))

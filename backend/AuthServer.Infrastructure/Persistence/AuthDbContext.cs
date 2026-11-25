@@ -182,10 +182,6 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
                 .HasMethod("gin")
                 .HasOperators("gin_trgm_ops");
 
-            // Array containment lookup (post-logout redirect URI check at logout).
-            b.HasIndex(e => e.PostLogoutRedirectUris, "ix_clients_post_logout_redirect_uris")
-                .HasMethod("gin");
-
             b.HasIndex(e => e.TargetResourceServerId, "ix_clients_target_resource_server_id");
 
             b.HasOne(e => e.Tenant).WithMany(t => t.Clients).HasForeignKey(e => e.TenantId);

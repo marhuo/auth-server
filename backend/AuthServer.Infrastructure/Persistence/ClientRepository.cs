@@ -58,9 +58,6 @@ public class ClientRepository(AuthDbContext db) : IClientRepository
         return clients.OrderBy(c => c.ClientId).ToPagedListAsync(query, e => e.ToDomain());
     }
 
-    public Task<bool> IsPostLogoutRedirectUriRegisteredAsync(string uri) =>
-        db.Clients.AnyAsync(c => c.IsActive && c.PostLogoutRedirectUris.Contains(uri));
-
     public Task<bool> ClientIdExistsAsync(string clientId, Guid? excludeId = null) =>
         db.Clients.AnyAsync(c => c.ClientId == clientId && c.Id != excludeId);
 

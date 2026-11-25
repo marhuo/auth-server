@@ -70,7 +70,7 @@ public class UserValidator(
         if (!await IsAuthServerRoleAsync(request.RoleId))
             return;
 
-        if (!await roles.HasOtherActiveHolderAsync(request.RoleId, user.Id))
+        if (!await users.HasOtherActiveHolderAsync(request.RoleId, user.Id))
             throw new ValidationException(nameof(request.RoleId), ErrorCode.NotAllowed,
                 "The last holder of an auth server role cannot be removed.",
                 "Auth server -roolin viimeistä haltijaa ei voi poistaa.");
@@ -121,7 +121,7 @@ public class UserValidator(
     {
         foreach (var roleId in await roles.GetAuthServerRoleIdsAsync(userId))
         {
-            if (!await roles.HasOtherActiveHolderAsync(roleId, userId))
+            if (!await users.HasOtherActiveHolderAsync(roleId, userId))
                 throw new ValidationException(key, ErrorCode.NotAllowed,
                     "The last active holder of an admin role cannot be locked.",
                     "Ylläpitäjäroolin viimeistä aktiivista haltijaa ei voi lukita.");

@@ -17,6 +17,9 @@ public interface IUserRepository
     // Whether another user has the normalized email.
     Task<bool> EmailTakenAsync(string normalizedEmail, Guid? excludeUserId = null);
 
+    // Whether a user other than userId, who can sign in (not locked by an admin), holds the role.
+    Task<bool> HasOtherActiveHolderAsync(Guid roleId, Guid userId);
+
     // Physically deletes users who are still Invited, have no roles and were created before the given
     // time. Returns the number of deleted users.
     Task<int> DeleteUnusedInvitedAsync(DateTimeOffset createdBefore);

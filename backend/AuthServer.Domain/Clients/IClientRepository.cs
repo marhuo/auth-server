@@ -15,8 +15,6 @@ public interface IClientRepository
     // Ordered by client id. SearchTerm matches the client id and the display name.
     Task<PagedList<Client>> GetPagedListAsync(PagedListQuery query);
 
-    // Whether any active client has registered the URI as a post-logout redirect URI.
-    Task<bool> IsPostLogoutRedirectUriRegisteredAsync(string uri);
 
     Task<bool> ClientIdExistsAsync(string clientId, Guid? excludeId = null);
 

@@ -189,11 +189,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "DisplayName" }, "ix_clients_display_name_trgm"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "DisplayName" }, "ix_clients_display_name_trgm"), new[] { "gin_trgm_ops" });
 
-                    b.HasIndex(new[] { "PostLogoutRedirectUris" }, "ix_clients_post_logout_redirect_uris")
-                        .HasDatabaseName("ix_clients_post_logout_redirect_uris");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "PostLogoutRedirectUris" }, "ix_clients_post_logout_redirect_uris"), "gin");
-
                     b.HasIndex(new[] { "TargetResourceServerId" }, "ix_clients_target_resource_server_id")
                         .HasDatabaseName("ix_clients_target_resource_server_id");
 

@@ -411,12 +411,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "ix_clients_post_logout_redirect_uris",
-                table: "clients",
-                column: "post_logout_redirect_uris")
-                .Annotation("Npgsql:IndexMethod", "gin");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_clients_target_resource_server_id",
                 table: "clients",
                 column: "target_resource_server_id");

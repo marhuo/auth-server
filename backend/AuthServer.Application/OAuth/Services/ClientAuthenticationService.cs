@@ -26,7 +26,4 @@ public class ClientAuthenticationService(IClientRepository clients)
 
     public Task<Client?> FindActiveAsync(string clientId) =>
         clients.FindActiveByClientIdAsync(clientId);
-
-    public Task<bool> IsPostLogoutRedirectUriRegisteredAsync(string uri) =>
-        clients.IsPostLogoutRedirectUriRegisteredAsync(uri);
 }
