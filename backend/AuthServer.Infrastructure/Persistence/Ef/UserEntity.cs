@@ -7,9 +7,6 @@ public class UserEntity
     public Guid Id { get; set; }
     public string Email { get; set; } = "";
     public string NormalizedEmail { get; set; } = "";
-    public string? PasswordHash { get; set; }
-    public int FailedLogins { get; set; }
-    public DateTimeOffset? LockedUntil { get; set; }
     public bool Locked { get; set; }
     public UserStatuses Status { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
@@ -29,9 +26,6 @@ public class UserEntity
     {
         Email = user.Email;
         NormalizedEmail = user.NormalizedEmail;
-        PasswordHash = user.PasswordHash;
-        FailedLogins = user.FailedLogins;
-        LockedUntil = user.LockedUntil;
         Locked = user.Locked;
         Status = user.Status;
     }
@@ -41,9 +35,6 @@ public class UserEntity
         id: Id,
         email: Email,
         normalizedEmail: NormalizedEmail,
-        passwordHash: PasswordHash,
-        failedLogins: FailedLogins,
-        lockedUntil: LockedUntil,
         locked: Locked,
         status: Status,
         roles: UserRoles

@@ -32,7 +32,7 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
     public DbSet<AuthorizationCodeEntity> AuthorizationCodes => Set<AuthorizationCodeEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
     public DbSet<SigningKeyEntity> SigningKeys => Set<SigningKeyEntity>();
-    public DbSet<PasswordTokenEntity> PasswordTokens => Set<PasswordTokenEntity>();
+    public DbSet<SignInCodeEntity> SignInCodes => Set<SignInCodeEntity>();
     public DbSet<TenantDomainEntity> TenantDomains => Set<TenantDomainEntity>();
     // ASP.NET Data Protection keys (Program.cs: PersistKeysToDbContext).
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -242,19 +242,16 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
             b.HasIndex(e => e.IsActive).IsUnique().HasFilter("is_active = true");
         });
 
-        modelBuilder.Entity<PasswordTokenEntity>(b =>
+        // No foreign key to users: a code is sent before the user exists.
+        modelBuilder.Entity<SignInCodeEntity>(b =>
         {
-            b.ToTable("password_tokens");
+            b.ToTable("sign_in_codes");
             b.HasKey(e => e.Id);
 
-            b.Property(e => e.Email).HasMaxLength(User.MaxEmailLength);
             b.Property(e => e.NormalizedEmail).HasMaxLength(User.MaxEmailLength);
 
-            b.HasIndex(e => e.TokenHash).IsUnique();
-            b.HasIndex(e => e.UserId);
+            b.HasIndex(e => new { e.NormalizedEmail, e.CreatedAt });
             b.HasIndex(e => e.ExpiresAt);
-
-            b.HasOne<UserEntity>().WithMany().HasForeignKey(e => e.UserId);
         });
 
         modelBuilder.Entity<TenantDomainEntity>(b =>

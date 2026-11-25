@@ -10,9 +10,7 @@ export interface UserDto {
     id: string;
     email: string;
     createdAt: string;
-    lockedUntil: string | null;
     locked: boolean;
     status: UserDtoStatuses;
-    hasPassword: boolean;
     userRoles: UserRoleDto[];
 }

@@ -5,7 +5,8 @@ namespace AuthServer.Web.Setup;
 
 public static class RateLimitSetup
 {
-    // "Forgot password" and registration may each send at most 10 emails per IP address in 15 minutes.
+    // The sign-in page may take at most 10 form posts per IP address in 15 minutes (sending a code sends
+    // an email; checking a code counts too).
     // Only form posts count; opening the page does not. Behind a reverse proxy, RemoteIpAddress needs
     // forwarded headers.
     public static IServiceCollection AddRateLimits(this IServiceCollection services)
@@ -13,8 +14,7 @@ public static class RateLimitSetup
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            options.AddPolicy(ForgotPasswordModel.PasswordResetRateLimit, EmailSendingLimit);
-            options.AddPolicy(RegisterModel.RegistrationRateLimit, EmailSendingLimit);
+            options.AddPolicy(LoginModel.SignInCodeRateLimit, EmailSendingLimit);
         });
 
         return services;

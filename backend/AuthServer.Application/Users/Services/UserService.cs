@@ -1,5 +1,6 @@
 using AuthServer.Application.Common.Messages;
 using AuthServer.Application.Users.Messages;
+using AuthServer.Domain.Clients;
 using AuthServer.Domain.Common;
 using AuthServer.Domain.OAuth;
 using AuthServer.Domain.ResourceServers;
@@ -12,10 +13,9 @@ public class UserService(
     IUserRepository users,
     IRoleRepository roles,
     IResourceServerRepository resourceServers,
-    IPasswordTokenRepository passwordTokens,
+    IClientRepository clients,
     IRefreshTokenRepository refreshTokens,
     UserValidator validator,
-    IPasswordHasher hasher,
     IUserEmailSender emailSender,
     TimeProvider timeProvider)
 {
@@ -44,9 +44,8 @@ public class UserService(
         return pagedList.ToDto(UserDto.ToDto);
     }
 
-    // Users are created only by invitation. Creates the user if the email is unknown, adds the roles,
-    // and sends an invitation link when the user has no password yet. Returns the id of the user,
-    // existing or new.
+    // Creates the user if the email is unknown, adds the roles, and sends an invitation email when the
+    // user has not signed in yet. Returns the id of the user, existing or new.
     public async Task<Guid> InviteAsync(UserInviteRequest request)
     {
         await validator.ValidateInviteAsync(request);
@@ -72,32 +71,28 @@ public class UserService(
             await users.UpdateAsync(user);
 
         if (user.Status == UserStatuses.Invited)
-            await SendInvitationAsync(user, request.ClientId, now);
+            await SendInvitationAsync(user, request.ClientId);
 
         return user.Id;
     }
 
-    // Sends a new invitation link to a user who has not set a password yet, e.g. when the first email
-    // went to spam. The earlier links stop working.
+    // Sends the invitation email again to a user who has not signed in yet, e.g. when the first email
+    // went to spam.
     public async Task ResendInviteAsync(Guid id)
     {
         var user = await LoadAsync(id, nameof(id));
 
         validator.ValidateResendInvite(user);
 
-        await SendInvitationAsync(user, clientId: null, timeProvider.GetUtcNow());
+        await SendInvitationAsync(user, clientId: null);
     }
 
-    // Sends a link to set the password. A new link invalidates the user's earlier unused links.
-    private async Task SendInvitationAsync(User user, string? clientId, DateTimeOffset now)
+    // The email links to the app's sign-in page (InitiateLoginUri) when the client is known, otherwise to
+    // the auth server's sign-in page. The user signs in with a code sent by email.
+    private async Task SendInvitationAsync(User user, string? clientId)
     {
-        var (token, rawToken) = PasswordToken.Create(
-            userId: user.Id,
-            email: user.Email,
-            type: PasswordTokenTypes.Invitation,
-            now: now);
-        await passwordTokens.CreateAsync(token);
-        await emailSender.SendInviteAsync(user.Email, rawToken, clientId);
+        var client = string.IsNullOrWhiteSpace(clientId) ? null : await clients.FindActiveByClientIdAsync(clientId);
+        await emailSender.SendInviteAsync(user.Email, client?.DisplayName, client?.InitiateLoginUri);
     }
 
     public async Task UpdateAsync(UserUpdateRequest request)
@@ -110,19 +105,6 @@ public class UserService(
         user.SetLocked(request.Locked);
 
         await users.UpdateAsync(user);
-    }
-
-    // Also revokes the user's refresh tokens, so other sessions must sign in again.
-    public async Task ChangePasswordAsync(UserChangePasswordRequest request)
-    {
-        validator.ValidatePassword(request.NewPassword);
-
-        var user = await LoadAsync(request.Id, nameof(request.Id));
-
-        user.SetPassword(request.NewPassword, hasher);
-
-        await users.UpdateAsync(user);
-        await refreshTokens.RevokeRefreshTokensAsync(user.Id, timeProvider.GetUtcNow());
     }
 
     public async Task AddRoleAsync(AddUserRoleRequest request)
@@ -172,13 +154,10 @@ public class UserService(
         await refreshTokens.RevokeRefreshTokensAsync(user.Id, timeProvider.GetUtcNow());
     }
 
-    // Deletes users who never started using their account, e.g. an unfinished registration.
+    // Deletes invited users who never signed in and no longer have roles.
     // Returns the number of deleted users.
-    public Task<int> DeleteUnusedInvitedAsync()
-    {
-        var now = timeProvider.GetUtcNow();
-        return users.DeleteUnusedInvitedAsync(now - User.UnusedInvitedRetention, now);
-    }
+    public Task<int> DeleteUnusedInvitedAsync() =>
+        users.DeleteUnusedInvitedAsync(timeProvider.GetUtcNow() - User.UnusedInvitedRetention);
 
     private async Task<User> LoadAsync(Guid id, string key) =>
         await users.GetByIdAsync(id)

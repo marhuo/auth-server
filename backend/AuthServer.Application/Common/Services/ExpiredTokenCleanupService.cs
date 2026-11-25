@@ -3,12 +3,12 @@ using AuthServer.Domain.Users;
 
 namespace AuthServer.Application.Common.Services;
 
-// Physically deletes authorization codes, refresh tokens and password tokens that expired more than
+// Physically deletes authorization codes, refresh tokens and sign-in codes that expired more than
 // ExpiredTokenRetention ago. Run nightly by ExpiredTokenCleanupJob.
 public class ExpiredTokenCleanupService(
     IAuthorizationCodeRepository authorizationCodes,
     IRefreshTokenRepository refreshTokens,
-    IPasswordTokenRepository passwordTokens,
+    ISignInCodeRepository signInCodes,
     TimeProvider timeProvider)
 {
     // Expired tokens are kept for a while so that recent token history can still be investigated.
@@ -21,6 +21,6 @@ public class ExpiredTokenCleanupService(
 
         return await authorizationCodes.DeleteExpiredAsync(expiredBefore)
             + await refreshTokens.DeleteExpiredAsync(expiredBefore)
-            + await passwordTokens.DeleteExpiredAsync(expiredBefore);
+            + await signInCodes.DeleteExpiredAsync(expiredBefore);
     }
 }

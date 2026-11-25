@@ -14,8 +14,7 @@ public class TokenController(
     ScopeService scopeService,
     UserAuthenticationService userService,
     TokenService tokenService,
-    AuthorizationCodeService authorizationCodeService,
-    TimeProvider timeProvider) : Controller
+    AuthorizationCodeService authorizationCodeService) : Controller
 {
     private static readonly Regex VerifierRegex = new(@"^[A-Za-z0-9\-._~]{43,128}\z", RegexOptions.Compiled);
 
@@ -186,7 +185,7 @@ public class TokenController(
     private async Task<bool> IsAllowedToSignInAsync(Client client, Guid userId, Guid? tenantId)
     {
         var user = await userService.GetByIdAsync(userId);
-        if (user is null || !user.CanSignIn(timeProvider.GetUtcNow()))
+        if (user is null || !user.CanSignIn)
             return false;
 
         if (client.TenantId is not null && client.TenantId != tenantId)

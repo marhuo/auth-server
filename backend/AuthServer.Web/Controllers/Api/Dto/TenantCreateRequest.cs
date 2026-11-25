@@ -6,7 +6,7 @@ public class TenantCreateRequest
     public required string AdminEmail { get; init; }
     public List<string> AdminRoleNames { get; init; } = [];
 
-    // Which app the user is invited to, e.g. "razor-pages-demo-web". After setting the password, the user
-    // gets a button to sign in to that app. Optional.
+    // Which app the user is invited to, e.g. "razor-pages-demo-web". The invitation email links to
+    // that app's sign-in (Client.InitiateLoginUri). Optional.
     public string? ClientId { get; init; }
 }

@@ -188,7 +188,7 @@ public static class Extensions
     public static async Task<List<Guid>> GetScopeIdsByNamesAsync(this AuthDbContext db, IEnumerable<string> names) =>
         await db.Scopes.Where(s => names.Contains(s.Name)).Select(s => s.Id).ToListAsync();
 
-    public static async Task<Guid> CreateUserIfNotExistsAsync(this AuthDbContext db, IPasswordHasher passwordHasher, string email, string password)
+    public static async Task<Guid> CreateUserIfNotExistsAsync(this AuthDbContext db, string email)
     {
         var normalizedEmail = User.NormalizeEmail(email);
 
@@ -203,7 +203,6 @@ public static class Extensions
         db.Users.Add(new UserEntity
         {
             Id = userId,
-            PasswordHash = passwordHasher.Hash(password),
             Email = email,
             NormalizedEmail = normalizedEmail,
             Status = UserStatuses.Active,

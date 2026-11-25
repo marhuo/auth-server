@@ -88,12 +88,11 @@ public class RoleRepository(AuthDbContext db) : IRoleRepository
             .Select(ur => ur.RoleId)
             .ToListAsync();
 
-    public Task<bool> HasOtherActiveHolderAsync(Guid roleId, Guid userId, DateTimeOffset now) =>
+    public Task<bool> HasOtherActiveHolderAsync(Guid roleId, Guid userId) =>
         db.UserRoles.AnyAsync(ur =>
             ur.RoleId == roleId
             && ur.UserId != userId
-            && !ur.User.Locked
-            && (ur.User.LockedUntil == null || ur.User.LockedUntil <= now));
+            && !ur.User.Locked);
 
     public async Task CreateAsync(Role role)
     {

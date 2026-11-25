@@ -57,11 +57,4 @@ public class UserController(UserService service) : AdminControllerBase
         await service.UpdateAsync(request);
         return NoContent();
     }
-
-    [HttpPost("change-password")]
-    public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordRequest request)
-    {
-        await service.ChangePasswordAsync(request);
-        return NoContent();
-    }
 }

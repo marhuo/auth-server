@@ -5,7 +5,7 @@ export class UserInviteModel extends FormModelBase {
 	email = $state('');
 
 	// Returns the id of the invited user. Roles are added on the user details page.
-	// If the email belongs to an existing user with a password, no invitation is sent.
-	// No client: an admin invitation is not for a specific app (no sign-in button after the password).
+	// If the email belongs to a user who has already signed in, no invitation is sent.
+	// No client: an admin invitation is not for a specific app, so the email links to the auth server.
 	submit = () => this.run({ email: this.email, userRoles: [], clientId: null }, inviteUser);
 }

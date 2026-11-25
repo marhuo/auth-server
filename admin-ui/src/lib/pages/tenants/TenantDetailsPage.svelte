@@ -267,15 +267,6 @@
 								<td class="whitespace-nowrap">
 									{#if user.locked}
 										<span class="badge badge-soft badge-sm badge-error">Lukittu</span>
-									{:else if user.lockedOut}
-										<span
-											class="badge badge-soft badge-sm badge-warning"
-											title="{formatIsoDateTime(
-												user.lockedUntil
-											)} asti, liian monta epäonnistunutta kirjautumista"
-										>
-											Tilapäisesti lukittu
-										</span>
 									{/if}
 								</td>
 							</tr>

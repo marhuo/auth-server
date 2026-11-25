@@ -4,40 +4,26 @@ using Microsoft.Extensions.Logging;
 
 namespace AuthServer.Infrastructure.Users;
 
-// Development implementation: writes the links to the log instead of sending an email.
+// Development implementation: writes the emails to the log instead of sending them.
 public class LoggingUserEmailSender(ILogger<LoggingUserEmailSender> logger, IConfiguration configuration) : IUserEmailSender
 {
     // ":l" writes the string as is: by default Serilog puts quotes around string values in the message,
     // and the link could not be copied from the log.
-    public Task SendInviteAsync(string toEmail, string token, string? clientId)
+    public Task SendInviteAsync(string toEmail, string? appName, string? appLoginUri)
     {
-        logger.LogInformation("Invite for {Email:l}: {Link:l}", toEmail,
-            SetPasswordLink(token, returnUrl: null) + (clientId is null ? "" : $"&clientId={Uri.EscapeDataString(clientId)}"));
+        var link = appLoginUri
+            ?? $"{configuration["Tokens:Issuer"]}/Login?email={Uri.EscapeDataString(toEmail)}";
+
+        logger.LogInformation("Invite for {Email:l} to {App:l}: {Link:l}", toEmail, appName ?? "the auth server", link);
         return Task.CompletedTask;
     }
 
-    public Task SendPasswordResetAsync(string toEmail, string token)
+    public Task SendSignInCodeAsync(string toEmail, string code, string? returnUrl)
     {
-        logger.LogInformation("Password reset for {Email:l}: {Link:l}", toEmail, SetPasswordLink(token, returnUrl: null));
+        var link = $"{configuration["Tokens:Issuer"]}/Login?email={Uri.EscapeDataString(toEmail)}&code={code}"
+            + (returnUrl is null ? "" : $"&returnUrl={Uri.EscapeDataString(returnUrl)}");
+
+        logger.LogInformation("Sign-in code for {Email:l}: {Code:l} {Link:l}", toEmail, code, link);
         return Task.CompletedTask;
     }
-
-    public Task SendRegistrationAsync(string toEmail, string token, string? returnUrl)
-    {
-        logger.LogInformation("Registration for {Email:l}: {Link:l}", toEmail, SetPasswordLink(token, returnUrl));
-        return Task.CompletedTask;
-    }
-
-    public Task SendAlreadyRegisteredAsync(string toEmail, string? returnUrl)
-    {
-        logger.LogInformation("Already registered, sign in instead, for {Email:l}: {Link:l}", toEmail,
-            Link("/Login", returnUrl is null ? "" : $"?returnUrl={Uri.EscapeDataString(returnUrl)}"));
-        return Task.CompletedTask;
-    }
-
-    private string SetPasswordLink(string token, string? returnUrl) =>
-        Link("/SetPassword", $"?token={Uri.EscapeDataString(token)}"
-            + (returnUrl is null ? "" : $"&returnUrl={Uri.EscapeDataString(returnUrl)}"));
-
-    private string Link(string path, string query) => $"{configuration["Tokens:Issuer"]}{path}{query}";
 }

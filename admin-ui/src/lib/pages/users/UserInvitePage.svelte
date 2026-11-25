@@ -32,8 +32,8 @@
 		<h1 class="mb-4 card-title">Kutsu käyttäjä</h1>
 
 		<p class="mb-2 text-sm opacity-60">
-			Käyttäjä luodaan ja hänelle lähetetään linkki salasanan asettamiseen. Roolit lisätään
-			käyttäjän tiedoissa kutsun jälkeen.
+			Käyttäjä luodaan ja hänelle lähetetään kutsu. Hän kirjautuu sähköpostiin tulevalla koodilla.
+			Roolit lisätään käyttäjän tiedoissa kutsun jälkeen.
 		</p>
 
 		<GeneralErrors messages={model.generalErrors} />

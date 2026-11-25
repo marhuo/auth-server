@@ -1,5 +1,7 @@
 # Käyttäjäkutsun testausohje
 
+*Vanhentunut 25.11.2026: salasanat poistettiin (docs/salasanaton-kirjautuminen.md). Kutsuttu käyttäjä kirjautuu sähköpostiin tulevalla koodilla, ja koodi näkyy lokissa rivillä `Sign-in code for`.*
+
 ## Ennen aloitusta
 
 Käyttäjäkutsun testaus vie noin 10 minuuttia, kun nämä kolme asiaa ovat valmiina:

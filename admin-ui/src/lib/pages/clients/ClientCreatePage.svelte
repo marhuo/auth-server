@@ -148,7 +148,7 @@
 						type="url"
 						bind:value={model.initiateLoginUri}
 						placeholder="https://example.com/kirjaudu"
-						hint="Sovelluksen osoite, josta kirjautuminen aloitetaan. Kutsuttu käyttäjä saa salasanan asettamisen jälkeen napin tähän osoitteeseen. Valinnainen."
+						hint="Sovelluksen osoite, josta kirjautuminen aloitetaan. Kutsusähköpostin linkki vie tähän osoitteeseen. Valinnainen."
 						errors={model.errorsFor('initiateLoginUri')}
 					/>
 				</FormField>

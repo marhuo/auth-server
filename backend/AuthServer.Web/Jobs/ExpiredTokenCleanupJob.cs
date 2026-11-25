@@ -3,7 +3,7 @@ using Hangfire;
 
 namespace AuthServer.Web.Jobs;
 
-// Deletes expired authorization codes, refresh tokens and password tokens. Scheduled in HangfireSetup.
+// Deletes expired authorization codes, refresh tokens and sign-in codes. Scheduled in HangfireSetup.
 public class ExpiredTokenCleanupJob(ExpiredTokenCleanupService cleanupService, ILogger<ExpiredTokenCleanupJob> logger)
 {
     public const string JobId = "expired-token-cleanup";

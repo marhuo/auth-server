@@ -29,7 +29,7 @@ public class AccountController : Controller
             CookieAuthenticationDefaults.AuthenticationScheme,
             OpenIdConnectDefaults.AuthenticationScheme);
 
-    // Signs in again to the chosen tenant. No password is asked.
+    // Signs in again to the chosen tenant. The auth server remembers the user, so nothing is asked.
     [HttpPost, ValidateAntiForgeryToken]
     public IActionResult SwitchTenant(Guid tenantId)
     {

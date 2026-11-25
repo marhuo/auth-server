@@ -17,8 +17,7 @@ public class AuthorizeController(
     TenantService tenantService,
     AuthorizationCodeService authorizationCodeService,
     ScopeService scopeService,
-    UserAuthenticationService userService,
-    TimeProvider timeProvider) : Controller
+    UserAuthenticationService userService) : Controller
 {
     private static readonly Regex CodeChallengeRegex = new(@"^[A-Za-z0-9_-]{43}\z", RegexOptions.Compiled);
 
@@ -73,10 +72,10 @@ public class AuthorizeController(
         var authentication = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         if (!authentication.Succeeded)
         {
-            // prompt=create (OpenID Connect): the product asks for the registration page instead of the
-            // login page, e.g. from its "Try it free" button. After registering, the user comes back here.
-            var page = Request.Query["prompt"] == "create" ? "/Register" : "/Login";
-            return RedirectToPage(page, new { returnUrl = Request.Path + Request.QueryString });
+            // prompt=create (OpenID Connect): the product asks for registration, e.g. from its "Try it
+            // free" button. The same page signs in and registers; only the heading differs.
+            var create = Request.Query["prompt"] == "create";
+            return RedirectToPage("/Login", new { returnUrl = Request.Path + Request.QueryString, create = create ? true : (bool?)null });
         }
 
         // The sign-in cookie is validated only periodically (UserSessionValidator), so check here too
@@ -93,7 +92,7 @@ public class AuthorizeController(
             return RedirectToPage("/Login", new { returnUrl = Request.Path + Request.QueryString });
         }
 
-        if (!user.CanSignIn(timeProvider.GetUtcNow()))
+        if (!user.CanSignIn)
         {
             return RedirectError(redirectUri, state, "access_denied", "The user is not allowed to sign in.");
         }

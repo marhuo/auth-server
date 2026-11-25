@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import DeleteIconButton from '#lib/components/DeleteIconButton.svelte';
 	import DetailsBooleanInput from '#lib/components/DetailsBooleanInput.svelte';
-	import DetailsPasswordInput from '#lib/components/DetailsPasswordInput.svelte';
 	import DetailsTextInput from '#lib/components/DetailsTextInput.svelte';
 	import {
 		userStatusBadgeClass,
@@ -61,13 +60,6 @@
 						required
 					/>
 
-					<DetailsPasswordInput
-						label="Salasana"
-						dialogTitle="Vaihda salasana"
-						hasPassword={model.hasPassword}
-						onSave={model.changePassword}
-					/>
-
 					<li class="list-row items-center">
 						<div class="list-col-grow">
 							<div class="text-xs opacity-60">Tila</div>
@@ -81,7 +73,7 @@
 							{#if userStatusIsInvited(model.status)}
 								<div class="text-sm opacity-60">
 									{#if model.inviteResent}Kutsu lähetetty uudelleen.{/if}
-									Uusi linkki on voimassa 7 päivää. Aiemmat linkit lakkaavat toimimasta.
+									Käyttäjä kirjautuu sähköpostiin tulevalla koodilla.
 								</div>
 							{/if}
 						</div>
@@ -105,21 +97,6 @@
 						hint="Lukittu käyttäjä ei voi kirjautua. Lukitus on voimassa, kunnes se poistetaan."
 						onSave={model.changeLocked}
 					/>
-
-					<!-- Automatic lockout after too many failed logins: ends by itself, or an admin ends it
-					     (saving locked = false also clears the lockout). -->
-					{#if model.lockedOut && !model.locked}
-						<li class="list-row items-center">
-							<div class="list-col-grow">
-								<div class="text-xs opacity-60">Tilapäinen lukitus</div>
-								<div>{formatIsoDateTime(model.lockedUntil)} asti</div>
-								<div class="text-sm opacity-60">Liian monta epäonnistunutta kirjautumista.</div>
-							</div>
-							<button class="btn btn-ghost btn-sm" onclick={() => model.changeLocked(false)}>
-								Poista
-							</button>
-						</li>
-					{/if}
 
 					<li class="list-row">
 						<div>

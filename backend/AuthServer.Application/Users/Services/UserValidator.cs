@@ -11,8 +11,7 @@ public class UserValidator(
     IUserRepository users,
     IRoleRepository roles,
     IResourceServerRepository resourceServers,
-    ITenantRepository tenants,
-    TimeProvider timeProvider)
+    ITenantRepository tenants)
 {
     public async Task ValidateInviteAsync(UserInviteRequest request)
     {
@@ -24,7 +23,7 @@ public class UserValidator(
             await ValidateRoleAssignmentAsync(nameof(request.UserRoles), role.RoleId, role.TenantId);
     }
 
-    // An invitation is for setting the first password; a user who has one uses "forgot password".
+    // Only a user who has not signed in yet is reminded.
     public void ValidateResendInvite(User user)
     {
         if (user.Status != UserStatuses.Invited)
@@ -55,13 +54,6 @@ public class UserValidator(
             throw new ValidationException(User.EmailTakenError());
     }
 
-    public void ValidatePassword(string password)
-    {
-        var errors = new ErrorCollector();
-        User.ValidatePassword(errors, password);
-        errors.ThrowIfAny();
-    }
-
     public async Task ValidateAddRoleAsync(User user, AddUserRoleRequest request)
     {
         if (user.HasRole(request.RoleId, request.TenantId))
@@ -78,7 +70,7 @@ public class UserValidator(
         if (!await IsAuthServerRoleAsync(request.RoleId))
             return;
 
-        if (!await roles.HasOtherActiveHolderAsync(request.RoleId, user.Id, timeProvider.GetUtcNow()))
+        if (!await roles.HasOtherActiveHolderAsync(request.RoleId, user.Id))
             throw new ValidationException(nameof(request.RoleId), ErrorCode.NotAllowed,
                 "The last holder of an auth server role cannot be removed.",
                 "Auth server -roolin viimeistä haltijaa ei voi poistaa.");
@@ -127,11 +119,9 @@ public class UserValidator(
     // Every auth server role the user holds must have another holder who is not locked.
     private async Task ValidateNotLastAdminAsync(Guid userId, string key)
     {
-        var now = timeProvider.GetUtcNow();
-
         foreach (var roleId in await roles.GetAuthServerRoleIdsAsync(userId))
         {
-            if (!await roles.HasOtherActiveHolderAsync(roleId, userId, now))
+            if (!await roles.HasOtherActiveHolderAsync(roleId, userId))
                 throw new ValidationException(key, ErrorCode.NotAllowed,
                     "The last active holder of an admin role cannot be locked.",
                     "Ylläpitäjäroolin viimeistä aktiivista haltijaa ei voi lukita.");

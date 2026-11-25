@@ -12,7 +12,7 @@ public interface IRefreshTokenRepository
 
     Task RevokeFamilyAsync(Guid familyId, DateTimeOffset now);
 
-    // Revokes the user's active refresh tokens, e.g. after a password change.
+    // Revokes the user's active refresh tokens, e.g. after a role is removed.
     Task RevokeRefreshTokensAsync(Guid userId, DateTimeOffset now);
 
     // Physically deletes tokens that expired before the given time. Returns the number of deleted tokens.

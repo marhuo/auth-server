@@ -111,7 +111,7 @@
 							type="url"
 							value={client.initiateLoginUri ?? ''}
 							mono={true}
-							hint="Sovelluksen osoite, josta kirjautuminen aloitetaan, esim. https://sovellus.fi/kirjaudu. Kutsuttu käyttäjä saa salasanan asettamisen jälkeen napin tähän osoitteeseen. Tyhjä poistaa."
+							hint="Sovelluksen osoite, josta kirjautuminen aloitetaan, esim. https://sovellus.fi/kirjaudu. Kutsusähköpostin linkki vie tähän osoitteeseen. Tyhjä poistaa."
 							onSave={(value) => client.changeInitiateLoginUri(value)}
 						/>
 					{/if}

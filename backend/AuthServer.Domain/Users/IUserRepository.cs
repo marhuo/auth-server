@@ -17,9 +17,9 @@ public interface IUserRepository
     // Whether another user has the normalized email.
     Task<bool> EmailTakenAsync(string normalizedEmail, Guid? excludeUserId = null);
 
-    // Physically deletes users who are still Invited, have no roles and no usable password link, and
-    // were created before the given time. Returns the number of deleted users.
-    Task<int> DeleteUnusedInvitedAsync(DateTimeOffset createdBefore, DateTimeOffset now);
+    // Physically deletes users who are still Invited, have no roles and were created before the given
+    // time. Returns the number of deleted users.
+    Task<int> DeleteUnusedInvitedAsync(DateTimeOffset createdBefore);
 
     Task CreateAsync(User user);
 

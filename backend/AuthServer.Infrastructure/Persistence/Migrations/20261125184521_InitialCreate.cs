@@ -47,6 +47,23 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "sign_in_codes",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    normalized_email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
+                    code_hash = table.Column<string>(type: "text", nullable: false),
+                    failed_attempts = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    expires_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    used_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_sign_in_codes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "signing_keys",
                 columns: table => new
                 {
@@ -89,9 +106,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
                     normalized_email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
-                    password_hash = table.Column<string>(type: "text", nullable: true),
-                    failed_logins = table.Column<int>(type: "integer", nullable: false),
-                    locked_until = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     locked = table.Column<bool>(type: "boolean", nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
@@ -201,31 +215,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         name: "fk_tenant_domains_tenants_tenant_id",
                         column: x => x.tenant_id,
                         principalTable: "tenants",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "password_tokens",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    type = table.Column<int>(type: "integer", nullable: false),
-                    email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
-                    normalized_email = table.Column<string>(type: "character varying(254)", maxLength: 254, nullable: false),
-                    token_hash = table.Column<string>(type: "text", nullable: false),
-                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    expires_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    used_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_password_tokens", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_password_tokens_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -438,22 +427,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 column: "tenant_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_password_tokens_expires_at",
-                table: "password_tokens",
-                column: "expires_at");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_password_tokens_token_hash",
-                table: "password_tokens",
-                column: "token_hash",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_password_tokens_user_id",
-                table: "password_tokens",
-                column: "user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_refresh_tokens_client_id",
                 table: "refresh_tokens",
                 column: "client_id");
@@ -546,6 +519,16 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "ix_scopes_resource_server_id",
                 table: "scopes",
                 column: "resource_server_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sign_in_codes_expires_at",
+                table: "sign_in_codes",
+                column: "expires_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_sign_in_codes_normalized_email_created_at",
+                table: "sign_in_codes",
+                columns: new[] { "normalized_email", "created_at" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_signing_keys_is_active",
@@ -657,10 +640,10 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                 name: "data_protection_keys");
 
             migrationBuilder.DropTable(
-                name: "password_tokens");
+                name: "refresh_tokens");
 
             migrationBuilder.DropTable(
-                name: "refresh_tokens");
+                name: "sign_in_codes");
 
             migrationBuilder.DropTable(
                 name: "signing_keys");

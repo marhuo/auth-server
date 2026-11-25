@@ -17,11 +17,8 @@ export interface UserListItem {
 	id: string;
 	email: string;
 	status: UserDtoStatuses;
-	lockedUntil: string | null;
 	// Locked by an admin.
 	locked: boolean;
-	// Automatic lockout (lockedUntil in the future) when the page was loaded.
-	lockedOut: boolean;
 	roles: UserListRole[];
 }
 
@@ -61,15 +58,11 @@ export class UserListModel extends PagedListBase<UserListItem> {
 			(t) => t
 		);
 
-		const now = Date.now();
-
 		const items: UserListItem[] = page.items.map((user) => ({
 			id: user.id,
 			email: user.email,
 			status: user.status,
-			lockedUntil: user.lockedUntil,
 			locked: user.locked,
-			lockedOut: user.lockedUntil !== null && Date.parse(user.lockedUntil) > now,
 			roles: user.userRoles.map((ur) => ({
 				roleId: ur.roleId,
 				roleName: roleMap.get(ur.roleId)?.name ?? ur.roleId,

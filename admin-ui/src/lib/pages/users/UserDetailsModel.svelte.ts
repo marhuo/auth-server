@@ -2,13 +2,7 @@ import type { UserDtoStatuses } from '#lib/api/generated/index.ts';
 import { getResourceServersByIds } from '#lib/api/resourceServerApi.ts';
 import { getRolesByIds } from '#lib/api/roleApi.ts';
 import { getTenantsByIds } from '#lib/api/tenantApi.ts';
-import {
-	changeUserPassword,
-	getUserById,
-	removeUserRole,
-	resendUserInvite,
-	updateUser
-} from '#lib/api/userApi.ts';
+import { getUserById, removeUserRole, resendUserInvite, updateUser } from '#lib/api/userApi.ts';
 import { distinct, toMap } from '#lib/utils/collectionUtils.ts';
 
 export interface UserRoleDetails {
@@ -43,11 +37,6 @@ export class UserDetailsModel {
 		return this._email;
 	}
 
-	private _hasPassword = $state(false);
-	get hasPassword() {
-		return this._hasPassword;
-	}
-
 	private _status = $state<UserDtoStatuses>('Invited');
 	get status() {
 		return this._status;
@@ -58,19 +47,6 @@ export class UserDetailsModel {
 	get locked() {
 		return this._locked;
 	}
-
-	// Automatic lockout after too many failed logins; read-only here.
-	private _lockedUntil = $state<string | null>(null);
-	get lockedUntil() {
-		return this._lockedUntil;
-	}
-
-	// Whether the automatic lockout was in force when the user was loaded.
-	get lockedOut() {
-		return this._lockedUntil !== null && Date.parse(this._lockedUntil) > this._loadedAt;
-	}
-
-	private _loadedAt = 0;
 
 	private _createdAt = $state('');
 	get createdAt() {
@@ -116,10 +92,7 @@ export class UserDetailsModel {
 			);
 
 			this._email = user.email;
-			this._lockedUntil = user.lockedUntil;
 			this._locked = user.locked;
-			this._loadedAt = Date.now();
-			this._hasPassword = user.hasPassword;
 			this._status = user.status;
 			this._createdAt = user.createdAt;
 			this._userRoles = user.userRoles.map((ur) => {
@@ -150,13 +123,6 @@ export class UserDetailsModel {
 		});
 	}
 
-	changePassword = async (password: string) => {
-		await changeUserPassword({ id: this.id, newPassword: password });
-		this._hasPassword = true;
-		// Setting the password also accepts the invitation (backend: User.Status).
-		this._status = 'Active';
-	};
-
 	private _resendingInvite = $state(false);
 	get resendingInvite() {
 		return this._resendingInvite;
@@ -183,11 +149,9 @@ export class UserDetailsModel {
 		this._email = email;
 	};
 
-	// Unlocking also ends the automatic lockout (backend: User.SetLocked).
 	changeLocked = async (locked: boolean) => {
 		await this.update({ locked });
 		this._locked = locked;
-		if (!locked) this._lockedUntil = null;
 	};
 
 	removeRole = async (roleId: string, tenantId: string | null) => {

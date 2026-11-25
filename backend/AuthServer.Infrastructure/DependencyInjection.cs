@@ -31,11 +31,10 @@ public static class DependencyInjection
         services.AddScoped<ITenantRepository, TenantRepository>();
         services.AddScoped<ITenantDomainRepository, TenantDomainRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IPasswordTokenRepository, PasswordTokenRepository>();
+        services.AddScoped<ISignInCodeRepository, SignInCodeRepository>();
         services.AddScoped<IAuthorizationCodeRepository, AuthorizationCodeRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
-        services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserEmailSender, LoggingUserEmailSender>();
         services.AddSingleton<IDnsTxtLookup, DnsTxtLookup>();
 

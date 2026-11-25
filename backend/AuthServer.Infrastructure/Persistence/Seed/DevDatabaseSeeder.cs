@@ -12,7 +12,6 @@ public static class DevDatabaseSeeder
 {
     public static async Task SeedAsync(IServiceProvider services)
     {
-        var passwordHasher = services.GetRequiredService<IPasswordHasher>();
         var db = services.GetRequiredService<AuthDbContext>();
 
 
@@ -25,12 +24,12 @@ public static class DevDatabaseSeeder
         ]);
 
         await CreateReactDemo(services);
-        await CreateRazorPagesDemo(db, passwordHasher);
+        await CreateRazorPagesDemo(db);
     }
 
     // demos/RazorPagesDemo: a product that is sold online (docs/saas-myynti-ja-rekisteroityminen.md).
     // No users or tenants: the demo creates them through the external API.
-    private static async Task CreateRazorPagesDemo(AuthDbContext db, IPasswordHasher passwordHasher)
+    private static async Task CreateRazorPagesDemo(AuthDbContext db)
     {
         var resourceServerId = await db.CreateResourceServerIfNotExistsAsync("razor-pages-demo", "Razor Pages demo");
         var tenantAdminRoleId = await db.CreateRoleIfNotExistsAsync(resourceServerId, "razor_pages_demo_tenant_admin", "Tenantin ylläpitäjä: saa ostaa ja kutsua käyttäjiä");
@@ -62,20 +61,20 @@ public static class DevDatabaseSeeder
             allowedScopeIds: await db.GetScopeIdsByNamesAsync([SystemScopes.AuthServerApi]));
 
         var tenant1Id = await db.CreateTenantIfNotExistsAsync("razor-tenant-1", "razor-tenant-1");
-        var tenantAdmin1Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-tenant-1-admin@example.com", "salasana1");
+        var tenantAdmin1Id = await db.CreateUserIfNotExistsAsync("razor-tenant-1-admin@example.com");
         await db.CreateUserRoleIfNotExistAsync(tenantAdmin1Id, tenantAdminRoleId, tenant1Id);
 
         var tenant2Id = await db.CreateTenantIfNotExistsAsync("razor-tenant-2", "razor-tenant-2");
-        var tenantAdmin2Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-tenant-2-admin@example.com", "salasana1");
+        var tenantAdmin2Id = await db.CreateUserIfNotExistsAsync("razor-tenant-2-admin@example.com");
         await db.CreateUserRoleIfNotExistAsync(tenantAdmin2Id, tenantAdminRoleId, tenant2Id);
 
         // User 1 belongs to both tenants
-        var tenantUser1Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-user-1@example.com", "salasana1");
+        var tenantUser1Id = await db.CreateUserIfNotExistsAsync("razor-user-1@example.com");
         await db.CreateUserRoleIfNotExistAsync(tenantUser1Id, userRoleId, tenant1Id);
         await db.CreateUserRoleIfNotExistAsync(tenantUser1Id, userRoleId, tenant2Id);
 
         //User 2 belongs only to tenant 1
-        var tenantUser2Id = await db.CreateUserIfNotExistsAsync(passwordHasher, "razor-user-2@example.com", "salasana1");
+        var tenantUser2Id = await db.CreateUserIfNotExistsAsync("razor-user-2@example.com");
         await db.CreateUserRoleIfNotExistAsync(tenantUser2Id, userRoleId, tenant1Id);
     }
 
@@ -97,7 +96,6 @@ public static class DevDatabaseSeeder
 
     private static async Task CreateReactDemo(IServiceProvider services)
     {
-        var passwordHasher = services.GetRequiredService<IPasswordHasher>();
         var db = services.GetRequiredService<AuthDbContext>();
 
         var resourceServerId = await db.CreateResourceServerIfNotExistsAsync("react-demo", "React demo api");
@@ -107,7 +105,7 @@ public static class DevDatabaseSeeder
         var managerRoleId = await db.CreateRoleIfNotExistsAsync(resourceServerId, "react_demo_manager", "React demo app manager");
         var workerRoleId = await db.CreateRoleIfNotExistsAsync(resourceServerId, "react_demo_worker", "React demo app worker");
 
-        var userId = await db.CreateUserIfNotExistsAsync(passwordHasher, "matti@example.com", "matti12345678");
+        var userId = await db.CreateUserIfNotExistsAsync("matti@example.com");
 
         var acmeId = await db.GetTenantIdByNameAsync("Acme Corporation") ?? throw new InvalidOperationException("Acme Corporation id not found");
         var globexId = await db.GetTenantIdByNameAsync("Globex") ?? throw new InvalidOperationException("Gobex id not found");

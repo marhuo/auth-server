@@ -11,13 +11,12 @@ type UserStatusInfo = {
 const userStatuses: Record<UserDtoStatuses, UserStatusInfo> = {
 	Invited: {
 		label: 'Kutsuttu',
-		description:
-			'Käyttäjä ei ole vielä asettanut salasanaa kutsulinkistä, joten hän ei voi kirjautua.',
+		description: 'Käyttäjä on kutsuttu, mutta ei ole vielä kirjautunut.',
 		badgeClass: 'badge-warning'
 	},
 	Active: {
 		label: 'Aktiivinen',
-		description: 'Käyttäjä on hyväksynyt kutsun ja asettanut salasanan.',
+		description: 'Käyttäjä on kirjautunut ainakin kerran.',
 		badgeClass: 'badge-success'
 	}
 };

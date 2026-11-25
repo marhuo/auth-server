@@ -3,7 +3,6 @@ import type {
 	AddUserRoleRequest,
 	PagedListDto,
 	RemoveUserRoleRequest,
-	UserChangePasswordRequest,
 	UserDto,
 	UserInviteRequest,
 	UserPagedListRequest,
@@ -31,7 +30,7 @@ export const getUserMapByIds = async (ids: string[]) => {
 // Returns the id of the invited user (an existing user if the email is already known).
 export const inviteUser = (request: UserInviteRequest) => httpPost<string>('/user/invite', request);
 
-// Sends a new invitation link to a user who has not set a password yet; earlier links stop working.
+// Sends the invitation email again to a user who has not signed in yet.
 export const resendUserInvite = (id: string) => httpPost<void>(`/user/${id}/resend-invite`);
 
 export const addUserRole = (request: AddUserRoleRequest) =>
@@ -41,6 +40,3 @@ export const removeUserRole = (request: RemoveUserRoleRequest) =>
 	httpPost<void>('/user/role/remove', request);
 
 export const updateUser = (request: UserUpdateRequest) => httpPut<void>('/user', request);
-
-export const changeUserPassword = (request: UserChangePasswordRequest) =>
-	httpPost<void>('/user/change-password', request);

@@ -5,7 +5,6 @@
 
 export * from './addUserRoleRequest';
 export * from './removeUserRoleRequest';
-export * from './userChangePasswordRequest';
 export * from './userDto';
 export * from './userDtoStatuses';
 export * from './userInviteRequest';

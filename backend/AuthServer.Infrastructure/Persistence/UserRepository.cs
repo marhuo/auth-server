@@ -76,19 +76,17 @@ public class UserRepository(AuthDbContext db) : IUserRepository
     public Task<bool> EmailTakenAsync(string normalizedEmail, Guid? excludeUserId = null) =>
         db.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail && u.Id != excludeUserId);
 
-    public async Task<int> DeleteUnusedInvitedAsync(DateTimeOffset createdBefore, DateTimeOffset now)
+    public async Task<int> DeleteUnusedInvitedAsync(DateTimeOffset createdBefore)
     {
         var userIds = db.Users
             .Where(u => u.Status == UserStatuses.Invited
                 && u.CreatedAt < createdBefore
-                && !u.UserRoles.Any()
-                && !db.PasswordTokens.Any(t => t.UserId == u.Id && t.UsedAt == null && t.ExpiresAt > now))
+                && !u.UserRoles.Any())
             .Select(u => u.Id);
 
         await using var transaction = await db.Database.BeginTransactionAsync();
 
         // The rows that point to the users first: all foreign keys are Restrict.
-        await db.PasswordTokens.Where(t => userIds.Contains(t.UserId)).ExecuteDeleteAsync();
         await db.RefreshTokens.Where(t => userIds.Contains(t.UserId)).ExecuteDeleteAsync();
         await db.AuthorizationCodes.Where(c => userIds.Contains(c.UserId)).ExecuteDeleteAsync();
         await db.UserExternalIds.Where(x => userIds.Contains(x.UserId)).ExecuteDeleteAsync();

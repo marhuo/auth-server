@@ -44,7 +44,7 @@ public class UserSession(UserAuthenticationService userService, TimeProvider tim
             ? await userService.GetByIdAsync(userId)
             : null;
 
-        if (user is null || !user.CanSignIn(now))
+        if (user is null || !user.CanSignIn)
         {
             context.RejectPrincipal();
             await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

@@ -3,25 +3,15 @@ using System.Text.Json.Serialization;
 
 namespace AuthServer.Domain.Users;
 
-// LockedOut: automatic lockout after failed logins. Locked: locked by an admin.
-public enum LoginStatus { Success, Failed, LockedOut, Locked }
-
-// Removing access means removing roles, and a person can be invited again. Only a user who never
-// became Active is deleted (IUserRepository.DeleteUnusedInvitedAsync).
+// Signs in with a code sent by email (SignInCode) or with an external service such as Google; there
+// are no passwords. Removing access means removing roles, and a person can be invited again. Only a
+// user who never became Active is deleted (IUserRepository.DeleteUnusedInvitedAsync).
 public sealed class User : AggregateRoot
 {
     public const int MaxEmailLength = 254;
-    public const int MinPasswordLength = 8;
-    public const int MaxPasswordLength = 128;
 
-    // An Invited user without roles is deleted this long after creation (registration not finished).
+    // An Invited user without roles is deleted this long after creation.
     public static readonly TimeSpan UnusedInvitedRetention = TimeSpan.FromDays(30);
-
-    public const int MaxFailedLogins = 10;
-    public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
-
-    // Error key used for both the create password and the new password.
-    private const string PasswordKey = "password";
 
     private readonly List<UserRole> _roles;
     private readonly List<UserExternalId> _externalIds;
@@ -31,9 +21,6 @@ public sealed class User : AggregateRoot
         Guid id,
         string email,
         string normalizedEmail,
-        string? passwordHash,
-        int failedLogins,
-        DateTimeOffset? lockedUntil,
         bool locked,
         UserStatuses status,
         IReadOnlyList<UserRole> roles,
@@ -43,9 +30,6 @@ public sealed class User : AggregateRoot
     {
         Email = email;
         NormalizedEmail = normalizedEmail;
-        PasswordHash = passwordHash;
-        FailedLogins = failedLogins;
-        LockedUntil = lockedUntil;
         Locked = locked;
         Status = status;
         _roles = [.. roles];
@@ -60,14 +44,6 @@ public sealed class User : AggregateRoot
     // is free for others. Identify users by Id, not by email.
     public string NormalizedEmail { get; private set; }
 
-    // Null until the invited user sets a password, and for users who sign in only externally.
-    public string? PasswordHash { get; private set; }
-
-    public int FailedLogins { get; private set; }
-
-    // Automatic lockout after too many failed logins (see Login). Ends by itself.
-    public DateTimeOffset? LockedUntil { get; private set; }
-
     // Locked by an admin. Lasts until an admin unlocks the user.
     public bool Locked { get; private set; }
 
@@ -78,21 +54,15 @@ public sealed class User : AggregateRoot
 
     public DateTimeOffset CreatedAt { get; private set; }
 
-    [JsonIgnore]
-    public bool HasPassword => PasswordHash is not null;
-
-    // Invited until the user has a way to sign in: a password (SetPassword) or an external account
-    // (AddExternalId). Stored, so never-activated users can be found in the database.
+    // Invited until the user signs in for the first time (Activate, AddExternalId). Stored, so
+    // never-activated users can be found in the database.
     public UserStatuses Status { get; private set; }
 
-    // Whether the automatic lockout is in force.
-    public bool IsLockedOut(DateTimeOffset now) => LockedUntil > now;
+    // Checked at sign-in, at the authorize and token endpoints and when the sign-in cookie is validated.
+    [JsonIgnore]
+    public bool CanSignIn => !Locked;
 
-    // Checked at login, at the authorize and token endpoints and when the sign-in cookie is validated.
-    public bool CanSignIn(DateTimeOffset now) => !Locked && !IsLockedOut(now);
-
-    // Users are created only by invitation: the new user is Invited (UserStatuses) and has no password
-    // until they set it with the invitation link.
+    // A user created by an invitation, or on the first sign-in with a code. Invited until Activate.
     public static User CreateInvited(string email, DateTimeOffset now)
     {
         email = email.Trim();
@@ -105,9 +75,6 @@ public sealed class User : AggregateRoot
             id: Guid.CreateVersion7(),
             email: email,
             normalizedEmail: NormalizeEmail(email),
-            passwordHash: null,
-            failedLogins: 0,
-            lockedUntil: null,
             locked: false,
             status: UserStatuses.Invited,
             roles: [],
@@ -123,6 +90,9 @@ public sealed class User : AggregateRoot
         return user;
     }
 
+    // A correct sign-in code proves the email: an invited user becomes Active.
+    public void Activate() => Status = UserStatuses.Active;
+
     public void SetEmail(string email)
     {
         email = email.Trim();
@@ -135,63 +105,8 @@ public sealed class User : AggregateRoot
         NormalizedEmail = NormalizeEmail(email);
     }
 
-    // Lock or unlock by an admin. Unlocking also ends the automatic lockout and resets the failed
-    // login counter, so the admin can let a user back in at once.
-    public void SetLocked(bool locked)
-    {
-        Locked = locked;
-
-        if (!locked)
-        {
-            LockedUntil = null;
-            FailedLogins = 0;
-        }
-    }
-
-    // Also ends the automatic lockout: a new password (e.g. after a password reset) lets the user sign
-    // in again. The admin lock (Locked) is not changed.
-    public void SetPassword(string password, IPasswordHasher hasher)
-    {
-        var errors = new ErrorCollector();
-        ValidatePassword(errors, password);
-        errors.ThrowIfAny();
-
-        PasswordHash = hasher.Hash(password);
-        LockedUntil = null;
-        FailedLogins = 0;
-        Status = UserStatuses.Active;
-    }
-
-    // Checks the password and applies the lockout policy: after MaxFailedLogins failed attempts
-    // the user is locked out for LockoutDuration. A successful login resets the counter and rehashes
-    // the password when the hash algorithm has changed. The admin lock is reported only after a
-    // correct password, so it does not reveal anything to someone who does not know the password.
-    public LoginStatus Login(string password, IPasswordHasher hasher, DateTimeOffset now)
-    {
-        if (IsLockedOut(now))
-            return LoginStatus.LockedOut;
-
-        var check = PasswordHash is null ? PasswordCheck.Failed : hasher.Verify(PasswordHash, password);
-
-        if (check == PasswordCheck.Failed)
-        {
-            if (++FailedLogins >= MaxFailedLogins)
-            {
-                LockedUntil = now.Add(LockoutDuration);
-                FailedLogins = 0;
-            }
-
-            return LoginStatus.Failed;
-        }
-
-        FailedLogins = 0;
-        LockedUntil = null;
-
-        if (check == PasswordCheck.SuccessRehashNeeded)
-            PasswordHash = hasher.Hash(password);
-
-        return Locked ? LoginStatus.Locked : LoginStatus.Success;
-    }
+    // Lock or unlock by an admin.
+    public void SetLocked(bool locked) => Locked = locked;
 
     public bool HasRole(Guid roleId, Guid? tenantId) =>
         _roles.Any(r => r.RoleId == roleId && r.TenantId == tenantId);
@@ -242,16 +157,6 @@ public sealed class User : AggregateRoot
             errors.Add(nameof(Email), ErrorCode.InvalidFormat,
                 "Email address is not valid.",
                 "Sähköpostiosoite ei ole kelvollinen.");
-        }
-    }
-
-    public static void ValidatePassword(ErrorCollector errors, string password)
-    {
-        if (password.Length is < MinPasswordLength or > MaxPasswordLength)
-        {
-            errors.Add(PasswordKey, ErrorCode.InvalidLength,
-                $"Password must be {MinPasswordLength}-{MaxPasswordLength} characters.",
-                $"Salasanan on oltava {MinPasswordLength}–{MaxPasswordLength} merkkiä pitkä.");
         }
     }
 

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuthServer.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20261124004807_InitialCreate")]
+    [Migration("20261125184521_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -201,66 +201,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_clients_target_resource_server_id");
 
                     b.ToTable("clients", (string)null);
-                });
-
-            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.PasswordTokenEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("email");
-
-                    b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_at");
-
-                    b.Property<string>("NormalizedEmail")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("character varying(254)")
-                        .HasColumnName("normalized_email");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("token_hash");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.Property<DateTimeOffset?>("UsedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("used_at");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_password_tokens");
-
-                    b.HasIndex("ExpiresAt")
-                        .HasDatabaseName("ix_password_tokens_expires_at");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique()
-                        .HasDatabaseName("ix_password_tokens_token_hash");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_password_tokens_user_id");
-
-                    b.ToTable("password_tokens", (string)null);
                 });
 
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.RefreshTokenEntity", b =>
@@ -497,6 +437,52 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.SignInCodeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("failed_attempts");
+
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)")
+                        .HasColumnName("normalized_email");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("used_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_sign_in_codes");
+
+                    b.HasIndex("ExpiresAt")
+                        .HasDatabaseName("ix_sign_in_codes_expires_at");
+
+                    b.HasIndex("NormalizedEmail", "CreatedAt")
+                        .HasDatabaseName("ix_sign_in_codes_normalized_email_created_at");
+
+                    b.ToTable("sign_in_codes", (string)null);
+                });
+
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.SigningKeyEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -677,27 +663,15 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(254)")
                         .HasColumnName("email");
 
-                    b.Property<int>("FailedLogins")
-                        .HasColumnType("integer")
-                        .HasColumnName("failed_logins");
-
                     b.Property<bool>("Locked")
                         .HasColumnType("boolean")
                         .HasColumnName("locked");
-
-                    b.Property<DateTimeOffset?>("LockedUntil")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("locked_until");
 
                     b.Property<string>("NormalizedEmail")
                         .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("character varying(254)")
                         .HasColumnName("normalized_email");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text")
-                        .HasColumnName("password_hash");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer")
@@ -888,16 +862,6 @@ namespace AuthServer.Infrastructure.Persistence.Migrations
                     b.Navigation("TargetResourceServer");
 
                     b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.PasswordTokenEntity", b =>
-                {
-                    b.HasOne("AuthServer.Infrastructure.Persistence.Ef.UserEntity", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_password_tokens_users_user_id");
                 });
 
             modelBuilder.Entity("AuthServer.Infrastructure.Persistence.Ef.RefreshTokenEntity", b =>

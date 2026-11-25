@@ -10,13 +10,12 @@ public static class CommonDatabaseSeeder
 {
     public static async Task SeedAsync(IServiceProvider services)
     {
-        var passwordHasher = services.GetRequiredService<IPasswordHasher>();
         var db = services.GetRequiredService<AuthDbContext>();
 
         // Auth db resource server and admin user
         var authServerResourceServerId = await db.CreateResourceServerIfNotExistsAsync("auth-server", "Auth server", true);
         var authServerAdminRoleId = await db.CreateRoleIfNotExistsAsync(authServerResourceServerId, SystemRoles.AuthServerAdmin, "Autentikointi palvelimen ylläpitäjä");
-        var authServerAdminUserId = await db.CreateUserIfNotExistsAsync(passwordHasher, "marko.huotari@gmail.com", "admin12345");
+        var authServerAdminUserId = await db.CreateUserIfNotExistsAsync("marko.huotari@gmail.com");
         await db.CreateUserRoleIfNotExistAsync(authServerAdminUserId, authServerAdminRoleId, null);
 
         await db.CreateScopeIfNotExistsAsync(SystemScopes.AuthServerApi, "Auth server api", authServerResourceServerId, false);

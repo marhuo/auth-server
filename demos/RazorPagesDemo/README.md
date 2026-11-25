@@ -32,6 +32,6 @@ Kun luot auth serverin tietokannan uudelleen, käynnistä myös demo uudelleen.
 ## Kokeile
 
 1. Etusivu → **Kokeile ilmaiseksi** → luo tunnus → anna tenantin nimi. Saat roolin `razor_pages_demo_tenant_admin`.
-2. **Käyttäjät** → kutsu toinen sähköposti. Kutsulinkki näkyy auth serverin lokissa (`Invite for ...`).
-3. Avaa kutsulinkki toisessa selaimessa, aseta salasana ja kirjaudu. Rooli on `razor_pages_demo_user`, eikä Laskutus-sivulla ole Osta-nappia.
+2. **Käyttäjät** → kutsu toinen sähköposti. Kutsusähköposti näkyy auth serverin lokissa (`Invite for ...`).
+3. Kirjaudu toisessa selaimessa kutsutulla sähköpostilla. Kirjautumiskoodi näkyy auth serverin lokissa (`Sign-in code for ...`). Rooli on `razor_pages_demo_user`, eikä Laskutus-sivulla ole Osta-nappia.
 4. **Useampi tenantti:** toinen käyttäjä luo oman tenanttinsa ja kutsuu ensimmäisen käyttäjän sinne. Kun ensimmäinen käyttäjä kirjautuu, auth server kysyy, kumpaan tenanttiin hän menee. Sen jälkeen tenantin voi vaihtaa vasemman yläkulman valikosta.

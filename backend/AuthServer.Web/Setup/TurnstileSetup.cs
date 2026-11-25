@@ -4,7 +4,7 @@ namespace AuthServer.Web.Setup;
 
 public static class TurnstileSetup
 {
-    // Cloudflare Turnstile for the pages that send emails (Register, ForgotPassword). The keys are
+    // Cloudflare Turnstile for the page that sends emails (Login, sending the code). The keys are
     // required: the server does not start without them.
     public static IServiceCollection AddTurnstile(this IServiceCollection services, IConfiguration configuration)
     {
