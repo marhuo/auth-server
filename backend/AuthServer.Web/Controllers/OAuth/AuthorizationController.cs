@@ -106,6 +106,15 @@ public class AuthorizeController(
             return RedirectError(redirectUri, state, "access_denied", "The user is not allowed to sign in.");
         }
 
+        // Signed in, but login_hint (e.g. from an invitation link) is another email: force a sign-in with that email.
+        // Rare: e.g. a user has two accounts (personal and work email) and is signed in with the other one,
+        // or someone opens another person's invitation link in their own browser.
+        var hint = Request.Query["login_hint"].ToString();
+        if (hint != "" && Domain.Users.User.NormalizeEmail(hint) != user.NormalizedEmail)
+        {
+            return RedirectToPage("/Login", new { returnUrl = Request.Path + Request.QueryString, email = hint });
+        }
+
         // Which organization (tenant) the tokens are for.
         var userTenantIds = await GetUserTenantIdsAsync(userId, client);
         var chosenTenantId = GetChosenTenantId();
