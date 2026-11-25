@@ -1,11 +1,11 @@
-/* The auth server's Razor pages (sign-in, registration). Built into
-   backend/AuthServer.Web/wwwroot/css/auth.css by "npm run css:auth" (run by the backend build). */
+/* Styles of the Razor pages: Tailwind + daisyUI with the admin UI theme. "npm run build" (run by the
+   project build) writes wwwroot/css/auth.css. */
 @import 'tailwindcss' source(none);
 @import './roboto.css';
-@import '../theme.css';
+@import './theme.css';
 @import './google-button.css';
 
-@source '../../../backend/AuthServer.Web/Pages';
+@source '../Pages';
 
 /* Form errors from asp-validation-summary: hidden when there are none. */
 .validation-summary-valid {

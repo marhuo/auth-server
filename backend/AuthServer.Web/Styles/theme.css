@@ -1,22 +1,21 @@
-/* Shared theme: the admin UI (routes/layout.css) and the Razor pages of the auth server and the demo
-   (razor/*.css, built with the Tailwind CLI). */
+/* Same theme as the admin UI (admin-ui/src/routes/layout.css). Copy changes from there. */
 
 @theme {
 	--font-sans: 'Roboto Variable', sans-serif;
 }
 
-/* Otetaan käyttöön vain omat teemat (ei daisyUI:n valmiita) */
+/* Only our own themes, not daisyUI's built-in ones. */
 @plugin 'daisyui' {
 	themes: false;
 }
 
-/* ============ VAALEA TEEMA ============ */
+/* ============ LIGHT THEME ============ */
 @plugin 'daisyui/theme' {
 	name: 'auth-light';
 	default: true;
 	color-scheme: light;
 
-	/* Taustat: base-100 = sivu ja kortit, base-200 = sivupalkki ja yläpalkki, base-300 = reunat */
+	/* Backgrounds: base-100 = page and cards, base-200 = sidebar and top bar, base-300 = borders */
 	--color-base-100: #ffffff;
 	--color-base-200: #ebebeb;
 	--color-base-300: #d6d6d6;
@@ -40,7 +39,7 @@
 	--color-error: #b00020;
 	--color-error-content: #ffffff;
 
-	/* Pyöristykset ja reunat */
+	/* Radii and borders */
 	--radius-selector: 0.5rem;
 	--radius-field: 0.5rem;
 	--radius-box: 0.75rem;
@@ -51,7 +50,7 @@
 	--noise: 0;
 }
 
-/* ============ TUMMA TEEMA ============ */
+/* ============ DARK THEME ============ */
 @plugin 'daisyui/theme' {
 	name: 'auth-dark';
 	prefersdark: true;

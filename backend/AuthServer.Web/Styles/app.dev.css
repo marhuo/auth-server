@@ -1,0 +1,5 @@
+/* Development only: app.css plus every daisyUI class, so any class works without a build. Utility
+   classes come from Tailwind in the browser (Pages/_Styles.cshtml). */
+@import './app.css';
+
+@source './node_modules/daisyui/components';

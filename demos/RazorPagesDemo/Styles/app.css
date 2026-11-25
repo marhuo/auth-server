@@ -1,10 +1,10 @@
-/* The Razor Pages demo. Built into demos/RazorPagesDemo/wwwroot/css/site.css by "npm run css:demo"
-   (run by the demo build). */
+/* Styles of the Razor pages: Tailwind + daisyUI with the admin UI theme. "npm run build" (run by the
+   project build) writes wwwroot/css/site.css. */
 @import 'tailwindcss' source(none);
 @import './roboto.css';
-@import '../theme.css';
+@import './theme.css';
 
-@source '../../../demos/RazorPagesDemo/Pages';
+@source '../Pages';
 
 @layer components {
 	/* The "Mitä tässä tapahtuu" boxes. */

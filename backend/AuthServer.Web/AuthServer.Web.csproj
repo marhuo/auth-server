@@ -41,10 +41,18 @@
     <ProjectReference Include="..\AuthServer.Infrastructure\AuthServer.Infrastructure.csproj" />
   </ItemGroup>
 
-  <!-- Builds wwwroot/css/auth.css (Tailwind + daisyUI) from admin-ui/src/razor/auth.css. The file is
-       committed, so the build works without npm too. -->
-  <Target Name="BuildAuthCss" BeforeTargets="BeforeBuild" Condition="Exists('../../admin-ui/node_modules')">
-    <Exec WorkingDirectory="../../admin-ui" Command="npm run css:auth" />
+  <!-- Styles/ is only the source of the CSS: not part of the app. -->
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Styles/node_modules/**</DefaultItemExcludes>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Remove="Styles/**" />
+  </ItemGroup>
+
+  <!-- Builds wwwroot/css/auth.css and dev.css from Styles/ (Tailwind + daisyUI). -->
+  <Target Name="BuildCss" BeforeTargets="BeforeBuild">
+    <Exec WorkingDirectory="Styles" Command="npm install" Condition="!Exists('Styles/node_modules')" />
+    <Exec WorkingDirectory="Styles" Command="npm run build" />
   </Target>
 
   <Target Name="RunTypeGen" AfterTargets="Build">

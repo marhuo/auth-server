@@ -11,9 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write .",
-		"css:auth": "tailwindcss -i src/razor/auth.css -o ../backend/AuthServer.Web/wwwroot/css/auth.css --minify && tailwindcss -i src/razor/auth.dev.css -o ../backend/AuthServer.Web/wwwroot/css/dev.css --minify",
-		"css:demo": "tailwindcss -i src/razor/demo.css -o ../demos/RazorPagesDemo/wwwroot/css/site.css --minify && tailwindcss -i src/razor/demo.dev.css -o ../demos/RazorPagesDemo/wwwroot/css/dev.css --minify"
+		"format": "prettier --write ."
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
@@ -21,7 +19,6 @@
 		"@sveltejs/adapter-static": "^4.0.1",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.2.0",
-		"@tailwindcss/cli": "^4.3.4",
 		"@tailwindcss/vite": "^4.3.0",
 		"@types/node": "^24",
 		"daisyui": "^5.7.50",
