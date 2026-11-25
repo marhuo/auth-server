@@ -8,10 +8,10 @@ public static class HangfireSetup
 {
     private const string SchemaName = "hangfire";
 
-    // How often the queue and the recurring job schedule are polled (default 15 s each). The jobs run
-    // nightly, so a delay of up to two minutes does not matter; "Trigger now" in the dashboard may
-    // also take up to a minute to start.
-    private static readonly TimeSpan PollInterval = TimeSpan.FromMinutes(1);
+    // How often the queue and the recurring job schedule are polled (default 15 s each). The jobs are
+    // nightly cleanups, so a delay of up to two hours does not matter; "Trigger now" in the dashboard
+    // may also take up to an hour to start.
+    private static readonly TimeSpan PollInterval = TimeSpan.FromHours(1);
 
     public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, string connectionString)
     {
