@@ -9,4 +9,5 @@ export interface UserInviteRequest {
     email: string;
     userRoles: UserRoleDto[];
     clientId: string | null;
+    language: string | null;
 }

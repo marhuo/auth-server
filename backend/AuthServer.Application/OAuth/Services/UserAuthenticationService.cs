@@ -1,3 +1,4 @@
+using AuthServer.Domain.Clients;
 using AuthServer.Domain.Common;
 using AuthServer.Domain.OAuth;
 using AuthServer.Domain.Roles;
@@ -12,13 +13,15 @@ public class UserAuthenticationService(
     IUserRepository users,
     IRoleRepository roles,
     ISignInCodeRepository signInCodes,
+    IClientRepository clients,
     IUserEmailSender emailSender,
     TimeProvider timeProvider)
 {
     // Sends a sign-in code to the email, whether or not it has a user yet. returnUrl goes into the
-    // email link (see IUserEmailSender.SendSignInCodeAsync).
+    // email link (see IUserEmailSender.SendSignInCodeAsync); clientId is the app the user signs in to,
+    // shown in the email, or null.
     // Returns nothing on purpose: otherwise anyone could check which emails are registered.
-    public async Task SendSignInCodeAsync(string email, string? returnUrl)
+    public async Task SendSignInCodeAsync(string email, string? returnUrl, string? clientId, EmailLanguage language)
     {
         email = email.Trim();
 
@@ -34,7 +37,8 @@ public class UserAuthenticationService(
         var (code, rawCode) = SignInCode.Create(email, timeProvider.GetUtcNow());
 
         await signInCodes.CreateAsync(code);
-        await emailSender.SendSignInCodeAsync(email, rawCode, returnUrl);
+        var client = string.IsNullOrEmpty(clientId) ? null : await clients.FindActiveByClientIdAsync(clientId);
+        await emailSender.SendSignInCodeAsync(email, rawCode, client?.DisplayName, returnUrl, language);
     }
 
     // Checks the code sent to the email. Creates the user on the first sign-in. Returns null if the

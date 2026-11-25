@@ -11,11 +11,18 @@ public class AccountController : Controller
 {
     // The auth server's parameter for the chosen tenant. Program.cs adds it to the sign-in request.
     public const string TenantParameter = "tenant";
+    public const string LoginHintParameter = "login_hint";
 
-    // The auth server's login page. Afterwards the user goes to /App.
+    // The auth server's login page. Afterwards the user goes to /App. The invitation email link has
+    // login_hint (the invited email): passed on, so the auth server fills in the email.
     [HttpGet]
-    public IActionResult Login() =>
-        Challenge(new OpenIdConnectChallengeProperties { RedirectUri = "/App" });
+    public IActionResult Login([FromQuery(Name = LoginHintParameter)] string? loginHint)
+    {
+        var properties = new OpenIdConnectChallengeProperties { RedirectUri = "/App" };
+        if (!string.IsNullOrEmpty(loginHint))
+            properties.Items[LoginHintParameter] = loginHint;
+        return Challenge(properties);
+    }
 
     // The auth server's registration page.
     [HttpGet]

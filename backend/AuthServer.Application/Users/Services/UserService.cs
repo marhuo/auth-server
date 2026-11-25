@@ -5,6 +5,7 @@ using AuthServer.Domain.Common;
 using AuthServer.Domain.OAuth;
 using AuthServer.Domain.ResourceServers;
 using AuthServer.Domain.Roles;
+using AuthServer.Domain.Tenants;
 using AuthServer.Domain.Users;
 
 namespace AuthServer.Application.Users.Services;
@@ -14,6 +15,7 @@ public class UserService(
     IRoleRepository roles,
     IResourceServerRepository resourceServers,
     IClientRepository clients,
+    ITenantRepository tenants,
     IRefreshTokenRepository refreshTokens,
     UserValidator validator,
     IUserEmailSender emailSender,
@@ -71,7 +73,11 @@ public class UserService(
             await users.UpdateAsync(user);
 
         if (user.Status == UserStatuses.Invited)
-            await SendInvitationAsync(user, request.ClientId);
+        {
+            var tenantId = request.UserRoles.Select(r => r.TenantId).FirstOrDefault(id => id is not null);
+            await SendInvitationAsync(
+                user, tenantId, request.ClientId, EmailLanguages.FromCode(request.Language));
+        }
 
         return user.Id;
     }
@@ -84,15 +90,24 @@ public class UserService(
 
         validator.ValidateResendInvite(user);
 
-        await SendInvitationAsync(user, clientId: null);
+        var tenantId = user.Roles.Select(r => r.TenantId).FirstOrDefault(id => id is not null);
+        await SendInvitationAsync(user, tenantId, clientId: null, EmailLanguage.Fi);
     }
 
-    // The email links to the app's sign-in page (InitiateLoginUri) when the client is known, otherwise to
-    // the auth server's sign-in page. The user signs in with a code sent by email.
-    private async Task SendInvitationAsync(User user, string? clientId)
+    // The email names the tenant the user joins, if any. It links to the app's sign-in
+    // page (InitiateLoginUri) when the client is known, otherwise to the auth server's sign-in page.
+    private async Task SendInvitationAsync(
+        User user, Guid? tenantId, string? clientId, EmailLanguage language)
     {
         var client = string.IsNullOrWhiteSpace(clientId) ? null : await clients.FindActiveByClientIdAsync(clientId);
-        await emailSender.SendInviteAsync(user.Email, client?.DisplayName, client?.InitiateLoginUri);
+        var tenant = tenantId is null ? null : await tenants.GetByIdAsync(tenantId.Value);
+
+        await emailSender.SendInviteAsync(
+            user.Email,
+            appName: client?.DisplayName,
+            tenantName: tenant?.Name,
+            appLoginUri: client?.InitiateLoginUri,
+            language);
     }
 
     public async Task UpdateAsync(UserUpdateRequest request)

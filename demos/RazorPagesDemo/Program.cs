@@ -66,6 +66,8 @@ builder.Services.AddAuthentication(options =>
         {
             if (context.Properties.Items.TryGetValue(AccountController.TenantParameter, out var tenantId))
                 context.ProtocolMessage.SetParameter(AccountController.TenantParameter, tenantId);
+            if (context.Properties.Items.TryGetValue(AccountController.LoginHintParameter, out var loginHint))
+                context.ProtocolMessage.LoginHint = loginHint;
             return Task.CompletedTask;
         };
 

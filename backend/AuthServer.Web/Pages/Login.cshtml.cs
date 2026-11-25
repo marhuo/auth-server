@@ -1,5 +1,6 @@
 using AuthServer.Application.OAuth.Services;
 using AuthServer.Domain.Common;
+using AuthServer.Domain.Users;
 using AuthServer.Web.Authentication;
 using AuthServer.Web.Captcha;
 using Microsoft.AspNetCore.Mvc;
@@ -62,7 +63,11 @@ public class LoginModel(
 
         try
         {
-            await userService.SendSignInCodeAsync(Email, string.IsNullOrWhiteSpace(ReturnUrl) ? null : ReturnUrl);
+            await userService.SendSignInCodeAsync(
+                Email,
+                returnUrl: string.IsNullOrWhiteSpace(ReturnUrl) ? null : ReturnUrl,
+                clientId: ClientIdFromReturnUrl(),
+                language: BrowserLanguage());
         }
         catch (ValidationException)
         {
@@ -96,16 +101,32 @@ public class LoginModel(
         return LocalRedirect(string.IsNullOrWhiteSpace(ReturnUrl) ? "/admin/users" : ReturnUrl);
     }
 
-    // ReturnUrl is the app's sign-in request: /connect/authorize?client_id=tuntiq-web&...
     private async Task LoadAppNameAsync()
     {
-        var query = ReturnUrl?.Split('?', 2).ElementAtOrDefault(1);
-        var clientId = query is null ? "" : QueryHelpers.ParseQuery(query)["client_id"].ToString();
-        if (clientId == "")
+        var clientId = ClientIdFromReturnUrl();
+        if (clientId is null)
             return;
 
         var client = await clientService.FindActiveAsync(clientId);
         AppName = client?.DisplayName;
+    }
+
+    // ReturnUrl is the app's sign-in request: /connect/authorize?client_id=tuntiq-web&...
+    private string? ClientIdFromReturnUrl()
+    {
+        var query = ReturnUrl?.Split('?', 2).ElementAtOrDefault(1);
+        var clientId = query is null ? "" : QueryHelpers.ParseQuery(query)["client_id"].ToString();
+        return clientId == "" ? null : clientId;
+    }
+
+    // The first of Finnish and English in the browser's language list (Accept-Language), else Finnish.
+    private EmailLanguage BrowserLanguage()
+    {
+        var code = Request.GetTypedHeaders().AcceptLanguage
+            .OrderByDescending(l => l.Quality ?? 1)
+            .Select(l => l.Value.Value ?? "")
+            .FirstOrDefault(l => l.StartsWith("fi") || l.StartsWith("en"));
+        return EmailLanguages.FromCode(code);
     }
 
     // Only local addresses (open redirect protection).

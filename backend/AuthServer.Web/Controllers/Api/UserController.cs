@@ -24,6 +24,7 @@ public class UserController(UserService userService, RoleService roleService) : 
         {
             Email = request.Email,
             ClientId = request.ClientId,
+            Language = request.Language,
             // Always with the tenant: the external API must never give auth server roles, and an
             // auth server role with a tenant is rejected by the validator.
             UserRoles = roleIds.Select(id => new AppUserRoleDto { RoleId = id, TenantId = request.TenantId }).ToList()

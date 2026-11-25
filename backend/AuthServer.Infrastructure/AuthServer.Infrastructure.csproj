@@ -10,9 +10,14 @@
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="10.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.15" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.23.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+  </ItemGroup>
+
+  <!-- Email templates, read once at first use (Users/EmailTemplates.cs). -->
+  <ItemGroup>
+    <!-- WithCulture: .fi/.en in the names are not .NET resource cultures (satellite assemblies). -->
+    <EmbeddedResource Include="Users/EmailTemplates/*.html" LogicalName="EmailTemplates/%(Filename)%(Extension)" WithCulture="false" />
   </ItemGroup>
 
   <PropertyGroup>

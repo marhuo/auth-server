@@ -15,7 +15,7 @@ public class AuthServerApi(HttpClient http, IConfiguration configuration)
             name,
             adminEmail,
             adminRoleNames = new[] { Roles.TenantAdmin },
-            // The invited user gets a button to sign in to the demo.
+            // The invitation email links to the demo.
             clientId = configuration["AuthServer:WebClientId"]
         });
 

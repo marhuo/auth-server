@@ -75,7 +75,16 @@ public class AuthorizeController(
             // prompt=create (OpenID Connect): the product asks for registration, e.g. from its "Try it
             // free" button. The same page signs in and registers; only the heading differs.
             var create = Request.Query["prompt"] == "create";
-            return RedirectToPage("/Login", new { returnUrl = Request.Path + Request.QueryString, create = create ? true : (bool?)null });
+
+            // login_hint (OpenID Connect): the email to fill in, e.g. from an invitation link.
+            var loginHint = Request.Query["login_hint"].ToString();
+
+            return RedirectToPage("/Login", new
+            {
+                returnUrl = Request.Path + Request.QueryString,
+                create = create ? true : (bool?)null,
+                email = loginHint == "" ? null : loginHint
+            });
         }
 
         // The sign-in cookie is validated only periodically (UserSessionValidator), so check here too

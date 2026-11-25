@@ -9,4 +9,7 @@ public class UserInviteRequest
     // Which app the user is invited to, e.g. "razor-pages-demo-web". The invitation email links to
     // that app's sign-in (Client.InitiateLoginUri). Optional.
     public string? ClientId { get; init; }
+
+    // The language of the invitation email: "fi" (default) or "en".
+    public string? Language { get; init; }
 }
