@@ -107,8 +107,7 @@ public class AuthorizeController(
         }
 
         // Signed in, but login_hint (e.g. from an invitation link) is another email: force a sign-in with that email.
-        // Rare: e.g. a user has two accounts (personal and work email) and is signed in with the other one,
-        // or someone opens another person's invitation link in their own browser.
+        // Rare: e.g. a user has two accounts (personal and work email) and is signed in with the other one.
         var hint = Request.Query["login_hint"].ToString();
         if (hint != "" && Domain.Users.User.NormalizeEmail(hint) != user.NormalizedEmail)
         {
