@@ -13,6 +13,10 @@ namespace AuthServer.Web.Authentication;
 // a user or removing a role takes effect within the interval, not only when the cookie expires.
 public class UserSession(UserAuthenticationService userService, TimeProvider timeProvider, IConfiguration configuration)
 {
+    // Kept over browser restarts. Each visit to the auth server starts the time again, so only a user
+    // who has not visited for this long must sign in again.
+    public static readonly TimeSpan Lifetime = TimeSpan.FromDays(90);
+
     private const string ValidatedAtKey = "validated_at";
     private static readonly TimeSpan DefaultValidationInterval = TimeSpan.FromMinutes(5);
 
@@ -21,7 +25,7 @@ public class UserSession(UserAuthenticationService userService, TimeProvider tim
 
     public async Task SignInAsync(HttpContext httpContext, User user)
     {
-        var properties = new AuthenticationProperties { IsPersistent = false };
+        var properties = new AuthenticationProperties { IsPersistent = true };
         SetValidatedAt(properties, timeProvider.GetUtcNow());
 
         await httpContext.SignInAsync(

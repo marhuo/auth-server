@@ -21,6 +21,10 @@ public static class AuthenticationSetup
             {
                 options.LoginPath = "/Login";
                 options.AccessDeniedPath = "/AccessDenied";
+
+                // The user stays signed in for UserSession.Lifetime after the last visit (sliding).
+                options.ExpireTimeSpan = UserSession.Lifetime;
+                options.SlidingExpiration = true;
                 options.Events.OnRedirectToLogin = ctx =>
                 {
                     if (ctx.Request.Path.StartsWithSegments("/api"))

@@ -1,0 +1,81 @@
+/* Google's sign-in button (developers.google.com/identity/branding-guidelines), shortened.
+   Used on a link in _ExternalLoginButtons.cshtml. */
+.gsi-material-button {
+	position: relative;
+	display: block;
+	box-sizing: border-box;
+	height: 48px;
+	padding: 0 12px;
+	overflow: hidden;
+	font-family: 'Roboto', arial, sans-serif;
+	font-size: 16px;
+	letter-spacing: 0.25px;
+	white-space: nowrap;
+	text-align: center;
+	text-decoration: none;
+	color: #1f1f1f;
+	background-color: #ffffff;
+	border: 1px solid #747775;
+	border-radius: 4px;
+	cursor: pointer;
+	user-select: none;
+	transition:
+		background-color 0.218s,
+		border-color 0.218s,
+		box-shadow 0.218s;
+}
+.gsi-material-button .gsi-material-button-content-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	height: 100%;
+}
+.gsi-material-button .gsi-material-button-icon {
+	width: 20px;
+	min-width: 20px;
+	height: 20px;
+	margin-right: 10px;
+}
+.gsi-material-button .gsi-material-button-contents {
+	flex-grow: 1;
+	overflow: hidden;
+	font-weight: 500;
+	text-overflow: ellipsis;
+}
+/* Gray layer shown on hover and focus. */
+.gsi-material-button .gsi-material-button-state {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transition: opacity 0.218s;
+}
+.gsi-material-button:hover {
+	box-shadow:
+		0 1px 2px 0 rgba(60, 64, 67, 0.3),
+		0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+.gsi-material-button:hover .gsi-material-button-state {
+	background-color: #303030;
+	opacity: 8%;
+}
+.gsi-material-button:active .gsi-material-button-state,
+.gsi-material-button:focus .gsi-material-button-state {
+	background-color: #303030;
+	opacity: 12%;
+}
+
+/* Dark mode: only the colors change. */
+@media (prefers-color-scheme: dark) {
+	.gsi-material-button {
+		color: #e3e3e3;
+		background-color: #131314;
+		border-color: #8e918f;
+	}
+	.gsi-material-button:hover .gsi-material-button-state,
+	.gsi-material-button:active .gsi-material-button-state,
+	.gsi-material-button:focus .gsi-material-button-state {
+		background-color: white;
+	}
+}

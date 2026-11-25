@@ -41,20 +41,6 @@
     <ProjectReference Include="..\AuthServer.Infrastructure\AuthServer.Infrastructure.csproj" />
   </ItemGroup>
 
-  <!-- Styles/ is only the source of the CSS: not part of the app. -->
-  <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);Styles/node_modules/**</DefaultItemExcludes>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Styles/**" />
-  </ItemGroup>
-
-  <!-- Builds wwwroot/css/auth.css and dev.css from Styles/ (Tailwind + daisyUI). -->
-  <Target Name="BuildCss" BeforeTargets="BeforeBuild">
-    <Exec WorkingDirectory="Styles" Command="npm install" Condition="!Exists('Styles/node_modules')" />
-    <Exec WorkingDirectory="Styles" Command="npm run build" />
-  </Target>
-
   <Target Name="RunTypeGen" AfterTargets="Build">
     <Exec Command="dotnet typegen generate" />
   </Target>

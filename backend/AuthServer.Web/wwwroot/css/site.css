@@ -1,0 +1,118 @@
+/* Own styles. daisyui.css (loaded before this file) has the daisyUI classes and common Tailwind
+   classes such as flex, gap-4 and max-w-md. Plain CSS: changes show on page refresh. */
+
+@font-face {
+	font-family: 'Roboto Variable';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 100 900;
+	src: url(/fonts/roboto/roboto-latin-ext-wght-normal.woff2) format('woff2-variations');
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+		U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+		U+A720-A7FF;
+}
+@font-face {
+	font-family: 'Roboto Variable';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 100 900;
+	src: url(/fonts/roboto/roboto-latin-wght-normal.woff2) format('woff2-variations');
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+		U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ============ THEME ============
+   Same colors as the admin UI (admin-ui/src/routes/layout.css). Copy changes from there. */
+:root {
+	color-scheme: light;
+	--font-sans: 'Roboto Variable', sans-serif;
+
+	/* Backgrounds: base-100 = page and cards, base-200 = sidebar and top bar, base-300 = borders */
+	--color-base-100: #ffffff;
+	--color-base-200: #ebebeb;
+	--color-base-300: #d6d6d6;
+	--color-base-content: #181818;
+
+	--color-primary: #181818;
+	--color-primary-content: #ffffff;
+	--color-secondary: #eeeeee;
+	--color-secondary-content: #181818;
+	--color-accent: #c1aa7b;
+	--color-accent-content: #181818;
+	--color-neutral: #3a3a3a;
+	--color-neutral-content: #ffffff;
+
+	--color-info: #2196f3;
+	--color-info-content: #ffffff;
+	--color-success: #4caf50;
+	--color-success-content: #ffffff;
+	--color-warning: #fb8c00;
+	--color-warning-content: #181818;
+	--color-error: #b00020;
+	--color-error-content: #ffffff;
+
+	/* Radii and borders */
+	--radius-selector: 0.5rem;
+	--radius-field: 0.5rem;
+	--radius-box: 0.75rem;
+	--size-selector: 0.25rem;
+	--size-field: 0.25rem;
+	--border: 1px;
+	--depth: 1;
+	--noise: 0;
+}
+
+/* Dark theme, when the operating system uses dark mode. */
+@media (prefers-color-scheme: dark) {
+	:root {
+		color-scheme: dark;
+
+		--color-base-100: #1f1f1f;
+		--color-base-200: #262626;
+		--color-base-300: #303030;
+		--color-base-content: #f3f3f3;
+
+		--color-primary: #d3d3d3;
+		--color-primary-content: #181818;
+		--color-secondary: #3a3a3a;
+		--color-secondary-content: #e6e6e6;
+		--color-accent: #c1aa7b;
+		--color-accent-content: #181818;
+		--color-neutral: #3a3a3a;
+		--color-neutral-content: #e6e6e6;
+
+		--color-info: #64b5f6;
+		--color-info-content: #181818;
+		--color-success: #81c784;
+		--color-success-content: #181818;
+		--color-warning: #ffb74d;
+		--color-warning-content: #181818;
+		--color-error: #c0324c;
+		--color-error-content: #ffffff;
+	}
+}
+
+/* Same tweaks as the admin UI. */
+.input:focus,
+.input:focus-within,
+.textarea:focus,
+.select:focus {
+	outline: none;
+	border-color: var(--color-neutral);
+	box-shadow: 0 0 0 1px var(--color-neutral);
+}
+.label:not(.text-error) {
+	color: color-mix(in oklab, var(--color-base-content) 80%, transparent);
+}
+
+/* Form errors from asp-validation-summary: hidden when there are none. */
+.validation-summary-valid {
+	display: none;
+}
+.validation-summary-errors ul {
+	margin: 0;
+	padding-left: 1.25rem;
+	list-style: disc;
+}

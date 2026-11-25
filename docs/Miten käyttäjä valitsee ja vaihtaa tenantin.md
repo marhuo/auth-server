@@ -53,3 +53,12 @@ Siksi käyttäjä, joka on kutsuttu kahteen yritykseen, näkee valikossa kaksi y
 2. Sovellus hakee yritysten listan `/connect/userinfo`-päätepisteestä.
 3. Valikon valinta kutsuu `signinRedirect` uudelleen parametrilla `tenant`, ja auth server antaa uuden tokenin valitulle yritykselle.
 4. Lista syntyy käyttäjän rooleista: kutsu lisää yrityksen listalle, roolin poisto poistaa sen.
+
+## Kehitysehdotukset
+
+**Tenantin vaihto ilman käyntiä auth serverillä (25.11.2026, ei toteutettu).** Nyt vaihto ohjaa selaimen auth serverille, koska token ja refresh token on sidottu yhteen tenanttiin. Jos auth serverin kirjautuminen (eväste) on vanhentunut, käyttäjältä kysytään kirjautuminen uudelleen, vaikka hän käyttää tuotetta päivittäin.
+
+- Tuotteen palvelin pyytää token-päätepisteestä uuden tokenin refresh tokenilla ja parametrilla `tenant`.
+- Auth server tarkistaa, että käyttäjä kuuluu pyydettyyn tenanttiin tuotteen kohdepalvelimella, ja antaa tokenit sille tenantille.
+- Selain ei käy auth serverillä, joten kirjautumista ei kysytä koskaan.
+- Auth0 vaatii vaihtoon käynnin auth serverillä, Slack ei.

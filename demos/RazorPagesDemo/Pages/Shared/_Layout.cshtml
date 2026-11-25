@@ -10,7 +10,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] – Razor Pages demo</title>
-    <partial name="_Styles" />
+    @* daisyui.css: daisyUI and common Tailwind classes, a ready-made file like Bootstrap. site.css: the theme and own styles. *@
+    <link rel="stylesheet" href="~/css/daisyui.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
 <body class="bg-base-100 min-h-screen">

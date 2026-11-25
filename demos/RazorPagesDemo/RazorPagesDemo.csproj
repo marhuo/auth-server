@@ -11,18 +11,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="10.0.15" />
   </ItemGroup>
 
-  <!-- Styles/ is only the source of the CSS: not part of the app. -->
-  <PropertyGroup>
-    <DefaultItemExcludes>$(DefaultItemExcludes);Styles/node_modules/**</DefaultItemExcludes>
-  </PropertyGroup>
-  <ItemGroup>
-    <Content Remove="Styles/**" />
-  </ItemGroup>
-
-  <!-- Builds wwwroot/css/site.css and dev.css from Styles/ (Tailwind + daisyUI). -->
-  <Target Name="BuildCss" BeforeTargets="BeforeBuild">
-    <Exec WorkingDirectory="Styles" Command="npm install" Condition="!Exists('Styles/node_modules')" />
-    <Exec WorkingDirectory="Styles" Command="npm run build" />
-  </Target>
-
 </Project>
