@@ -1,17 +1,19 @@
 <script lang="ts">
 	import { ValidationError } from '#lib/api/httpClient.ts';
+	import type { Snippet } from 'svelte';
 
 	// A label and a switch that saves immediately, without a dialog. While saving the switch ignores
 	// changes; if saving fails, it returns to the saved value and the error is shown on the row.
 	interface Props {
 		label: string;
 		value: boolean;
+		belowLabel?: Snippet<[boolean]>;
 		hint?: string;
 		editable?: boolean;
 		onSave?: (value: boolean) => Promise<void>;
 	}
 
-	let { label, value, hint, editable = true, onSave }: Props = $props();
+	let { label, value, hint, editable = true, onSave, belowLabel }: Props = $props();
 
 	const id = $props.id();
 
@@ -50,8 +52,9 @@
 </script>
 
 <li class="list-row items-center">
-	<div class="list-col-grow">
+	<div class="flex flex-col gap-1 list-col-grow">
 		<label for={id} class="text-xs opacity-60">{label}</label>
+		{@render belowLabel?.(value)}
 		{#if hint}
 			<div class="text-sm opacity-60">{hint}</div>
 		{/if}
@@ -59,11 +62,10 @@
 			<div class="text-sm text-error">{msg}</div>
 		{/each}
 	</div>
-
 	<input
 		{id}
 		type="checkbox"
-		class={['toggle toggle-accent', saving && 'pointer-events-none']}
+		class={['toggle', saving && 'pointer-events-none']}
 		{checked}
 		aria-busy={saving}
 		disabled={!editable || !onSave}

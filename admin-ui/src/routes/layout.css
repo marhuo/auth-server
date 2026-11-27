@@ -117,6 +117,11 @@
 	color: color-mix(in oklab, var(--color-base-content) 80%, transparent);
 }
 
+/* Switches have a thicker border than other components. */
+.toggle {
+	--border: 2px;
+}
+
 /* Hints and errors under form inputs (<p class="label">) wrap; daisyUI's label does not wrap. */
 p.label {
 	white-space: normal;

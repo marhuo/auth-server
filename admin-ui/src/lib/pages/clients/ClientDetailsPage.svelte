@@ -137,39 +137,6 @@
 			</div>
 		</div>
 
-		<!-- Tokenien voimassaoloajat -->
-		<div class="card border border-base-300">
-			<div class="card-body">
-				<h2 class="card-title">Tokenien voimassaoloajat</h2>
-				<ul class="list -mx-4">
-					<li class="list-row">
-						<div>
-							<div class="text-xs opacity-60">Access token</div>
-							<div>{formatDurationSeconds(client.accessTokenLifetimeSeconds)}</div>
-						</div>
-					</li>
-
-					{#if client.idTokenLifetimeSeconds !== null}
-						<li class="list-row">
-							<div>
-								<div class="text-xs opacity-60">ID token</div>
-								<div>{formatDurationSeconds(client.idTokenLifetimeSeconds)}</div>
-							</div>
-						</li>
-					{/if}
-
-					{#if client.refreshTokenLifetimeSeconds !== null}
-						<li class="list-row">
-							<div>
-								<div class="text-xs opacity-60">Refresh token</div>
-								<div>{formatDurationSeconds(client.refreshTokenLifetimeSeconds)}</div>
-							</div>
-						</li>
-					{/if}
-				</ul>
-			</div>
-		</div>
-
 		{#if client.hasUsers}
 			<!-- Redirect URIt -->
 			<div class="card border border-base-300">
@@ -236,6 +203,40 @@
 				</div>
 			</div>
 		{/if}
+
+		<!-- Tokenien voimassaoloajat -->
+		<div class="card border border-base-300">
+			<div class="card-body">
+				<h2 class="card-title">Tokenien voimassaoloajat</h2>
+				<ul class="list -mx-4">
+					<li class="list-row">
+						<div>
+							<div class="text-xs opacity-60">Access token</div>
+							<div>{formatDurationSeconds(client.accessTokenLifetimeSeconds)}</div>
+						</div>
+					</li>
+
+					{#if client.idTokenLifetimeSeconds !== null}
+						<li class="list-row">
+							<div>
+								<div class="text-xs opacity-60">ID token</div>
+								<div>{formatDurationSeconds(client.idTokenLifetimeSeconds)}</div>
+							</div>
+						</li>
+					{/if}
+
+					{#if client.refreshTokenLifetimeSeconds !== null}
+						<li class="list-row">
+							<div>
+								<div class="text-xs opacity-60">Refresh token</div>
+								<div>{formatDurationSeconds(client.refreshTokenLifetimeSeconds)}</div>
+							</div>
+						</li>
+					{/if}
+				</ul>
+			</div>
+		</div>
+
 		<!-- Scopet -->
 		<div class="card border border-base-300">
 			<div class="card-body">

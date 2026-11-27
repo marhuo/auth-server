@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import DeleteIconButton from '#lib/components/DeleteIconButton.svelte';
-	import DetailsBooleanInput from '#lib/components/DetailsBooleanInput.svelte';
 	import DetailsTextInput from '#lib/components/DetailsTextInput.svelte';
 	import {
 		userStatusBadgeClass,
@@ -14,11 +13,13 @@
 	import { formatIsoDateTime } from '#lib/utils/dateUtils.ts';
 	import Icon from '@iconify/svelte';
 	import { resolve } from '$app/paths';
+	import LockDialog from '#lib/pages/users/components/LockDialog.svelte';
 
 	const model = new UserDetailsModel(page.params.id!);
 	model.load();
 
 	let addRoleDialogOpen = $state(false);
+	let lockDialogOpen = $state(false);
 
 	function onRoleAdded() {
 		addRoleDialogOpen = false;
@@ -62,8 +63,7 @@
 
 					<li class="list-row items-center">
 						<div class="list-col-grow">
-							<div class="text-xs opacity-60">Tila</div>
-							<div>
+							<div class="mb-1">
 								<span class="badge badge-soft badge-sm {userStatusBadgeClass(model.status)}">
 									{userStatusLabel(model.status)}
 								</span>
@@ -91,12 +91,30 @@
 						{/if}
 					</li>
 
-					<DetailsBooleanInput
-						label="Lukittu"
-						value={model.locked}
-						hint="Lukittu käyttäjä ei voi kirjautua. Lukitus on voimassa, kunnes se poistetaan."
-						onSave={model.changeLocked}
-					/>
+					<li class="list-row items-center">
+						<div class="list-col-grow">
+							<div class="mb-1">
+								{#if model.locked}
+									<span class="badge badge-soft badge-sm badge-error">Lukittu</span>
+								{:else}
+									<span class="badge badge-soft badge-sm badge-neutral">Ei-lukittu</span>
+								{/if}
+							</div>
+							<div class="text-sm opacity-60">
+								Lukittu käyttäjä ei voi kirjautua. Lukitus on voimassa, kunnes se poistetaan.
+							</div>
+						</div>
+						<button
+							type="button"
+							class="btn btn-square btn-ghost btn-sm"
+							aria-label={model.locked ? 'Poista lukitus' : 'Lukitse'}
+							onclick={() => {
+								lockDialogOpen = true;
+							}}
+						>
+							<Icon icon="ic:outline-edit" width="18" />
+						</button>
+					</li>
 
 					<li class="list-row">
 						<div>
@@ -181,6 +199,19 @@
 			email={model.email}
 			onAdded={onRoleAdded}
 			onCancel={() => (addRoleDialogOpen = false)}
+		/>
+	{/if}
+	{#if lockDialogOpen}
+		<LockDialog
+			email={model.email}
+			isLocked={model.locked}
+			onCancel={() => {
+				lockDialogOpen = false;
+			}}
+			onLockToggle={async (isLocked) => {
+				await model.changeLocked(isLocked);
+				lockDialogOpen = false;
+			}}
 		/>
 	{/if}
 {/if}
